@@ -3,32 +3,41 @@
 
 :root,
 :root[data-theme='dark'] {
-  --bg: #070b14;
-  --bg2: #0d1424;
-  --card: #111a2e;
-  --ln: #1f2b45;
-  --fg: #eef3ff;
-  --mut: #8d9bb8;
-  --acc: #2f7bff;        /* Evo electric blue */
-  --acc2: #5aa2ff;
-  --chord: #6fb3ff;      /* chord names */
-  --glow: 0 0 18px rgba(47, 123, 255, 0.45);
-  --danger: #ff5d6c;
+  /* EvoLyric palette */
+  --bg: #15110e;
+  --bg2: #1b1612;
+  --card: #221c17;
+  --ln: #33291f;
+  --fg: #f3ece3;
+  --mut: #a89c8e;
+  --acc: #f0a04b;        /* Evo orange */
+  --acc2: #ffb35c;
+  --acct: #f0a04b;       /* accent used as text */
+  --chord: #f0a04b;      /* chord names */
+  --stage: #0d0a08;      /* song (play) screen background, as in EvoLyric */
+  --on-acc: #15110e;     /* text on orange buttons */
+  --glow: 0 0 18px rgba(240, 160, 75, 0.4);
+  --danger: #ff6b6b;
   --radius: 14px;
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  --spring: cubic-bezier(.34, 1.45, .5, 1);
   color-scheme: dark;
 }
 :root[data-theme='light'] {
-  --bg: #f3f6fc;
-  --bg2: #e8eef9;
+  --bg: #faf6f0;
+  --bg2: #f3ece2;
   --card: #ffffff;
-  --ln: #d6deec;
-  --fg: #0d1424;
-  --mut: #56637d;
-  --acc: #1f5be0;
-  --acc2: #2f7bff;
-  --chord: #1450c8;
-  --glow: 0 0 14px rgba(31, 91, 224, 0.25);
-  --danger: #d32f43;
+  --ln: #e3d8ca;
+  --fg: #1f1812;
+  --mut: #675b4e;
+  --acc: #f0a04b;
+  --acc2: #e8812a;
+  --acct: #9c4a06;
+  --chord: #9c4a06;
+  --stage: #faf6f0;
+  --on-acc: #15110e;
+  --glow: 0 0 14px rgba(240, 160, 75, 0.3);
+  --danger: #c0302e;
   color-scheme: light;
 }
 
@@ -62,7 +71,7 @@ button { cursor: pointer; }
   min-height: 44px; padding: 0 16px; border-radius: 12px;
   border: 1px solid var(--ln); background: var(--card); font-weight: 700;
 }
-.btn.primary { background: var(--acc); border-color: var(--acc); color: #fff; box-shadow: var(--glow); }
+.btn.primary { background: var(--acc); border-color: var(--acc); color: var(--on-acc); box-shadow: var(--glow); }
 .btn.ghost { background: transparent; }
 .btn.danger { background: var(--danger); border-color: var(--danger); color: #fff; }
 .btn:disabled { opacity: 0.45; cursor: default; }

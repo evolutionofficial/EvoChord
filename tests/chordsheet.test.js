@@ -165,3 +165,10 @@ lampu menyala<br />
     expect(parseChordtelaHtml(page).chords.map((x) => x.n)).toEqual(['C', 'G']);
   });
 });
+
+describe('page furniture', () => {
+  it('drops everything from "Share" on', () => {
+    const r = parseChordSheet('C     G\nlirik terakhir\n\nShare\nChord "X" by Y\nto :\nFacebook\nChord Kunci Gitar Terkait:\nLagu Lain - Judul\nAbout Us · Contact Us\nCopyright © 2013');
+    expect(r.lyrics).toBe('lirik terakhir');
+  });
+});
