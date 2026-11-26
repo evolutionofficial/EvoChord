@@ -2,6 +2,7 @@ import './songView.css';
 import { esc, $, icon, toast, confirmDialog } from './dom.js';
 import { songLines, transposeSong } from '../core/song.js';
 import { transposeKey } from '../core/chord.js';
+import { isBeatLine } from '../core/beats.js';
 import { createScroller, SPEED_MIN, SPEED_MAX } from './scroller.js';
 
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
@@ -19,21 +20,29 @@ function segmentsOf(text, chords) {
   return segs;
 }
 
-function lineHtml(line) {
-  if (line.type === 'section') return `<div class="sv-sec">${esc(line.text)}</div>`;
-  if (line.type === 'gap') return '<div class="sv-gap"></div>';
-  if (line.type === 'instrumental') {
-    const chips = line.chords.map((c) => `<span class="chord sv-chip">${esc(c.n)}</span>`).join('');
-    return `<div class="sv-inst">${chips}</div>`;
-  }
-  if (!line.chords.length) return `<div class="sv-line">${esc(line.text)}</div>`;
-  const segs = segmentsOf(line.text, line.chords)
+/** Chord segments as HTML: a chord above each segment of text. */
+function chordSegsHtml(text, chords) {
+  return segmentsOf(text, chords)
     .map(
       (s) =>
         `<span class="sv-seg"><span class="chord sv-c">${s.n ? esc(s.n) : '&nbsp;'}</span><span class="sv-t">${esc(s.t)}</span></span>`
     )
     .join('');
-  return `<div class="sv-line sv-has">${segs}</div>`;
+}
+
+function lineHtml(line) {
+  if (line.type === 'section') return `<div class="sv-sec">${esc(line.text)}</div>`;
+  if (line.type === 'gap') return '<div class="sv-gap"></div>';
+  if (line.type === 'instrumental') {
+    if (isBeatLine(line.text)) {
+      if (!line.chords.length) return `<div class="sv-line sv-beat"><span class="sv-t">${esc(line.text)}</span></div>`;
+      return `<div class="sv-line sv-has sv-beat">${chordSegsHtml(line.text, line.chords)}</div>`;
+    }
+    const chips = line.chords.map((c) => `<span class="chord sv-chip">${esc(c.n)}</span>`).join('');
+    return `<div class="sv-inst">${chips}</div>`;
+  }
+  if (!line.chords.length) return `<div class="sv-line">${esc(line.text)}</div>`;
+  return `<div class="sv-line sv-has">${chordSegsHtml(line.text, line.chords)}</div>`;
 }
 
 export function render(root, ctx, params) {

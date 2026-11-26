@@ -22,8 +22,37 @@ export const sectionName = (line) => {
 };
 /** EvoLyric note lines ("{n|...}") are not lyrics. */
 export const isNoteLine = (line) => /^\s*\{n[|}]/.test(line ?? '');
-/** Instrumental rows made by the importer: only "·" placeholders and spaces. */
-export const isInstrumentalLine = (line) => /^[·\s]+$/.test(line ?? '') && /·/.test(line ?? '');
+/** Rows without lyrics: beat rows ("|• · • ·|", see beats.js) and older "·" placeholder rows. */
+export const isInstrumentalLine = (line) => /^[|•·\s]+$/.test(line ?? '') && /[•·]/.test(line ?? '');
+
+/**
+ * Chord boxes per row in the chord editor: the same for every row, so chords can also go
+ * after the last word (at least 4 spare boxes) and on rows without lyrics.
+ */
+export function gridCells(song, { spare = 4, min = 16, max = 48 } = {}) {
+  let widest = 0;
+  for (const raw of String(song?.lyrics || '').split('\n')) {
+    if (sectionName(raw) || isNoteLine(raw)) continue;
+    widest = Math.max(widest, cellCount(raw));
+  }
+  for (const it of song?.chords || []) widest = Math.max(widest, (it.c >> 1) + 1);
+  return Math.max(min, Math.min(max, widest + spare));
+}
+
+/**
+ * Lyrics with each line padded with spaces so every chord box it uses exists in the text
+ * (EvoLyric places chords by character, so chords after the last word need the spaces).
+ */
+export function padLyricsForChords(lyrics, chords) {
+  const lines = String(lyrics || '').split('\n');
+  for (const it of chords || []) {
+    const raw = lines[it.l];
+    if (raw == null || sectionName(raw)) continue;
+    const need = it.c + 1 - visibleText(raw).length;
+    if (need > 0) lines[it.l] = raw + ' '.repeat(need);
+  }
+  return lines.join('\n');
+}
 
 /** Number of chord boxes for a line (one per 2 visible characters). */
 export const cellCount = (line) => Math.ceil(visibleText(line).length / 2);

@@ -1,9 +1,17 @@
 import './chordEditorView.css';
 import { esc, $$, icon, toast, confirmDialog } from './dom.js';
-import { visibleText, sectionName, isNoteLine, isInstrumentalLine } from '../core/song.js';
+import {
+  visibleText,
+  sectionName,
+  isNoteLine,
+  isInstrumentalLine,
+  gridCells,
+  padLyricsForChords,
+} from '../core/song.js';
 import { KEY_ROWS, canPress, press, backspace } from '../core/chord.js';
+import { isBeatLine, readBeatLine, resizeBeatLine, makeBeatLine, TIME_SIGS } from '../core/beats.js';
 
-// Editor chord: satu kotak per 2 karakter di atas lirik, plus keyboard chord.
+// Editor chord: grid seragam (jumlah kotak sama di semua baris), baris ketukan, plus keyboard chord.
 export function render(root, ctx, params) {
   const [id] = params || [];
   const song = ctx.store.get(id);
@@ -17,6 +25,9 @@ export function render(root, ctx, params) {
   const map = {};
   for (const x of song.chords || []) map[`${x.l}:${x.c}`] = x.n;
 
+  // Baris lirik (bisa bertambah/berkurang karena baris ketukan).
+  const lines = song.lyrics.split('\n');
+
   const now = () =>
     Object.entries(map)
       .map(([k, n]) => {
@@ -25,7 +36,8 @@ export function render(root, ctx, params) {
       })
       .sort((a, b) => a.l - b.l || a.c - b.c);
 
-  const start = JSON.stringify(now());
+  const snapshot = () => JSON.stringify({ lines, chords: now() });
+  const start = snapshot();
   let sel = -1;
   let buf = '';
   const cells = []; // { l, c, el, nEl }
@@ -42,7 +54,7 @@ export function render(root, ctx, params) {
   root.appendChild(top);
 
   async function close() {
-    if (JSON.stringify(now()) !== start) {
+    if (snapshot() !== start) {
       const ok = await confirmDialog({ title: 'Buang perubahan chord?', ok: 'Buang', danger: true });
       if (!ok) return;
     }
@@ -51,7 +63,9 @@ export function render(root, ctx, params) {
 
   top.querySelector('.icon-btn').addEventListener('click', close);
   top.querySelector('.btn.primary').addEventListener('click', () => {
-    ctx.store.put({ ...song, chords: now() });
+    const chords = now();
+    const lyrics = padLyricsForChords(lines.join('\n'), chords);
+    ctx.store.put({ ...song, lyrics, chords });
     toast('Chord disimpan');
     ctx.go('/song/' + id);
   });
@@ -61,43 +75,159 @@ export function render(root, ctx, params) {
   grid.className = 'ce-grid';
   root.appendChild(grid);
 
-  song.lyrics.split('\n').forEach((line, l) => {
-    const sec = sectionName(line);
-    if (sec) {
-      const d = document.createElement('div');
-      d.className = 'ce-sec';
-      d.textContent = sec;
-      grid.appendChild(d);
-      return;
-    }
-    if (!line.trim()) {
-      const d = document.createElement('div');
-      d.className = 'ce-gap';
-      grid.appendChild(d);
-      return;
-    }
-    if (isNoteLine(line)) return;
+  const curPos = () => (sel >= 0 && cells[sel] ? { l: cells[sel].l, c: cells[sel].c } : null);
+  const shiftPos = (p, from, delta) => (p && p.l >= from ? { l: p.l + delta, c: p.c } : p);
 
-    const v = visibleText(line);
-    const row = document.createElement('div');
-    row.className = isInstrumentalLine(line) ? 'ce-row ce-inst' : 'ce-row';
-    for (let c = 0; c < v.length; c += 2) {
-      const name = map[`${l}:${c}`] || '';
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'ce-cell';
-      btn.dataset.i = String(cells.length);
-      btn.innerHTML = `<b class="ce-n">${esc(name)}</b><span class="ce-t">${esc(v.slice(c, c + 2))}</span>`;
-      row.appendChild(btn);
-      cells.push({ l, c, el: btn, nEl: btn.querySelector('.ce-n') });
+  // Geser semua kunci chord baris >= from sebesar delta.
+  function shiftRows(from, delta) {
+    const entries = Object.entries(map);
+    for (const k of Object.keys(map)) delete map[k];
+    for (const [k, n] of entries) {
+      const [l, c] = k.split(':').map(Number);
+      map[`${l >= from ? l + delta : l}:${c}`] = n;
     }
-    grid.appendChild(row);
-  });
+  }
+
+  // Hapus chord baris l dengan kotak c >= fromCell.
+  function dropChords(l, fromCell) {
+    for (const k of Object.keys(map)) {
+      const [kl, kc] = k.split(':').map(Number);
+      if (kl === l && kc >= fromCell) delete map[k];
+    }
+  }
+
+  function beatControls(l, line) {
+    const { timeSig } = readBeatLine(line);
+    const ctl = document.createElement('div');
+    ctl.className = 'ce-bctl';
+    ctl.innerHTML = `<select class="ce-tsig" data-l="${l}" aria-label="Birama">${TIME_SIGS.map(
+      (t) => `<option value="${t}"${t === timeSig ? ' selected' : ''}>${t}</option>`
+    ).join('')}</select><button type="button" class="ce-bbtn" data-b="minus" data-l="${l}" aria-label="Kurangi birama">−</button><button type="button" class="ce-bbtn" data-b="plus" data-l="${l}" aria-label="Tambah birama">+</button><button type="button" class="ce-bbtn" data-b="trash" data-l="${l}" aria-label="Hapus baris ketukan">${icon('trash', 18)}</button>`;
+    return ctl;
+  }
+
+  // Bangun ulang grid dari lines + map. keep = {l,c} kotak yang tetap dipilih bila masih ada.
+  function buildGrid(keep = curPos()) {
+    grid.innerHTML = '';
+    cells.length = 0;
+    const n = gridCells({ lyrics: lines.join('\n'), chords: now() });
+
+    const addTop = document.createElement('div');
+    addTop.className = 'ce-top';
+    addTop.innerHTML = `<button type="button" class="ce-add" data-b="add-top" aria-label="Tambah baris ketukan di awal">+ Ketukan di awal</button>`;
+    grid.appendChild(addTop);
+
+    lines.forEach((line, l) => {
+      const sec = sectionName(line);
+      if (sec) {
+        const d = document.createElement('div');
+        d.className = 'ce-sec';
+        d.innerHTML = `<span>${esc(sec)}</span><button type="button" class="ce-add" data-b="add" data-l="${l}" aria-label="Tambah baris ketukan">+ Ketukan</button>`;
+        grid.appendChild(d);
+        return;
+      }
+      if (!line.trim()) {
+        const d = document.createElement('div');
+        d.className = 'ce-gap';
+        grid.appendChild(d);
+        return;
+      }
+      if (isNoteLine(line)) return;
+
+      const v = visibleText(line);
+      const beat = isBeatLine(line);
+      const row = document.createElement('div');
+      row.className = beat ? 'ce-row ce-inst ce-beat' : isInstrumentalLine(line) ? 'ce-row ce-inst' : 'ce-row';
+      for (let i = 0; i < n; i++) {
+        const c = i * 2;
+        const name = map[`${l}:${c}`] || '';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = c >= v.length ? 'ce-cell ce-x' : 'ce-cell';
+        btn.dataset.i = String(cells.length);
+        btn.innerHTML = `<b class="ce-n">${esc(name)}</b><span class="ce-t">${esc(v.slice(c, c + 2))}</span>`;
+        row.appendChild(btn);
+        cells.push({ l, c, el: btn, nEl: btn.querySelector('.ce-n') });
+      }
+      if (beat) row.appendChild(beatControls(l, line));
+      grid.appendChild(row);
+    });
+
+    const idx = keep ? cells.findIndex((x) => x.l === keep.l && x.c === keep.c) : -1;
+    select(idx);
+  }
+
+  // --- Baris ketukan ------------------------------------------------------
+  function resizeBeat(l, delta) {
+    lines[l] = resizeBeatLine(lines[l], delta);
+    dropChords(l, visibleText(lines[l]).length);
+    buildGrid();
+  }
+
+  function setTimeSig(l, sig) {
+    lines[l] = makeBeatLine(readBeatLine(lines[l]).bars, sig);
+    dropChords(l, visibleText(lines[l]).length);
+    buildGrid();
+  }
+
+  async function removeBeat(l) {
+    if (now().some((x) => x.l === l)) {
+      const ok = await confirmDialog({ title: 'Hapus baris ketukan ini?', ok: 'Hapus', danger: true });
+      if (!ok) return;
+    }
+    const pos = curPos();
+    const keep = pos && pos.l === l ? null : shiftPos(pos, l + 1, -1);
+    dropChords(l, 0);
+    shiftRows(l + 1, -1);
+    lines.splice(l, 1);
+    buildGrid(keep);
+  }
+
+  function insertBeat(k) {
+    const row = makeBeatLine(1, song.timeSig || '4/4');
+    shiftRows(k, 1);
+    lines.splice(k, 0, row);
+    buildGrid(null);
+    select(cells.findIndex((x) => x.l === k && x.c === 0));
+  }
+
+  // Baris ketukan baru jatuh setelah baris section dan baris ketukan yang sudah ada.
+  function addBeatAfterSection(l) {
+    let k = l + 1;
+    while (k < lines.length && isBeatLine(lines[k])) k++;
+    insertBeat(k);
+  }
 
   grid.addEventListener('click', (e) => {
-    const btn = e.target.closest('.ce-cell');
-    if (!btn || !grid.contains(btn)) return;
-    select(Number(btn.dataset.i));
+    const cell = e.target.closest('.ce-cell');
+    if (cell && grid.contains(cell)) {
+      select(Number(cell.dataset.i));
+      return;
+    }
+    const b = e.target.closest('button[data-b]');
+    if (!b || !grid.contains(b)) return;
+    const l = Number(b.dataset.l);
+    switch (b.dataset.b) {
+      case 'add-top':
+        insertBeat(0);
+        break;
+      case 'add':
+        addBeatAfterSection(l);
+        break;
+      case 'minus':
+        resizeBeat(l, -1);
+        break;
+      case 'plus':
+        resizeBeat(l, 1);
+        break;
+      case 'trash':
+        removeBeat(l);
+        break;
+    }
+  });
+
+  grid.addEventListener('change', (e) => {
+    if (e.target.matches('.ce-tsig')) setTimeSig(Number(e.target.dataset.l), e.target.value);
   });
 
   // --- Keyboard -----------------------------------------------------------
@@ -205,4 +335,6 @@ export function render(root, ctx, params) {
       }
     }
   });
+
+  buildGrid();
 }
