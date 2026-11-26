@@ -266,35 +266,89 @@ function decodeEntities(s) {
   });
 }
 
+function htmlToText(fragment, { blocks = false } = {}) {
+  let t = fragment
+    .replace(/<(script|style|noscript)\b[\s\S]*?<\/\1>/gi, '')
+    .replace(/<span\b[^>]*class="[^"]*\bcustom\b[^"]*"[^>]*>[\s\S]*?<\/span>/gi, '');
+  if (!blocks) t = t.replace(/<br\s*\/?>/gi, '\n');
+  else {
+    // Normal HTML (not <pre>): source line breaks/tabs are just spaces, <br> and blocks are lines,
+    // and spaces at the start of a line disappear. Only &nbsp; keeps the chord columns.
+    t = t
+      .replace(/<br\s*\/?>/gi, '\u23ce')
+      .replace(/<\/?(p|div|li|h\d|tr)\b[^>]*>/gi, '\u23ce')
+      .replace(/[\r\n\t ]+/g, ' ')
+      .replace(/ ?\u23ce ?/g, '\n');
+  }
+  return decodeEntities(t.replace(/<[^>]+>/g, ''));
+}
+
+const CHORD_LINK = /tbi-tooltip/g;
+
+/**
+ * Candidate chord-sheet texts in a Chordtela page, best first:
+ * 1. <pre> blocks, most chord links first; 2. the region around the chord links (pages without <pre>).
+ */
+export function chordtelaCandidates(html) {
+  const src = String(html ?? '');
+  const pres = [...src.matchAll(/<pre\b[^>]*>([\s\S]*?)<\/pre>/gi)]
+    .map((m) => ({ p: m[1], score: (m[1].match(CHORD_LINK) || []).length }))
+    .sort((a, b) => b.score - a.score)
+    .map((x) => htmlToText(x.p));
+  const out = [];
+  if (pres.length && /tbi-tooltip/.test(src.match(/<pre\b[\s\S]*?<\/pre>/i)?.[0] || '')) out.push(pres[0]);
+  const idx = [...src.matchAll(CHORD_LINK)].map((m) => m.index);
+  // Older pages: <div class="telabox"> with <br> lines and &nbsp; spacing.
+  const box = src.indexOf('class="telabox');
+  if (box >= 0 && idx.length) {
+    const start = src.indexOf('>', box) + 1;
+    const end = src.indexOf('</div>', idx[idx.length - 1]);
+    out.push(htmlToText(src.slice(start, end > 0 ? end : undefined), { blocks: true }));
+  }
+  if (idx.length >= 3) {
+    const from = src.lastIndexOf('<', Math.max(0, idx[0] - 800));
+    const to = src.indexOf('>', idx[idx.length - 1] + 400);
+    out.push(htmlToText(src.slice(Math.max(0, from), to > 0 ? to + 1 : undefined), { blocks: true }));
+  }
+  for (const p of pres) if (!out.includes(p)) out.push(p);
+  return out;
+}
+
 /** The chord sheet text inside a Chordtela song page, or null. */
 export function chordtelaHtmlToText(html) {
-  const pres = [...String(html ?? '').matchAll(/<pre\b[^>]*>([\s\S]*?)<\/pre>/gi)].map((m) => m[1]);
-  if (!pres.length) return null;
-  // The song is the <pre> with the most chord links.
-  const best = pres
-    .map((p) => ({ p, score: (p.match(/tbi-tooltip/g) || []).length }))
-    .sort((a, b) => b.score - a.score)[0].p;
-  const text = best
-    .replace(/<(script|style)\b[\s\S]*?<\/\1>/gi, '')
-    .replace(/<span\b[^>]*class="[^"]*\bcustom\b[^"]*"[^>]*>[\s\S]*?<\/span>/gi, '')
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<[^>]+>/g, '');
-  return decodeEntities(text);
+  return chordtelaCandidates(html)[0] ?? null;
+}
+
+/** What a page looks like, for error reports when no chords were found. */
+export function describeHtml(html) {
+  const src = String(html ?? '');
+  return {
+    bytes: src.length,
+    title: decodeEntities((/<title>([^<]*)/i.exec(src) || [])[1] || '').trim().slice(0, 120),
+    pre: (src.match(/<pre\b/gi) || []).length,
+    chordLinks: (src.match(CHORD_LINK) || []).length,
+    challenge: /just a moment|attention required|cf-chl|challenge-platform/i.test(src),
+  };
+}
+
+/**
+ * Canonical Chordtela song URL ("https://www.chordtela.com/YYYY/MM/slug.html") or null.
+ * Accepts http, www/m/amp subdomains, an "/amp/" suffix, query strings and #fragments.
+ */
+export function normalizeChordtelaUrl(u) {
+  try {
+    const url = new URL(String(u ?? '').trim());
+    if (!/^https?:$/.test(url.protocol)) return null;
+    if (!/^((www|m|amp)\.)?chordtela\.com$/i.test(url.hostname)) return null;
+    const m = /^\/(\d{4})\/(\d{2})\/([a-z0-9-]+)\.html(?:\/amp)?\/?$/i.exec(url.pathname);
+    return m ? `https://www.chordtela.com/${m[1]}/${m[2]}/${m[3].toLowerCase()}.html` : null;
+  } catch {
+    return null;
+  }
 }
 
 /** Only real Chordtela song pages are accepted (used by the Worker before fetching). */
-export function isChordtelaSongUrl(u) {
-  try {
-    const url = new URL(u);
-    return (
-      url.protocol === 'https:' &&
-      /^(www\.)?chordtela\.com$/i.test(url.hostname) &&
-      /^\/\d{4}\/\d{2}\/[a-z0-9-]+\.html$/i.test(url.pathname)
-    );
-  } catch {
-    return false;
-  }
-}
+export const isChordtelaSongUrl = (u) => normalizeChordtelaUrl(u) !== null;
 
 /** "Artist - Title" from the page heading ("Kunci Gitar Artist - Title Chord Dasar ©ChordTela.com"). */
 function pageTitle(html) {
@@ -319,8 +373,14 @@ const VERSION_NOISE = /^\s*(?:-{3,}|lihat\s+pula\b.*|.*\bversi\s+chord\b.*)\s*$/
  * ({ name, key, keyGuessed, capo, lyrics, chords }).
  */
 export function parseChordtelaHtml(html, url = '') {
-  const text = chordtelaHtmlToText(html);
-  if (!text) return null;
+  for (const text of chordtelaCandidates(html)) {
+    const r = parseVersions(text, html, url);
+    if (r) return r;
+  }
+  return null;
+}
+
+function parseVersions(text, html, url) {
   const head = pageTitle(html);
   const parts = text.split(VERSION_SPLIT); // [first, label, second, ...]
   const versions = [];

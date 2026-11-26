@@ -27,3 +27,19 @@ describe('/api/chordtela', () => {
     expect((await importChordtela('https://www.chordtela.com/2026/01/x.html', { fetchImpl: async () => new Response('<html>no pre</html>') })).status).toBe(404);
   });
 });
+
+describe('/api/chordtela diagnostics', () => {
+  it('reports a bot challenge as blocked with debug info', async () => {
+    const r = await importChordtela('https://www.chordtela.com/2026/01/x.html', { fetchImpl: async () => new Response('<title>Just a moment...</title>', { status: 403 }) });
+    expect(r.status).toBe(502);
+    const j = await r.json();
+    expect(j.error).toBe('blocked');
+    expect(j.debug.challenge).toBe(true);
+  });
+  it('explains what it received when no chords are found', async () => {
+    const r = await importChordtela('https://www.chordtela.com/2026/01/x.html', { fetchImpl: async () => new Response('<title>Halaman</title><p>tanpa chord</p>') });
+    const j = await r.json();
+    expect(j.error).toBe('no_chords');
+    expect(j.debug).toMatchObject({ title: 'Halaman', pre: 0, chordLinks: 0 });
+  });
+});

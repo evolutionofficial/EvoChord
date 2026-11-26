@@ -1,6 +1,14 @@
 import './libraryView.css';
-import { esc, icon, $ } from './dom.js';
+import { esc, icon, $, toast } from './dom.js';
 import { chordsUsed } from '../core/song.js';
+import { findChordtelaUrl } from '../features/import/importer.js';
+import {
+  chordtelaSearchUrl,
+  markSearchStarted,
+  searchStartedRecently,
+  clearSearch,
+  setPendingUrl,
+} from '../features/import/pending.js';
 
 export function render(root, ctx) {
   const { store, go } = ctx;
@@ -20,7 +28,8 @@ export function render(root, ctx) {
       <span class="lv-search-icon">${icon('search', 18)}</span>
       <input class="input" type="search" id="lv-q" placeholder="Cari judul atau artis" autocomplete="off">
     </label>
-    <div id="lv-body"></div>`;
+    <div id="lv-body"></div>
+    <div id="lv-bar"></div>`;
 
   function renderTheme() {
     const dark = store.prefs().theme !== 'light';
@@ -42,6 +51,10 @@ export function render(root, ctx) {
   function renderBody() {
     const body = $('#lv-body', root);
     const all = store.list();
+    if (!all.length && query.trim()) {
+      body.innerHTML = webHtml(query.trim());
+      return;
+    }
     if (!all.length) {
       body.innerHTML = `
         <div class="lv-empty">
@@ -61,12 +74,53 @@ export function render(root, ctx) {
     const list = songs.length
       ? `<div class="lv-list">${songs.map(itemHtml).join('')}</div>`
       : `<p class="lv-none muted">Tidak ada yang cocok</p>`;
-    body.innerHTML = count + list;
+    body.innerHTML = count + list + webHtml(query.trim());
+  }
+
+  function webHtml(text) {
+    if (!text) return '';
+    return `<button class="lv-web card" type="button" data-web="1">
+      <span class="lv-web-icon">${icon('search', 22)}</span>
+      <span class="lv-web-text">
+        <b>Cari "${esc(text)}" di Chordtela</b>
+        <span class="lv-web-sub muted">lewat Google</span>
+      </span>
+    </button>`;
+  }
+
+  function renderBanner() {
+    const bar = $('#lv-bar', root);
+    const show = searchStartedRecently();
+    root.classList.toggle('lv-has-paste', show);
+    bar.innerHTML = show
+      ? `<div class="lv-paste card">
+          <span class="lv-paste-text">Sudah dapat lagunya?</span>
+          <button class="btn primary" type="button" id="lv-paste-go">${icon('paste', 20)} Tempel link</button>
+          <button class="icon-btn flat" type="button" id="lv-paste-x" aria-label="Tutup">${icon('close', 20)}</button>
+        </div>`
+      : '';
+  }
+
+  async function pasteFromClipboard() {
+    let url = null;
+    try {
+      url = findChordtelaUrl(await navigator.clipboard.readText());
+    } catch {
+      url = null;
+    }
+    if (!url) {
+      toast('Belum ada link Chordtela yang disalin', { error: true });
+      return;
+    }
+    setPendingUrl(url);
+    clearSearch();
+    go('/import');
   }
 
   function rerender() {
     renderTheme();
     renderBody();
+    renderBanner();
   }
 
   function onClick(e) {
@@ -74,6 +128,16 @@ export function render(root, ctx) {
     if (goEl) return go(goEl.dataset.go);
     const item = e.target.closest('.lv-item');
     if (item) return go('/song/' + item.dataset.id);
+    if (e.target.closest('.lv-web')) {
+      markSearchStarted();
+      window.open(chordtelaSearchUrl(query.trim()), '_blank', 'noopener');
+      return rerender();
+    }
+    if (e.target.closest('#lv-paste-go')) return pasteFromClipboard();
+    if (e.target.closest('#lv-paste-x')) {
+      clearSearch();
+      return renderBanner();
+    }
     if (e.target.closest('#lv-theme')) {
       store.setPrefs({ theme: store.prefs().theme === 'light' ? 'dark' : 'light' });
     }
@@ -85,8 +149,18 @@ export function render(root, ctx) {
     renderBody();
   }
 
+  function onFocus() {
+    renderBanner();
+  }
+
+  function onVisibility() {
+    if (document.visibilityState === 'visible') renderBanner();
+  }
+
   root.addEventListener('click', onClick);
   root.addEventListener('input', onInput);
+  window.addEventListener('focus', onFocus);
+  document.addEventListener('visibilitychange', onVisibility);
   rerender();
   const unsub = store.subscribe(rerender);
 
@@ -94,5 +168,8 @@ export function render(root, ctx) {
     unsub();
     root.removeEventListener('click', onClick);
     root.removeEventListener('input', onInput);
+    window.removeEventListener('focus', onFocus);
+    document.removeEventListener('visibilitychange', onVisibility);
+    root.classList.remove('lv-has-paste');
   };
 }

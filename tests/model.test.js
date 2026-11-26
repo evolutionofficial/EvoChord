@@ -66,3 +66,28 @@ describe('cloud row (shared with EvoLyric)', () => {
     expect(back.id).toBe(s.id);
   });
 });
+
+describe('search → import hand-off', async () => {
+  const { chordtelaSearchUrl, setPendingUrl, takePendingUrl, markSearchStarted, searchStartedRecently, clearSearch } = await import('../src/features/import/pending.js');
+  const { findChordtelaUrl } = await import('../src/features/import/importer.js');
+  const mem = new Map();
+  globalThis.localStorage = { getItem: (k) => mem.get(k) ?? null, setItem: (k, v) => mem.set(k, String(v)), removeItem: (k) => mem.delete(k) };
+  it('builds a Google search limited to Chordtela', () => {
+    expect(chordtelaSearchUrl('pesan terakhir')).toBe('https://www.google.com/search?q=pesan%20terakhir%20chord%20site%3Achordtela.com');
+  });
+  it('keeps a pending link once', () => {
+    setPendingUrl('https://www.chordtela.com/2021/07/a.html');
+    expect(takePendingUrl()).toBe('https://www.chordtela.com/2021/07/a.html');
+    expect(takePendingUrl()).toBeNull();
+  });
+  it('remembers a recent search for 15 minutes', () => {
+    markSearchStarted(1000);
+    expect(searchStartedRecently(1000 + 60000)).toBe(true);
+    expect(searchStartedRecently(1000 + 16 * 60000)).toBe(false);
+    clearSearch();
+    expect(searchStartedRecently(2000)).toBe(false);
+  });
+  it('finds a Chordtela link inside shared text', () => {
+    expect(findChordtelaUrl('Lihat chord ini m.chordtela.com/2021/07/Lagu-X.html/amp/ ya')).toBe('https://www.chordtela.com/2021/07/lagu-x.html');
+  });
+});

@@ -115,3 +115,78 @@
   align-items: center;
   gap: 8px;
 }
+
+.lv-web {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: calc(100% - 32px);
+  min-height: 56px;
+  margin: 0 16px 24px;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  text-align: left;
+  font: inherit;
+  color: var(--fg);
+  cursor: pointer;
+}
+.lv-web-icon {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--acc);
+}
+.lv-web-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.lv-web-text b {
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lv-web-sub {
+  font-size: 13px;
+}
+
+.lv-paste {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  max-width: 796px;
+  margin: 0 auto;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  padding: 10px 10px 10px 14px;
+  border: 1px solid var(--acc);
+  box-shadow: var(--glow);
+}
+.lv-paste-text {
+  flex: 1;
+  min-width: 0;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lv-paste .btn {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.lv-paste .icon-btn {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.lv-has-paste .lv-list {
+  padding-bottom: 90px;
+}
