@@ -1,0 +1,11 @@
+{
+  "name": "Evo Chord",
+  "short_name": "Evo Chord",
+  "description": "Chord dan lirik untuk pemain musik, dari Evolution.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070b14",
+  "theme_color": "#070b14",
+  "lang": "id",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
