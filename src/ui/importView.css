@@ -16,6 +16,12 @@
 
 .iv-err { margin: 2px 0 0; color: var(--danger); font-weight: 700; font-size: 14px; }
 .iv-note { margin: 16px 0 0; font-size: 13px; }
+.iv-hint { margin: 0; font-size: 13px; }
+.iv-dbg {
+  margin: 0; font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  word-break: break-all;
+}
 
 .iv-ta {
   min-height: 0; resize: vertical; line-height: 1.5;

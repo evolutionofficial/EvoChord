@@ -6,7 +6,7 @@
 //
 // Experimental (v0.1): only Chordtela song pages are accepted, results are cached for a day.
 
-import { isChordtelaSongUrl, parseChordtelaHtml } from '../src/core/chordsheet.js';
+import { normalizeChordtelaUrl, parseChordtelaHtml, describeHtml } from '../src/core/chordsheet.js';
 
 const CACHE_SECONDS = 86400;
 const UA = 'EvoChord/0.1 (+https://github.com/evolutionofficial/evochord)';
@@ -18,11 +18,9 @@ const json = (status, body, extra = {}) =>
   });
 
 export async function importChordtela(pageUrl, { fetchImpl = fetch, cache = null } = {}) {
-  if (!isChordtelaSongUrl(pageUrl)) return json(400, { error: 'bad_url' });
-  const url = new URL(pageUrl);
-  url.hostname = 'www.chordtela.com';
-  url.search = '';
-  url.hash = '';
+  const canonical = normalizeChordtelaUrl(pageUrl);
+  if (!canonical) return json(400, { error: 'bad_url' });
+  const url = new URL(canonical);
   const cacheKey = new Request('https://evochord.cache/chordtela' + url.pathname);
   if (cache) {
     const hit = await cache.match(cacheKey);
@@ -36,13 +34,19 @@ export async function importChordtela(pageUrl, { fetchImpl = fetch, cache = null
       signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined,
     });
     if (res.status === 404) return json(404, { error: 'not_found' });
-    if (!res.ok) return json(502, { error: 'upstream', status: res.status });
     html = await res.text();
+    if (!res.ok) {
+      const d = describeHtml(html);
+      return json(502, { error: d.challenge ? 'blocked' : 'upstream', status: res.status, debug: d });
+    }
   } catch (e) {
     return json(502, { error: 'unreachable' });
   }
   const song = parseChordtelaHtml(html, url.toString());
-  if (!song) return json(404, { error: 'no_chords' });
+  if (!song) {
+    const d = describeHtml(html);
+    return json(d.challenge ? 502 : 404, { error: d.challenge ? 'blocked' : 'no_chords', debug: { ...d, status: 200 } });
+  }
   const res = json(200, { ...song, ms: Date.now() - t0 }, { 'cache-control': `public, max-age=${CACHE_SECONDS}` });
   if (cache) await cache.put(cacheKey, res.clone());
   return res;

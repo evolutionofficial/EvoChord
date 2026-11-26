@@ -118,8 +118,50 @@ describe('Chordtela page', () => {
   it('accepts only Chordtela song URLs', () => {
     expect(isChordtelaSongUrl('https://www.chordtela.com/2021/07/lyodra-pesan-terakhir.html')).toBe(true);
     expect(isChordtelaSongUrl('https://chordtela.com/2021/07/a-b.html')).toBe(true);
-    expect(isChordtelaSongUrl('http://www.chordtela.com/2021/07/a.html')).toBe(false);
+    expect(isChordtelaSongUrl('http://www.chordtela.com/2021/07/a.html')).toBe(true); // upgraded to https
     expect(isChordtelaSongUrl('https://evil.com/2021/07/a.html')).toBe(false);
     expect(isChordtelaSongUrl('https://www.chordtela.com/search?q=x')).toBe(false);
+  });
+});
+
+describe('robust Chordtela reading', () => {
+  it('normalizes link variants', async () => {
+    const { normalizeChordtelaUrl } = await import('../src/core/chordsheet.js');
+    const c = 'https://www.chordtela.com/2021/07/lyodra-pesan-terakhir.html';
+    for (const u of [c, 'http://chordtela.com/2021/07/lyodra-pesan-terakhir.html', 'https://m.chordtela.com/2021/07/Lyodra-Pesan-Terakhir.html?m=1#x', 'https://www.chordtela.com/2021/07/lyodra-pesan-terakhir.html/amp/'])
+      expect(normalizeChordtelaUrl(u), u).toBe(c);
+    expect(normalizeChordtelaUrl('https://www.chordtela.com/chord-kunci-gitar-dasar-hasil-pencarian?q=x')).toBeNull();
+  });
+  it('reads pages where the chords are not in a <pre>', () => {
+    const page = `<html><title>Kunci Gitar A - B Chord Dasar</title><h1>Kunci Gitar A - B Chord Dasar</h1><nav>Menu Home</nav>
+<div class="entry"><p>Intro : <a class="tbi-tooltip">C</a> <a class="tbi-tooltip">G</a></p>
+<p><a class="tbi-tooltip">Am</a>&nbsp;&nbsp;&nbsp;&nbsp; <a class="tbi-tooltip">F</a><br>halo semua<br><a class="tbi-tooltip">C</a><br>sampai jumpa</p></div><footer>footer</footer></html>`;
+    const r = parseChordtelaHtml(page);
+    expect([r.artist, r.title]).toEqual(['A', 'B']);
+    expect(r.lyrics).toContain('halo semua');
+    expect(r.chords.map((x) => x.n)).toEqual(['C', 'G', 'Am', 'F', 'C']);
+  });
+  it('reads older pages: div.telabox with <br> lines and &nbsp; spacing', () => {
+    const a = (c) => `<a class="tbi-tooltip">${c}<span class="custom tbi-${c}"></span></a>`;
+    const page = `<title>Kunci Gitar Grup Lama - Lagu Lama Chord Dasar ©ChordTela.com</title><div class="chordbox"><table><tr><td>${a('Am')}</td></tr></table></div><div class="telabox">
+\t\t\tIntro :&nbsp;${a('Am')}...<br />
+<br />
+&nbsp; &nbsp;&nbsp;${a('Am')}&nbsp; &nbsp; &nbsp;&nbsp;${a('F')}&nbsp; &nbsp;${a('G')}<br />
+kita berjalan pelan, di tepi kota<br />
+&nbsp;${a('Dm')}<br />
+lampu menyala<br />
+</div><div class="sidebar">lain</div>`;
+    const r = parseChordtelaHtml(page);
+    expect([r.artist, r.title]).toEqual(['Grup Lama', 'Lagu Lama']);
+    const lines = r.lyrics.split('\n');
+    expect(lines).toContain('kita berjalan pelan, di tepi kota');
+    const l = lines.indexOf('kita berjalan pelan, di tepi kota');
+    expect(r.chords.filter((x) => x.l === l).map((x) => [x.c, x.n])).toEqual([[4, 'Am'], [12, 'F'], [16, 'G']]);
+    expect(r.chords.filter((x) => x.l === l + 1).map((x) => x.n)).toEqual(['Dm']);
+    expect(r.lyrics).not.toContain('lain');
+  });
+  it('falls back to another <pre> when the first one has no chord links', () => {
+    const page = '<pre>catatan</pre><pre>C     G\nkita di sini</pre>';
+    expect(parseChordtelaHtml(page).chords.map((x) => x.n)).toEqual(['C', 'G']);
   });
 });

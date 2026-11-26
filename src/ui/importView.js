@@ -1,17 +1,24 @@
 import './importView.css';
 import { esc, $, icon, toast, confirmDialog } from './dom.js';
 import { findChordtelaUrl, importFromChordtela, importFromText, resultToSong } from '../features/import/importer.js';
+import { takePendingUrl } from '../features/import/pending.js';
 import { sectionName } from '../core/song.js';
 
 const SNIP_LINES = 10;
 
 export function render(root, ctx) {
-  const st = { tab: 'link', url: '', text: '', err: '', busy: false, prev: null, base: null, verIdx: 0, ms: 0, title: '', artist: '' };
+  const st = { tab: 'link', url: '', text: '', err: '', errCode: '', debug: null, busy: false, prev: null, base: null, verIdx: 0, ms: 0, title: '', artist: '' };
   let alive = true;
 
   root.addEventListener('click', onClick);
   root.addEventListener('input', onInput);
+  const pending = takePendingUrl();
+  if (pending) {
+    st.tab = 'link';
+    st.url = pending;
+  }
   draw();
+  if (pending) fetchLink();
 
   return () => {
     alive = false;
@@ -42,6 +49,8 @@ export function render(root, ctx) {
     if (el.dataset.tab) {
       st.tab = el.dataset.tab;
       st.err = '';
+      st.errCode = '';
+      st.debug = null;
       draw();
       return;
     }
@@ -53,6 +62,7 @@ export function render(root, ctx) {
       case 'back': ctx.go('/'); break;
       case 'paste-link': pasteLink(); break;
       case 'fetch': fetchLink(); break;
+      case 'use-paste': st.tab = 'paste'; st.err = ''; st.errCode = ''; st.debug = null; draw(); break;
       case 'paste-text': pasteText(); break;
       case 'process': processText(); break;
       case 'cancel': st.prev = null; st.err = ''; draw(); break;
@@ -79,12 +89,16 @@ export function render(root, ctx) {
   async function fetchLink() {
     st.busy = true;
     st.err = '';
+    st.errCode = '';
+    st.debug = null;
     draw();
     const r = await importFromChordtela(st.url);
     if (!alive) return;
     st.busy = false;
     if (!r.ok) {
       st.err = r.message;
+      st.errCode = r.error || '';
+      st.debug = r.debug || null;
       draw();
       return;
     }
@@ -169,7 +183,19 @@ export function render(root, ctx) {
       </label>
       <button class="btn" data-act="paste-link">${icon('paste')} Tempel link</button>
       <button class="btn primary iv-full" data-act="fetch"${st.busy ? ' disabled' : ''}>${st.busy ? 'Mengambil…' : 'Ambil'}</button>
-      ${err}`;
+      <p class="iv-hint muted">Bisa juga: cari judul di Library, lalu "Cari di Chordtela".</p>
+      ${err}${debugHtml()}${fallbackHtml()}`;
+  }
+
+  function debugHtml() {
+    const d = st.debug;
+    if (!st.err || !d) return '';
+    return `<p class="iv-dbg muted">Info: status ${esc(d.status ?? '-')} · ${esc(d.bytes ?? '-')} byte · pre ${esc(d.pre ?? '-')} · link chord ${esc(d.chordLinks ?? '-')}${d.challenge ? ' · diblokir' : ''}</p>`;
+  }
+
+  function fallbackHtml() {
+    if (!st.err || !['no_chords', 'blocked'].includes(st.errCode)) return '';
+    return `<button class="btn iv-full" data-act="use-paste">Pakai Tempel teks</button>`;
   }
 
   function pasteHtml(err) {
