@@ -43,3 +43,13 @@ describe('/api/chordtela diagnostics', () => {
     expect(j.debug).toMatchObject({ title: 'Halaman', pre: 0, chordLinks: 0 });
   });
 });
+
+describe('/api/chordtela cache', () => {
+  it('keys the cache by parser version', async () => {
+    const keys = [];
+    const cache = { match: async (k) => (keys.push(k.url), undefined), put: async () => {} };
+    await importChordtela('https://www.chordtela.com/2026/01/evo-band-lagu-contoh.html', { fetchImpl: okFetch, cache });
+    const { PARSER_VERSION } = await import('../worker/index.js');
+    expect(keys[0]).toBe(`https://evochord.cache/v${PARSER_VERSION}/chordtela/2026/01/evo-band-lagu-contoh.html`);
+  });
+});
