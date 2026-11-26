@@ -9,6 +9,8 @@
 import { normalizeChordtelaUrl, parseChordtelaHtml, describeHtml } from '../src/core/chordsheet.js';
 
 const CACHE_SECONDS = 86400;
+// Bump when the chord-sheet reader changes, so cached imports are read again with the new rules.
+export const PARSER_VERSION = 3;
 const UA = 'EvoChord/0.1 (+https://github.com/evolutionofficial/evochord)';
 
 const json = (status, body, extra = {}) =>
@@ -21,7 +23,7 @@ export async function importChordtela(pageUrl, { fetchImpl = fetch, cache = null
   const canonical = normalizeChordtelaUrl(pageUrl);
   if (!canonical) return json(400, { error: 'bad_url' });
   const url = new URL(canonical);
-  const cacheKey = new Request('https://evochord.cache/chordtela' + url.pathname);
+  const cacheKey = new Request(`https://evochord.cache/v${PARSER_VERSION}/chordtela` + url.pathname);
   if (cache) {
     const hit = await cache.match(cacheKey);
     if (hit) return hit;
