@@ -8,7 +8,7 @@
   flex: 1; min-height: 44px; padding: 0 12px; border: 0; border-radius: 999px;
   background: transparent; color: var(--mut); font-weight: 700;
 }
-.iv-tab.on { background: var(--acc); color: #fff; }
+.iv-tab.on { background: var(--acc); color: var(--on-acc); }
 
 .iv-body { display: grid; gap: 10px; }
 .iv-body .field { margin: 0; }

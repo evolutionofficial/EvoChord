@@ -4,8 +4,8 @@
   "description": "Chord dan lirik untuk pemain musik, dari Evolution.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#070b14",
-  "theme_color": "#070b14",
+  "background_color": "#15110e",
+  "theme_color": "#15110e",
   "lang": "id",
   "icons": [
     {

@@ -2,8 +2,10 @@ import './songView.css';
 import { esc, $, icon, toast, confirmDialog } from './dom.js';
 import { songLines, transposeSong } from '../core/song.js';
 import { transposeKey } from '../core/chord.js';
+import { createScroller, SPEED_MIN, SPEED_MAX } from './scroller.js';
 
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+const DEFAULT_SPEED = 5;
 
 /** Split a lyric line into chord segments: each chord starts a segment that runs to the next chord. */
 function segmentsOf(text, chords) {
@@ -44,170 +46,193 @@ export function render(root, ctx, params) {
   }
 
   root.classList.add('sv-view');
+  const hasChords = Array.isArray(song.chords) && song.chords.length > 0;
   let t = 0;
   let menuOpen = false;
-  let playing = false;
-  let raf = 0;
-  let last = null;
-  let frac = 0;
-  let wake = null;
+  let speed = Number(song.speed) || DEFAULT_SPEED;
+  let fontPx = ctx.store.prefs().fontSize;
+  let speedT = 0;
+  let fontT = 0;
+  let panelT = 0;
+  let pressing = false;
+
+  root.innerHTML = `
+    <header class="top sv-top">
+      <button class="icon-btn flat" data-act="back" aria-label="Kembali">${icon('back')}</button>
+      <div class="sv-title">
+        <h1>${esc(song.title)}</h1>
+        ${song.artist ? `<div class="sv-artist muted">${esc(song.artist)}</div>` : ''}
+      </div>
+      <button class="icon-btn flat" data-act="menu" aria-label="Menu" aria-expanded="false">${icon('more')}</button>
+      <div class="card sv-menu" role="menu">
+        <button role="menuitem" data-act="edit-lyric">Edit lirik</button>
+        <button role="menuitem" data-act="edit-chord">Edit chord</button>
+        <button role="menuitem" class="sv-danger" data-act="delete">Hapus lagu</button>
+      </div>
+    </header>
+    <div class="sv-tools" id="sv-tools"></div>
+    ${
+      hasChords
+        ? ''
+        : `<div class="card sv-nochord">
+            <span class="muted">Belum ada chord</span>
+            <button class="btn" data-act="add-chord">Tambah chord</button>
+          </div>`
+    }
+    <div class="sv-lyr" id="sv-lyr"><div class="sv-sheet" id="sv-sheet" style="font-size:${fontPx}px"></div></div>
+    <div class="sv-hud" aria-hidden="true"><span>Kecepatan</span><div class="trk"><i></i><u></u></div><b></b></div>
+    <div class="sv-spc">
+      <div class="sv-spp" role="group" aria-label="Kecepatan">
+        <div class="sv-sph"><span>Kecepatan</span><b class="sv-spv"></b><button class="sv-spx" type="button" aria-label="Tutup">⌄</button></div>
+        <div class="sv-spr"><button class="sv-step" data-act="sp-minus" aria-label="Lebih lambat">−</button><input type="range" class="sv-sp" min="${SPEED_MIN}" max="${SPEED_MAX}" step="any" aria-label="Kecepatan gulir"><button class="sv-step" data-act="sp-plus" aria-label="Lebih cepat">+</button></div>
+        <div class="sv-spm"><span>${SPEED_MIN}</span><span>${SPEED_MAX}</span></div>
+      </div>
+      <button class="sv-spb" type="button" aria-label="Kecepatan" aria-expanded="false"><b class="sv-spbv"></b><small>kecepatan</small></button>
+    </div>`;
+
+  const tools = $('#sv-tools', root);
+  const sheet = $('#sv-sheet', root);
+  const lyr = $('#sv-lyr', root);
+  const menuBtn = $('[data-act="menu"]', root);
+  const menu = $('.sv-menu', root);
+  const spp = $('.sv-spp', root);
+  const spb = $('.sv-spb', root);
+  const slider = $('.sv-sp', root);
 
   const keyLabel = () => (song.key ? transposeKey(song.key, t) : '');
   const deltaLabel = () => (t > 0 ? `+${t}` : `${t}`);
 
-  function draw() {
-    const prefs = ctx.store.prefs();
-    const hasChords = Array.isArray(song.chords) && song.chords.length > 0;
+  function drawTools() {
     const key = keyLabel();
-    const lines = songLines(song, { transpose: t }).map(lineHtml).join('');
-
-    root.innerHTML = `
-      <header class="top">
-        <button class="icon-btn flat" data-act="back" aria-label="Kembali">${icon('back')}</button>
-        <div class="sv-title">
-          <h1>${esc(song.title)}</h1>
-          ${song.artist ? `<div class="sv-artist muted">${esc(song.artist)}</div>` : ''}
-        </div>
-        <button class="icon-btn flat" data-act="menu" aria-label="Menu">${icon('more')}</button>
-        ${
-          menuOpen
-            ? `<div class="card sv-menu" role="menu">
-                <button role="menuitem" data-act="edit-lyric">Edit lirik</button>
-                <button role="menuitem" data-act="edit-chord">Edit chord</button>
-                <button role="menuitem" class="sv-danger" data-act="delete">Hapus lagu</button>
-              </div>`
-            : ''
-        }
-      </header>
-      <div class="sv-info">
-        <span class="sv-tag">Nada ${key ? esc(key) : '?'}</span>
-        ${song.capo ? `<span class="sv-tag">Capo ${esc(song.capo)}</span>` : ''}
-        ${song.source?.site === 'chordtela' ? '<span class="sv-tag muted">Chordtela</span>' : ''}
-      </div>
-      ${
-        hasChords
-          ? ''
-          : `<div class="card sv-nochord">
-              <span class="muted">Belum ada chord</span>
-              <button class="btn" data-act="add-chord">Tambah chord</button>
-            </div>`
-      }
-      <div class="sv-sheet" style="font-size:${prefs.fontSize}px">${lines}</div>
-      <div class="card sv-bar">
-        <div class="sv-group">
-          <button class="icon-btn" data-act="down" aria-label="Turunkan nada">${icon('minus')}</button>
-          <div class="sv-key">${esc(key || '?')}${t ? `<small>${deltaLabel()}</small>` : ''}</div>
-          <button class="icon-btn" data-act="up" aria-label="Naikkan nada">${icon('plus')}</button>
-          ${t ? '<button class="btn primary sv-save" data-act="save">Simpan nada</button>' : ''}
-        </div>
-        <div class="sv-group">
-          <button class="btn sv-btn" data-act="font-down" aria-label="Perkecil huruf">A&minus;</button>
-          <button class="btn sv-btn" data-act="font-up" aria-label="Perbesar huruf">A+</button>
-        </div>
-        <div class="sv-group">
-          <button class="icon-btn" data-act="play" aria-label="Gulir otomatis">${icon(playing ? 'pause' : 'play')}</button>
-          <button class="btn sv-btn" data-act="slower" aria-label="Lebih lambat">&minus;</button>
-          <span class="sv-spd">${prefs.scrollSpeed}</span>
-          <button class="btn sv-btn" data-act="faster" aria-label="Lebih cepat">+</button>
-        </div>
-      </div>`;
+    tools.innerHTML = `
+      <span class="sv-tag">Nada ${key ? esc(key) : '?'}</span>
+      ${song.capo ? `<span class="sv-tag">Capo ${esc(song.capo)}</span>` : ''}
+      ${song.source?.site === 'chordtela' ? '<span class="sv-tag muted">Chordtela</span>' : ''}
+      <span class="sv-spacer"></span>
+      <button class="icon-btn" data-act="down" aria-label="Turunkan nada">${icon('minus', 18)}</button>
+      <b class="sv-key">${esc(key || '?')}${t ? `<small>${deltaLabel()}</small>` : ''}</b>
+      <button class="icon-btn" data-act="up" aria-label="Naikkan nada">${icon('plus', 18)}</button>
+      ${t ? '<button class="btn primary sv-save" data-act="save">Simpan nada</button>' : ''}`;
   }
 
-  function atBottom() {
-    return window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+  function drawSheet() {
+    sheet.innerHTML = songLines(song, { transpose: t }).map(lineHtml).join('') + '<div class="sv-end"></div>';
   }
 
-  async function requestWake() {
-    try {
-      const s = await navigator.wakeLock?.request('screen');
-      if (!s) return;
-      if (playing) wake = s;
-      else s.release().catch(() => {});
-    } catch {
-      /* not supported or denied */
+  // Only the sheet and the tools are redrawn; the scroller keeps its element references.
+  function refresh() {
+    drawTools();
+    drawSheet();
+    scroller.sync();
+  }
+
+  function paintSpeed() {
+    $('.sv-spv', root).textContent = Math.round(speed * 10) / 10;
+    $('.sv-spbv', root).textContent = Math.round(speed);
+    slider.value = speed;
+  }
+
+  function saveSpeed() {
+    speedT = 0;
+    if (!ctx.store.get(id)) return;
+    song = ctx.store.put({ ...song, speed });
+  }
+
+  function setSpeed(v) {
+    speed = Math.round(clamp(Number(v), SPEED_MIN, SPEED_MAX) * 10) / 10;
+    paintSpeed();
+    clearTimeout(speedT);
+    speedT = setTimeout(saveSpeed, 400);
+  }
+
+  function saveFont() {
+    fontT = 0;
+    ctx.store.setPrefs({ fontSize: fontPx });
+  }
+
+  function setFont(v) {
+    fontPx = v;
+    sheet.style.fontSize = v + 'px';
+    clearTimeout(fontT);
+    fontT = setTimeout(saveFont, 400);
+  }
+
+  // Write pending speed/font changes right away (leaving the view, or before a save).
+  function flush() {
+    if (speedT) {
+      clearTimeout(speedT);
+      saveSpeed();
+    }
+    if (fontT) {
+      clearTimeout(fontT);
+      saveFont();
     }
   }
 
-  function releaseWake() {
-    const s = wake;
-    wake = null;
-    if (s) s.release().catch(() => {});
+  function toggleMenu(on = !menuOpen) {
+    menuOpen = on;
+    menu.classList.toggle('open', on);
+    menuBtn.setAttribute('aria-expanded', String(on));
   }
 
-  function tick(now) {
-    if (!playing) return;
-    const dt = last === null ? 0 : Math.min((now - last) / 1000, 0.1);
-    last = now;
-    const speed = ctx.store.prefs().scrollSpeed || 3;
-    frac += speed * 14 * dt;
-    const px = Math.floor(frac);
-    if (px > 0) {
-      frac -= px;
-      window.scrollBy(0, px);
-    }
-    if (atBottom()) {
-      setPlaying(false);
-      return;
-    }
-    raf = requestAnimationFrame(tick);
+  function panelOpen(on) {
+    spp.classList.toggle('open', on);
+    spb.classList.toggle('hid', on);
+    spb.setAttribute('aria-expanded', String(on));
+    clearTimeout(panelT);
+    if (on) panelTouch();
   }
 
-  function setPlaying(on) {
-    playing = on;
-    if (on) {
-      frac = 0;
-      last = null;
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(tick);
-      requestWake();
-    } else {
-      cancelAnimationFrame(raf);
-      raf = 0;
-      releaseWake();
-    }
-    const b = $('[data-act="play"]', root);
-    if (b) b.innerHTML = icon(on ? 'pause' : 'play');
+  // The speed panel closes 3 s after the last touch, but never while a finger is on the slider.
+  function panelTouch() {
+    clearTimeout(panelT);
+    panelT = setTimeout(() => {
+      if (!pressing) panelOpen(false);
+    }, 3000);
   }
 
-  const stopOnUser = () => {
-    if (playing) setPlaying(false);
-  };
+  drawTools();
+  drawSheet();
+  paintSpeed();
+  // EvoLyric places the speed HUD just inside the top of the lyrics.
+  const placeHud = () => root.style.setProperty('--hud-top', lyr.offsetTop + 14 + 'px');
+  requestAnimationFrame(placeHud);
 
-  const onDocDown = (e) => {
-    if (!menuOpen) return;
-    if (e.target.closest?.('.sv-menu, [data-act="menu"]')) return;
-    menuOpen = false;
-    $('.sv-menu', root)?.remove();
-  };
+  const scroller = createScroller({
+    container: lyr,
+    content: sheet,
+    hud: $('.sv-hud', root),
+    getSpeed: () => speed,
+    setSpeed,
+    getFont: () => fontPx,
+    setFont,
+    onPlayChange: (on) => root.classList.toggle('sv-run', on),
+  });
 
   root.addEventListener('click', async (e) => {
     const b = e.target.closest('[data-act]');
     if (!b || !root.contains(b)) return;
-    const act = b.dataset.act;
-    const prefs = () => ctx.store.prefs();
 
-    switch (act) {
+    switch (b.dataset.act) {
       case 'back':
         ctx.go('/');
         break;
       case 'menu':
-        menuOpen = !menuOpen;
-        draw();
+        toggleMenu();
         break;
       case 'edit-lyric':
-        menuOpen = false;
+        toggleMenu(false);
         ctx.go('/edit/' + id);
         break;
       case 'edit-chord':
-        menuOpen = false;
+        toggleMenu(false);
         ctx.go('/chords/' + id);
         break;
       case 'add-chord':
         ctx.go('/chords/' + id);
         break;
       case 'delete': {
-        menuOpen = false;
-        draw();
+        toggleMenu(false);
         const ok = await confirmDialog({ title: 'Hapus lagu ini?', message: song.title, ok: 'Hapus', danger: true });
         if (!ok) break;
         ctx.store.remove(id);
@@ -217,50 +242,62 @@ export function render(root, ctx, params) {
       }
       case 'down':
         t = clamp(t - 1, -11, 11);
-        draw();
+        refresh();
         break;
       case 'up':
         t = clamp(t + 1, -11, 11);
-        draw();
+        refresh();
         break;
       case 'save':
         song = ctx.store.put(transposeSong(song, t));
         t = 0;
-        draw();
+        refresh();
         toast('Nada disimpan');
         break;
-      case 'font-down':
-        ctx.store.setPrefs({ fontSize: clamp(prefs().fontSize - 2, 14, 44) });
-        draw();
+      case 'sp-minus':
+        setSpeed(speed - 1);
+        panelTouch();
         break;
-      case 'font-up':
-        ctx.store.setPrefs({ fontSize: clamp(prefs().fontSize + 2, 14, 44) });
-        draw();
-        break;
-      case 'slower':
-        ctx.store.setPrefs({ scrollSpeed: clamp(prefs().scrollSpeed - 1, 1, 10) });
-        draw();
-        break;
-      case 'faster':
-        ctx.store.setPrefs({ scrollSpeed: clamp(prefs().scrollSpeed + 1, 1, 10) });
-        draw();
-        break;
-      case 'play':
-        setPlaying(!playing);
+      case 'sp-plus':
+        setSpeed(speed + 1);
+        panelTouch();
         break;
     }
   });
 
-  window.addEventListener('touchstart', stopOnUser, { passive: true });
-  window.addEventListener('wheel', stopOnUser, { passive: true });
+  const onDocDown = (e) => {
+    if (!menuOpen) return;
+    if (e.target.closest?.('.sv-menu, [data-act="menu"]')) return;
+    toggleMenu(false);
+  };
   document.addEventListener('pointerdown', onDocDown);
 
-  draw();
+  spb.addEventListener('click', () => panelOpen(!spp.classList.contains('open')));
+  $('.sv-spx', root).addEventListener('click', () => panelOpen(false));
+  spp.addEventListener('pointerdown', panelTouch);
+  spp.addEventListener('click', panelTouch);
+  spp.addEventListener('input', panelTouch);
+  slider.addEventListener('input', () => setSpeed(slider.value));
+  slider.addEventListener('pointerdown', () => {
+    pressing = true;
+    spp.classList.add('act');
+    panelTouch();
+  });
+  const release = () => {
+    if (!pressing) return;
+    pressing = false;
+    spp.classList.remove('act');
+    panelTouch();
+  };
+  window.addEventListener('pointerup', release);
+  window.addEventListener('pointercancel', release);
 
   return () => {
-    setPlaying(false);
-    window.removeEventListener('touchstart', stopOnUser);
-    window.removeEventListener('wheel', stopOnUser);
+    scroller.destroy();
+    flush();
+    clearTimeout(panelT);
     document.removeEventListener('pointerdown', onDocDown);
+    window.removeEventListener('pointerup', release);
+    window.removeEventListener('pointercancel', release);
   };
 }

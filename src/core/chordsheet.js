@@ -80,7 +80,9 @@ function normalizeName(n) {
 const KEY_RE = /^\s*(?:do|nada\s+dasar|key|kunci|tone)\s*[:=]\s*([A-G][#b]?m?)\b/i;
 const CAPO_RE = /\bcapo\b[^\d\n]{0,14}?(\d{1,2})\b/i;
 const BACK_RE = /^\s*\*?\s*(?:back\s+to|kembali\s+ke|balik\s+ke|repeat|ulang(?:i)?|ke)\s+(reff?|chorus|refrain|verse|bait|intro|bridge|pre[- ]?chorus)\b/i;
-const SKIP_RE = /^\s*(?:\*+|chord\s+by|kunci\s+gitar|add\s+to\s+playlist|tuning|original\s+key|capo|strum|genre|lirik|lyrics?\s+by|\(?\s*\d+\s*x\s*\)?$)/i;
+// Page furniture after the song (share buttons, related songs, footer): everything from here on is dropped.
+const STOP_RE = /^\s*(?:share\b|bagikan\b|chord\s+kunci\s+gitar\s+terkait|lagu\s+terkait|about\s+us\b|copyright\b)/i;
+const SKIP_RE = /^\s*(?:\*+|chord\s+by|kunci\s+gitar|add\s+to\s+playlist|tuning|original\s+key|capo|strum|genre\s*:|lirik\s*(?:oleh|by|:)|lyrics?\s+by|\(?\s*\d+\s*x\s*\)?$)/i;
 
 // ---------------------------------------------------------------------------
 
@@ -141,6 +143,7 @@ export function parseChordSheet(text, opts = {}) {
   for (; i < src.length; i++) {
     let line = src[i];
     const tr = line.trim();
+    if (tr.length < 60 && STOP_RE.test(tr)) break;
     if (!tr) {
       blank();
       continue;

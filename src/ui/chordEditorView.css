@@ -21,8 +21,8 @@
 /* Kotak per 2 karakter. Lebar kotak mengikuti teks lirik, bukan panjang chord. */
 .ce-cell{display:inline-flex;flex-direction:column;align-items:stretch;padding:0;margin:0;background:none;border:0;color:var(--fg)}
 .ce-n{display:block;height:20px;width:0;min-width:100%;overflow:visible;position:relative;margin:0 1px 3px 0;padding:0 3px;border:1px dashed var(--ln);border-radius:5px;font:800 12px/18px 'Bricolage Grotesque',sans-serif;color:var(--chord);white-space:nowrap;text-align:left;box-sizing:border-box}
-.ce-n:not(:empty){border-style:solid;border-color:rgba(47,123,255,.5);z-index:1;background:var(--bg)}
-.ce-cell.on .ce-n{border:2px solid var(--acc);background:rgba(47,123,255,.18)}
+.ce-n:not(:empty){border-style:solid;border-color:rgba(240,160,75,.5);z-index:1;background:var(--bg)}
+.ce-cell.on .ce-n{border:2px solid var(--acc);background:rgba(240,160,75,.18)}
 .ce-t{white-space:pre;text-align:left}
 
 /* Baris instrumental: kotak lebih lega */
@@ -89,5 +89,5 @@
   flex: 2;
   background: var(--acc);
   border-color: var(--acc);
-  color: #fff;
+  color: var(--on-acc);
 }
