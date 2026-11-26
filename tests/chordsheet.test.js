@@ -44,7 +44,7 @@ describe('parseChordSheet', () => {
     const r = parseChordSheet('Intro : C  G  Am\n\nReff:\nF    G\nbernyanyi');
     const lines = r.lyrics.split('\n');
     expect(lines[0]).toBe('[Intro]');
-    expect(lines[1]).toMatch(/^·/);
+    expect(lines[1]).toBe('|• · • · • · • ·|• · • · • · • ·|• · • · • · • ·|');
     expect(chordAt(r, 1).map((x) => x.split(':')[1])).toEqual(['C', 'G', 'Am']);
     expect(lines).toContain('[Chorus]');
     expect(lines[lines.length - 1]).toBe('bernyanyi');

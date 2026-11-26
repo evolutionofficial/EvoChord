@@ -1,6 +1,8 @@
 /* Editor chord (chordEditorView.js). Prefix: ce- */
 
 .ce-sec {
+  display: flex;
+  align-items: center;
   margin: 14px 0 6px;
   font: 700 12px/1.2 'Bricolage Grotesque', sans-serif;
   text-transform: uppercase;
@@ -10,9 +12,12 @@
 
 .ce-gap { height: 8px; }
 
+/* Grid bisa lebih lebar dari layar: digulir horizontal, kotak tetap sejajar */
+.ce-grid { overflow-x: auto; padding-bottom: 4px; }
+
 .ce-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: flex-end;
   margin-bottom: 10px;
   font: 700 19px/1.2 'Atkinson Hyperlegible', sans-serif;
@@ -24,10 +29,26 @@
 .ce-n:not(:empty){border-style:solid;border-color:rgba(240,160,75,.5);z-index:1;background:var(--bg)}
 .ce-cell.on .ce-n{border:2px solid var(--acc);background:rgba(240,160,75,.18)}
 .ce-t{white-space:pre;text-align:left}
+.ce-x .ce-t{min-width:1.1em}
+/* Kotak setelah teks habis: tetap terlihat, dibuat lebih redup */
+.ce-x .ce-n{border-color:rgba(240,160,75,.25)}
 
 /* Baris instrumental: kotak lebih lega */
 .ce-inst .ce-cell{min-width:42px}
 .ce-inst .ce-t{color:var(--mut)}
+
+/* Baris ketukan: titik & garis birama rata */
+.ce-beat .ce-t{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--mut);letter-spacing:.05em}
+
+/* Kontrol baris ketukan (birama, +/−, hapus) di ujung baris */
+.ce-bctl{display:flex;align-items:center;gap:4px;flex:none;margin-left:8px;margin-bottom:3px;font:700 13px/1 'Atkinson Hyperlegible',sans-serif}
+.ce-tsig{height:32px;padding:0 4px;border:1px solid var(--ln);border-radius:8px;background:var(--bg2);color:var(--fg);font:inherit}
+.ce-bbtn{width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--ln);border-radius:8px;background:var(--bg2);color:var(--fg);font:700 16px/1 'Atkinson Hyperlegible',sans-serif}
+
+/* Tombol tambah baris ketukan */
+.ce-top{display:flex;align-items:center;margin:6px 0 4px}
+.ce-add{margin-left:8px;padding:4px 10px;min-height:30px;border-radius:999px;border:1px dashed var(--acc);background:none;color:var(--acct);font:700 12px/1 'Atkinson Hyperlegible',sans-serif;text-transform:none;letter-spacing:0}
+.ce-top .ce-add{margin-left:0}
 
 /* Keyboard chord: melayang di bawah layar */
 .ce-kb {

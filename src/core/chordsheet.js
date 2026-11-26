@@ -5,6 +5,7 @@
 // (see song.js). Pure string code: runs in the browser and in the Cloudflare Worker.
 
 import { isChord, parseChord } from './chord.js';
+import { makeBeatLine, barStartCell } from './beats.js';
 
 // ---------------------------------------------------------------------------
 // Section labels
@@ -194,19 +195,11 @@ export function parseChordSheet(text, opts = {}) {
         for (const f of found) place(l, f.col - lead, f.n);
         i++;
       } else {
-        // Instrumental row: "·" placeholders keep the chords in order and spaced like the original.
-        const base = found[0].col;
-        out.push('');
+        // Instrumental row (intro, interlude): a beat row with one bar per chord, chord on beat 1.
+        // The sheet does not say how long each chord lasts; one bar each is the common case.
+        out.push(makeBeatLine(found.length, '4/4'));
         const l = out.length - 1;
-        let last = -2;
-        for (const f of found) {
-          let c = Math.max(f.col - base, last + 2);
-          c -= c % 2;
-          if (c <= last) c = last + 2;
-          out[l] = out[l].padEnd(c, ' ') + '·';
-          chords.push({ l, c, n: f.n });
-          last = c;
-        }
+        found.forEach((f, bar) => chords.push({ l, c: barStartCell(bar, '4/4') * 2, n: f.n }));
       }
       continue;
     }
@@ -244,7 +237,7 @@ export function parseChordSheet(text, opts = {}) {
 
   let keyGuessed = false;
   if (!key) {
-    const first = finalChords.find((x) => !/^[·\s]+$/.test(lyricsLines[x.l])) || finalChords[0];
+    const first = finalChords.find((x) => !/^[|•·\s]+$/.test(lyricsLines[x.l])) || finalChords[0];
     const p = first && parseChord(first.n);
     if (p) {
       key = p.root + p.acc + (/^m(?!aj)/.test(p.quality) ? 'm' : '');

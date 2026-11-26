@@ -60,6 +60,9 @@
 .sv-seg { display: inline-flex; flex-direction: column; }
 .sv-c { font-size: 0.72em; line-height: 1.25; padding-right: 0.45em; min-height: 1.25em; color: var(--chord); }
 .sv-t { white-space: pre; }
+.sv-has .sv-t:empty { min-width: 1.2em; }
+.sv-beat .sv-t { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight: 400; color: var(--mut); letter-spacing: 0; font-size: .7em; }
+.sv-beat .sv-c { min-width: 1.4em; }
 
 .sv-inst { display: flex; flex-wrap: wrap; gap: 0.5em; margin: 0 0 0.35em; }
 .sv-chip {
