@@ -4,15 +4,16 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "test": "vitest run",
-    "deploy": "vite build && wrangler deploy"
+    "build": "node tools/build.mjs",
+    "test": "vitest run tests/core && node tests/e2e/run.js",
+    "test:core": "vitest run tests/core",
+    "test:e2e": "node tests/e2e/run.js",
+    "deploy": "node tools/build.mjs && wrangler deploy"
   },
   "devDependencies": {
-    "vite": "^5.4.0",
+    "esbuild": "^0.28.2",
     "vitest": "^2.1.0",
-    "wrangler": "^4.0.0"
+    "wrangler": "^4.0.0",
+    "playwright": "^1.50.0"
   }
 }
