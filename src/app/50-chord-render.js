@@ -1,5 +1,5 @@
-/* ===== Evo Chord: chords in the lyrics screen =====
-   Files 01–17 are EvoLyric as it is. Files 50+ are what Evo Chord changes: a function declared here
+/* ===== EvoChords: chords in the lyrics screen =====
+   Files 01–17 are EvoLyric as it is. Files 50+ are what EvoChords changes: a function declared here
    with the same name as an EvoLyric function replaces it everywhere (the files are joined into one script).
 
    Replaces chordApply (EvoLyric v180):

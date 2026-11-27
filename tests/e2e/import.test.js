@@ -41,7 +41,7 @@ test('Import: Simplenote .zip (notes.json) with one note imports straight away; 
   await up(p,[['notes.zip',zip([['source/notes.json',JSON.stringify({activeNotes:[{content:'Senja Kecil\n\n[Verse]\nOmbak datang perlahan'}],trashedNotes:[{content:'x'}]}),true],['Senja Kecil.txt','Senja Kecil\n\n[Verse]\nOmbak datang perlahan',false]])]]);
   await p.waitForTimeout(500);eq(await p.evaluate(()=>$('#ipbox').classList.contains('on')),false,'no preview for one note');
   eq(await added(p),[['Senja Kecil','[Verse]\nOmbak datang perlahan']],'imported');await t.close()});
-test('Import: Word .docx keeps highlights and coloured text as Evo Chord highlights; title from the file name',async()=>{
+test('Import: Word .docx keeps highlights and coloured text as EvoChords highlights; title from the file name',async()=>{
   const t=await open(),p=t.page;
   await up(p,[['Lampu Kota.docx',docx([['Lampu Kota'],['Jalan ',['basah','<w:highlight w:val="yellow"/>'],' sehabis hujan'],[['Reff','<w:color w:val="FF0000"/>'],' di sini'],[['abu','<w:color w:val="808080"/>']]])]]);
   await p.waitForTimeout(500);

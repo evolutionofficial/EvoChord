@@ -1,4 +1,4 @@
-/* Evo Chord cloud sync (Supabase). One module, no second Supabase client: it receives the app's client through hooks.
+/* EvoChords cloud sync (Supabase). One module, no second Supabase client: it receives the app's client through hooks.
  *
  * Model
  *  - Local library (songs[] / cats[]) stays the source of the UI and is always cached in localStorage.
@@ -344,7 +344,7 @@
     } catch (e) {
       lastRun = Date.now();
       if (isNet(e)) { setSt('offline'); toastOnce('off', 'Offline. Changes are saved on this device and will sync later.', false); }
-      else { var m = (e && e.message) ? e.message : 'Unknown error'; setSt('error', m); toastOnce('err', 'Saved on this device, but cloud sync failed: ' + m, true); console.warn('Evo Chord sync:', e); }
+      else { var m = (e && e.message) ? e.message : 'Unknown error'; setSt('error', m); toastOnce('err', 'Saved on this device, but cloud sync failed: ' + m, true); console.warn('EvoChords sync:', e); }
       scheduleRetry();
     }
   }

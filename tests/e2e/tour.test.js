@@ -38,7 +38,7 @@ test('Tour: Help → Interactive tour; Skip in the editor or Back across screens
   await p.evaluate(()=>helpOpen());await p.waitForTimeout(300);
   const row=await p.evaluateHandle(()=>[...document.querySelectorAll('#helpbody .srow')].find(r=>/Tur interaktif/.test(r.textContent)));
   assert(row.asElement(),'Help has the tour row');await row.asElement().click();await p.waitForTimeout(600);
-  eq([await view(p),await p.$eval('#tour h4',e=>e.textContent)],['list','Selamat datang di Evo Chord'],'starts on Home, in Indonesian');
+  eq([await view(p),await p.$eval('#tour h4',e=>e.textContent)],['list','Selamat datang di EvoChords'],'starts on Home, in Indonesian');
   for(let k=0;k<8;k++){await p.waitForTimeout(450);await p.click('#tour .tnx')}
   await p.waitForTimeout(600);eq(await view(p),'play','on the lyrics screen');
   await p.click('#tour .tbk');await p.waitForTimeout(700);eq(await view(p),'play','back inside the lyrics part');

@@ -75,7 +75,7 @@ async function pasteNew(){fabOpen(false);const pre=lib.v==='cat'?[lib.id]:[];let
   if(x==null){openEdit(null,'','',null,pre);pasteFail();return note(L('Paste the lyrics here','Tempel liriknya di sini'))}
   if(!x.trim())return note(L('Nothing to paste. Copy a note first.','Tidak ada yang bisa ditempel. Salin catatannya dulu.'));
   textIn(x,pre)}
-/* v163: Android share target (manifest share_target, GET ./?title=…&text=…&url=…): Share → Evo Chord opens the editor with the note */
+/* v163: Android share target (manifest share_target, GET ./?title=…&text=…&url=…): Share → EvoChords opens the editor with the note */
 const SHK='evo.share';
 (()=>{let q;try{q=new URLSearchParams(location.search)}catch(e){return}if(!q.has('text')&&!q.has('title')&&!q.has('url'))return;
   const d={title:q.get('title')||'',text:q.get('text')||'',url:q.get('url')||''};try{sessionStorage.setItem(SHK,JSON.stringify(d))}catch(e){window.__evoShare=d}

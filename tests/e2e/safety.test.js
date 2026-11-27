@@ -50,6 +50,6 @@ test('Support: Help → Contact support opens a page with an email button to evo
   assert((await p.evaluate(()=>$('#helpbody').textContent)).includes('evolution.studio.id@gmail.com'),'email shown in Help');
   await p.click('#helpbody .srow:has-text("Hubungi dukungan")');await p.waitForTimeout(300);
   const h=await p.$eval('#docbody a.dbtn',a=>[a.textContent,a.getAttribute('href')]);
-  eq(h[0],'Kirim email ke dukungan','button');assert(h[1].startsWith('mailto:evolution.studio.id@gmail.com?subject=Evo%20Chord%20support&body='),'mailto: '+h[1].slice(0,80));
-  assert(decodeURIComponent(h[1]).includes('Evo Chord 0.2'),'version included');await t.close()});
+  eq(h[0],'Kirim email ke dukungan','button');assert(h[1].startsWith('mailto:evolution.studio.id@gmail.com?subject=EvoChords%20support&body='),'mailto: '+h[1].slice(0,80));
+  assert(decodeURIComponent(h[1]).includes('EvoChords 0.2'),'version included');await t.close()});
 };
