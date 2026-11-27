@@ -1,0 +1,39 @@
+/* ===== v30: Home "+" button (New song / Import .txt) ===== */
+#items{padding-bottom:92px}
+#fab{position:absolute;right:16px;bottom:16px;z-index:21;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--acc);color:#15110e;box-shadow:0 8px 22px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.35);transition:transform .3s var(--spring)}
+#lastb{position:absolute;right:20px;bottom:84px;z-index:21;width:48px;height:48px;border-radius:50%;border:1.5px solid var(--acc);background:transparent;color:var(--acc);display:flex;align-items:center;justify-content:center;font:normal 400 30px/1 'Instrument Serif',Georgia,serif;padding:0 2px 3px 0;-webkit-tap-highlight-color:transparent;transition:transform .2s var(--ease),background .2s}
+#fabm.on~#lastb{opacity:0;pointer-events:none;transform:scale(.6)} /* v163: the + menu is taller; the L button steps aside while it is open */
+#lastb:active{transform:scale(.9);background:rgba(255,255,255,.06)}
+@media(max-height:480px){#lastb{bottom:76px;right:16px;width:40px;height:40px;font-size:25px}}
+#fab svg{width:26px;height:26px;transition:transform .32s var(--spring)}
+#fab[aria-expanded=true] svg{transform:rotate(45deg)}
+#fab:active{transform:scale(.92)}
+#fbg{position:absolute;inset:0;z-index:19;display:none}#fbg.on{display:block}
+#fabm{position:absolute;right:16px;bottom:84px;z-index:20;width:min(214px,calc(100vw - 32px));padding:5px;display:flex;flex-direction:column;background:rgba(34,28,23,.95);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.1);border-radius:16px;box-shadow:0 14px 34px rgba(0,0,0,.55);transform-origin:bottom right;opacity:0;transform:translateY(8px) scale(.92);visibility:hidden;pointer-events:none;transition:opacity .15s var(--ease),transform .24s var(--ease),visibility 0s .24s}
+#fabm.on{opacity:1;transform:none;visibility:visible;pointer-events:auto;transition:opacity .18s var(--ease),transform .34s var(--spring),visibility 0s}
+#fabm button{display:flex;align-items:center;gap:12px;width:100%;min-height:50px;padding:0 14px;border-radius:11px;font-weight:700;font-size:15px;text-align:left;transition:background .15s}
+#fabm button:active{background:var(--ln)}
+#fabm button svg{width:19px;height:19px;flex:none;color:var(--acct)}
+@media(max-height:480px){#fab{width:48px;height:48px;bottom:10px;right:12px}#fabm{bottom:68px;right:12px}#items{padding-bottom:70px}}
+@media(prefers-reduced-motion:reduce){#fab,#fab svg,#fabm{transition:none!important}}
+
+/* ===== v31: clear (x) button inside search boxes. Shown only while the box has text (CSS :placeholder-shown, so it follows programmatic changes too) ===== */
+.sfield{position:relative;flex:1;min-width:0;display:flex}
+.sfield input{padding-right:40px}
+.sfield .clr{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;display:none;align-items:center;justify-content:center;color:var(--mut);background:rgba(255,255,255,.07);transition:background .15s,color .15s}
+.sfield .clr svg{width:11px;height:11px}
+.sfield input:not(:placeholder-shown)~.clr{display:flex}
+.sfield .clr:active{background:var(--ln);color:var(--fg)}
+/* v32: sort button, pin marker, "Pinned" header */
+#sortb{width:44px;flex:none;border-radius:12px;background:var(--card);border:1px solid var(--ln);display:flex;align-items:center;justify-content:center;color:var(--mut)}
+#hvrow{padding:0 12px 2px;display:flex;justify-content:flex-start;gap:8px}#hvrow:has(#hView[hidden]):has(#sortb[hidden]){display:none}#hvrow #sortb{height:32px;width:40px}#hView{width:40px;height:32px;flex:none;border-radius:12px;background:var(--card);border:1px solid var(--ln);display:flex;align-items:center;justify-content:center;color:var(--mut)}#hView[hidden]{display:none}#hView.on{color:var(--acct);border-color:var(--acc)}
+#items.cmp .it{padding:5px 4px}#items.cmp .it small{display:none}#items.cmp .it b{font-size:17px;line-height:1.2}#items.cmp .key{font-size:13px}#items.cmp .ltr{padding:8px 4px 1px;font-size:13px}
+#sortb svg{width:20px;height:20px}#sortb.on{color:var(--acct);border-color:var(--acc)}
+.ltr.pn{display:flex;align-items:center;gap:6px}.ltr.pn svg{width:14px;height:14px}
+.pinic{display:inline-flex;color:var(--acct);margin-right:6px;vertical-align:-1px}.pinic svg{width:14px;height:14px}
+.sheet button.ck{display:flex;justify-content:space-between;gap:16px}.sheet button.ck i{font-style:normal;color:var(--acct)}
+/* v36: dialogs and toasts must sit above the fullscreen player (z-index 1000), e.g. Send to friend from the player menu */
+#ctx,#note{z-index:1100}
+/* v38: notification banner */
+#ntf{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top,0px));transform:translate(-50%,-14px);opacity:0;z-index:1200;max-width:min(92vw,420px);background:var(--card);color:var(--fg);border:1px solid var(--acc);border-radius:16px;padding:12px 16px;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.5);transition:transform .25s var(--ease),opacity .25s;text-align:left}
+#ntf.on{transform:translate(-50%,0);opacity:1}

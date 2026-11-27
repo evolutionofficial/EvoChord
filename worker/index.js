@@ -63,6 +63,16 @@ export default {
       return importChordtela(url.searchParams.get('url') || '', { cache });
     }
     if (url.pathname.startsWith('/api/')) return json(404, { error: 'not_found' });
+    // Same as EvoLyric (v168): the asset host redirects /index.html → / and /x.html → /x; older service
+    // workers cached that redirect and Safari refuses it. Serve these pages directly, no redirect.
+    const p = url.pathname;
+    if (/^\/(index|privacy|terms)\.html$/.test(p)) {
+      const u = new URL(request.url);
+      u.pathname = p === '/index.html' ? '/' : p.slice(0, -5);
+      const r = await env.ASSETS.fetch(new Request(u.toString(), { method: request.method, headers: request.headers }));
+      if (r.status >= 300 && r.status < 400) return env.ASSETS.fetch(request);
+      return new Response(r.body, { status: r.status, headers: r.headers });
+    }
     return env.ASSETS.fetch(request);
   },
 };

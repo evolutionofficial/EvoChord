@@ -1,0 +1,76 @@
+/* ===== v135: aurora glow – a soft magenta / purple / teal light around the screen edges while auto-scroll runs.
+   Only opacity and transform are animated (GPU-composited), the layer never takes touches, and it sits under the lyrics. ===== */
+#aura{display:none}
+#play.fs #aura{display:block;position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;opacity:0;transition:opacity 1.2s var(--ease);
+  -webkit-mask-image:linear-gradient(to right,#000,rgba(0,0,0,.35) 26px,transparent 72px,transparent calc(100% - 72px),rgba(0,0,0,.35) calc(100% - 26px),#000),linear-gradient(to bottom,#000,rgba(0,0,0,.35) 26px,transparent 72px,transparent calc(100% - 72px),rgba(0,0,0,.35) calc(100% - 26px),#000);
+  mask-image:linear-gradient(to right,#000,rgba(0,0,0,.35) 26px,transparent 72px,transparent calc(100% - 72px),rgba(0,0,0,.35) calc(100% - 26px),#000),linear-gradient(to bottom,#000,rgba(0,0,0,.35) 26px,transparent 72px,transparent calc(100% - 72px),rgba(0,0,0,.35) calc(100% - 26px),#000)}
+#play.fs.run #aura{opacity:1}
+#play.noaura #aura{display:none!important}
+#aura i{position:absolute;inset:-30px;opacity:0;will-change:opacity,transform;animation:auraFade 15s linear infinite,auraDrift 11s ease-in-out infinite alternate;animation-play-state:paused}
+#play.run #aura i{animation-play-state:running}
+#aura i:nth-child(1){--c:255,43,214;animation-delay:0s,-3s}
+#aura i:nth-child(2){--c:139,92,255;animation-delay:-10s,-8s;animation-duration:15s,13s}
+#aura i:nth-child(3){--c:32,227,200;animation-delay:-5s,-5s;animation-duration:15s,9s}
+#aura i{background:radial-gradient(60% 30% at 18% 0%,rgba(var(--c),.85),transparent 70%),radial-gradient(30% 50% at 100% 72%,rgba(var(--c),.7),transparent 70%),radial-gradient(55% 28% at 70% 100%,rgba(var(--c),.75),transparent 70%),radial-gradient(28% 45% at 0% 40%,rgba(var(--c),.6),transparent 70%);box-shadow:inset 0 0 46px 34px rgba(var(--c),.5)}
+#aura i:nth-child(2){transform-origin:30% 70%}
+#aura i:nth-child(3){transform-origin:70% 30%}
+@keyframes auraFade{0%{opacity:0}16%{opacity:1}33%{opacity:.9}50%{opacity:0}100%{opacity:0}}
+@keyframes auraDrift{0%{transform:translate3d(-12px,8px,0) scale(1.01)}100%{transform:translate3d(12px,-10px,0) scale(1.04)}}
+:root[data-theme="light"] #play.fs.run #aura{opacity:.75}
+@media(prefers-reduced-motion:reduce){#aura i{animation:none!important;transform:none!important;opacity:.4}}
+/* ===== v137: Web Lyric – Save to Library button in the lyrics header, only for a temporary song ===== */
+#tsv{display:none;flex:none;align-items:center;gap:5px;height:40px;padding:0 12px 0 9px;border-radius:12px;border:1px solid rgba(240,160,75,.55);background:rgba(34,28,23,.72);color:var(--acct);font:800 14px/1 'Atkinson Hyperlegible',system-ui,sans-serif;letter-spacing:.2px}
+#tsv svg{width:19px;height:19px}
+#tsv:active{transform:scale(.94);background:rgba(240,160,75,.14)}
+#play.tmp #tsv{display:flex}
+#play.run #tsv{opacity:.08}
+#play.nodim.run #tsv,#play.run #tsv:active,#play.run #tsv:focus-visible{opacity:1}
+:root[data-theme="light"] #tsv{background:rgba(255,255,255,.86);border-color:rgba(200,110,30,.5)}
+/* ===== v138: Web Lyric – version list, return-from-Google question, busy globe ===== */
+#csheet.wl{width:min(92vw,380px);max-height:80vh;overflow:auto}
+#csheet.wl .wlh{display:flex;align-items:center;gap:8px;padding:2px 2px 4px 12px}#csheet.wl .wlh h3{flex:1;min-width:0;margin:0}
+#csheet.wl .wlg{flex:none;display:flex;align-items:center;gap:6px;height:30px;padding:0 11px 0 9px;border-radius:15px;border:1px solid rgba(240,160,75,.5);color:var(--acct);font-weight:700;font-size:13px;white-space:nowrap}#csheet.wl .wlg svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7}#csheet.wl .wlg:active{background:var(--ln)}
+#csheet.wl .wlx{display:block;width:calc(100% - 12px);margin:8px 6px 4px;padding:12px;text-align:center;font-weight:700;border:1px solid var(--ln);background:var(--card);border-radius:12px} /* v151: Cancel is a framed button */
+#csheet.wl h3{white-space:normal;color:var(--fg);font-weight:700;font-size:16px}
+.wlv b{display:block;font-size:15.5px;font-weight:700;line-height:1.25}
+.wlv small{display:block;margin-top:3px;color:var(--mut);font-size:12.5px;line-height:1.3}
+.wlv small i{font-style:normal;margin-left:6px;padding:1px 6px;border-radius:6px;border:1px solid var(--ln);font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+.wlsrc{display:none;margin:4px 12px 6px;color:var(--mut);font-size:11.5px} /* v151: hidden – LRCLIB is credited in Help → Credit */
+.wlp{margin:0 12px 8px;font-size:14px;line-height:1.4}
+#csheet .wlok{color:var(--acct);font-weight:800}
+.wlta{margin:0 6px 8px;min-height:120px;resize:vertical;background:var(--bg);color:var(--fg);border:1px solid var(--ln);border-radius:10px;padding:10px;font:15px/1.4 'Atkinson Hyperlegible',system-ui,sans-serif}
+#goog.busy svg,#dgoog.busy svg{animation:wlspin 1s linear infinite}
+@keyframes wlspin{to{transform:rotate(360deg)}}
+/* ===== v141: LRCLIB versions button – in the speed corner, only for lyrics opened from an LRCLIB list with several versions ===== */
+#vsb{display:none;position:relative;width:40px;height:40px;border-radius:50%;flex-direction:column;align-items:center;justify-content:center;background:rgba(34,28,23,.62);border:1px solid rgba(240,160,75,.45);color:var(--fg)}
+#vsb b{font:800 14px/1 'Bricolage Grotesque',system-ui,sans-serif;color:var(--acct)}
+#vsb small{font:700 6px/1 'Atkinson Hyperlegible',system-ui,sans-serif;letter-spacing:.6px;text-transform:uppercase;color:var(--mut);margin-top:2px}
+#vsb:active{transform:scale(.92)}
+#vsb.hid{opacity:0;transform:scale(.8);pointer-events:none}
+#play.lrc #vsb{display:flex}
+#play.lrc #spb{display:none}
+#play.run #vsb:not(.hid){opacity:.08}
+#play.nodim.run #vsb:not(.hid),#play.run #vsb:active{opacity:1}
+#vsp{position:absolute;right:0;bottom:0;width:min(300px,calc(100vw - 16px));max-height:min(62vh,440px);overflow:auto;padding:6px;background:var(--card);border:1px solid var(--ln);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.45);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(8px) scale(.97);transform-origin:100% 100%;transition:opacity .15s,transform .2s,visibility 0s .2s}
+#vsp.open{opacity:1;visibility:visible;pointer-events:auto;transform:none;transition:opacity .18s var(--ease),transform .3s var(--spring),visibility 0s}
+#vsp .vsh{display:flex;align-items:center;justify-content:space-between;padding:4px 6px 6px 10px;font-weight:700;font-size:14px;color:var(--mut)}
+#vsx{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+#vsl{display:flex;flex-direction:column;gap:2px}
+#vsl .wlv{text-align:left;padding:11px 10px;border-radius:10px}
+#vsl .wlv:active{background:var(--ln)}
+#vsl .wlv.cur{background:rgba(240,160,75,.12)}
+#vsl .wlv.cur b{color:var(--acct)}
+:root[data-theme="light"] #vsb{background:rgba(255,255,255,.86)}
+@media(prefers-reduced-motion:reduce){#vsp,#vsb{transition:none!important}}
+/* v142: More version (Google) at the top right of the versions panel, next to its close arrow */
+#vsg{margin-left:auto;margin-right:4px;display:flex;align-items:center;gap:6px;height:30px;padding:0 11px 0 9px;border-radius:15px;border:1px solid rgba(240,160,75,.5);color:var(--acct);font-weight:700;font-size:13px;white-space:nowrap}
+#vsg svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7}
+#vsg:active{background:var(--ln)}
+/* v144: Auto Section button at the top of the editor's Section panel */
+#side #eA{flex:none;width:100%;padding:8px 4px;border-radius:10px;border:1px solid rgba(240,160,75,.55);background:rgba(240,160,75,.1);color:var(--acct);font:800 12px/1.15 'Atkinson Hyperlegible',system-ui,sans-serif;text-align:center}
+#side #eA:active{transform:scale(.96)}
+#side #eC{flex:none;width:100%;padding:8px 4px;border-radius:10px;border:1px solid var(--ln);background:transparent;color:var(--mut);font:700 12px/1.15 'Atkinson Hyperlegible',system-ui,sans-serif;text-align:center}
+#side #eC:active{transform:scale(.96)}
+/* v146: colour tone sliders */
+svg.lg{filter:saturate(var(--tsat,1))} /* the app logo follows the colour slider (Google's logo keeps its colours) */
+.srng input[type=range]{flex:0 0 46%;max-width:220px;accent-color:var(--acct);height:28px}

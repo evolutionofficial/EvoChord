@@ -1,0 +1,40 @@
+/* v154: no globe buttons – wider search boxes; category dropdown in the side panel header; Search online in the song menu */
+#drawer .hd #dcat{flex:0 1 auto;max-width:150px;min-width:0;height:42px;padding:0 10px;font-size:14px}
+#play:not(.fs) #drawer .hd #dcat{height:38px}
+#dItems .ewb{width:calc(100% - 8px);margin:10px 4px}
+.ewb.busy svg{animation:wlspin 1s linear infinite}
+.sheet button.wsr{display:flex;align-items:center;gap:10px}.sheet button.wsr svg{width:18px;height:18px;flex:none;fill:none;stroke:var(--acct);stroke-width:1.7}
+.doc .lgw .rel{font-size:14px;font-weight:600;color:var(--acct);letter-spacing:.02em}
+/* v158: delete account */
+.srow.danger .lbl{color:var(--f)}
+.dzw{display:flex;flex-direction:column;gap:4px;padding:14px 16px;margin:4px 0 14px;border-radius:14px;border:1px solid color-mix(in srgb,var(--f) 55%,transparent);background:color-mix(in srgb,var(--f) 12%,transparent)}
+.dzw b{color:var(--f);font-size:16px}.dzw span{font-size:14px;line-height:1.45}
+.dzword{color:var(--f);letter-spacing:.08em}
+.dzin{display:block;width:100%;margin:0 0 12px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.dbtn.danger{background:var(--f);border-color:var(--f);color:#fff}.dbtn.danger:disabled{opacity:.35}
+/* v159: safety + support */
+.fr button.frm{min-width:38px;padding:0 8px;font-size:18px;line-height:1}
+.sheet button.rr i,.sheet button.rpb i{font-style:normal;color:var(--acct);margin-left:auto}
+.sheet button.rr,.sheet button.rpb{display:flex;gap:12px;align-items:center}
+.sheet textarea.rpt{margin:6px 6px 8px;min-height:72px;resize:vertical;background:var(--bg);color:var(--fg);border:1px solid var(--ln);border-radius:10px;padding:10px;font:15px/1.4 'Atkinson Hyperlegible',system-ui,sans-serif}
+.susb{display:flex;flex-direction:column;gap:4px;margin:4px 0 12px;padding:12px 14px;border-radius:14px;border:1px solid color-mix(in srgb,var(--f) 55%,transparent);background:color-mix(in srgb,var(--f) 12%,transparent)}
+.susb b{color:var(--f)}.susb span{font-size:14px;line-height:1.4}.susb a{color:var(--acct);font-weight:700;font-size:14px}
+#susp{position:fixed;inset:0;z-index:2500;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+#susp .spc2{max-width:360px;text-align:center}#susp h2{color:var(--f);margin:0 0 10px}#susp p{margin:0 0 12px;line-height:1.45}#susp .dbtn{margin-top:8px}
+.doc a.dbtn,#susp a.dbtn{text-decoration:none;color:#15110e}.supm{text-align:center;color:var(--mut);margin-top:-2px}
+/* v160: guest button, consent line, legal pages */
+.wguest{display:block;width:100%;min-height:46px;margin-top:10px;border-radius:12px;border:1px solid var(--ln);background:transparent;color:var(--fg);font:700 15px 'Atkinson Hyperlegible',system-ui,sans-serif}
+.wguest:active{background:var(--ln)}
+.legal-ok{font-size:12.5px;line-height:1.45;color:var(--mut);text-align:center;margin:12px 0 0}.legal-ok .lnk{display:inline;padding:0;font:inherit;color:var(--acct);text-decoration:underline;background:none;border:0}
+.doc.legal h1{display:none}.doc.legal h2{margin-top:22px}.doc.legal h3{font-size:15px;margin:14px 0 4px}.doc.legal ol,.doc.legal ul{padding-left:22px}.doc.legal a{color:var(--acct)}
+/* v161: notice on the old address */
+#moved{margin:0 12px 10px;padding:12px 14px;border-radius:14px;border:1px solid rgba(240,160,75,.55);background:rgba(240,160,75,.1);display:flex;flex-direction:column;gap:10px}
+#moved .mvt b{display:block;color:var(--acct);margin-bottom:2px}#moved .mvt span{font-size:13.5px;line-height:1.4;color:var(--fg)}
+#moved .mvb{display:flex;gap:8px;flex-wrap:wrap}#moved .pill{text-decoration:none}
+/* ===== v179: Lite mode (Preferences > Screen): no blur, shadows or CSS animations, for low-end phones ===== */
+html[data-lite] *,html[data-lite] *::before,html[data-lite] *::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important;text-shadow:none!important;animation:none!important;transition:none!important}
+html[data-lite] #aura{display:none!important}
+html[data-lite] #drawer{background:var(--card)!important}
+html[data-lite] #shud{background:rgba(21,17,14,.94)!important}
+html[data-lite][data-theme="light"] #shud{background:rgba(255,255,255,.96)!important}
+html[data-lite] #dTop{background:rgba(21,17,14,.88)!important}

@@ -1,0 +1,9 @@
+/* ===== Evo Chord: chord sheet look (files 50+ are Evo Chord's changes on top of EvoLyric) ===== */
+/* chord names a little larger and higher than EvoLyric's chord preview, with room above each line */
+.ln.hasch{line-height:2.75;padding-top:.35em}
+.chd{position:relative;display:inline;width:0}
+.chd::before{content:attr(data-c);position:absolute;left:0;bottom:115%;font:800 .68em/1 'Bricolage Grotesque',system-ui,sans-serif;color:var(--acct);white-space:nowrap;letter-spacing:.01em;pointer-events:none}
+/* beat rows: "|• · • · • · • ·|" – one character pair per eighth, bar lines, quiet monospace */
+.ln.beat{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:400;color:var(--mut);letter-spacing:0;font-size:.8em}
+.ln.beat .bar{white-space:nowrap}
+.ln.beat .chd::before{font-size:.85em}

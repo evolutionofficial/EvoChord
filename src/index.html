@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#15110e">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Evo Chord">
+<meta name="apple-mobile-web-app-status-bar-style" content="black"><!-- v27: solid status bar (was black-translucent, which let iOS draw a blur strip over the top of the page). Revert to black-translucent to undo. -->
+<meta name="description" content="Evo Chord: chords and lyrics for musicians, with auto-scroll, transpose and sections. Works offline.">
+<title>Evo Chord</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:wght@400;600;800&family=Instrument+Serif:ital@0;1&display=swap">
+<script>/* v179: Lite mode flag before first paint */try{if(JSON.parse(localStorage.getItem('evo.prefs')||'{}').lite)document.documentElement.dataset.lite='1'}catch(e){}</script>
+<style>
+/*@APP_CSS@*/
+</style>
+</head>
+<body>
+
+<section id="list" class="v on">
+  <div class="hd"><h1><svg class="lg" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="lgg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffbe6b"/><stop offset="1" stop-color="#e8812a"/></linearGradient></defs><rect width="40" height="40" rx="11" fill="url(#lgg)"/><g stroke="#15110e" stroke-width="3.2" stroke-linecap="round"><path d="M13 12.5h14" opacity=".45"/><path d="M10 20h20"/><path d="M15 27.5h10" opacity=".45"/></g></svg><span class="wm"><span>Evo<i>Lyric</i></span><small class="by" data-nt>Evolution Digital Studio</small><b class="tier" id="tier" data-tier="pro" hidden>Pro</b></span></h1><span id="svw" hidden>⚠ Not saved</span><button class="ic" id="gear" type="button" aria-label="Settings" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button><div id="auth"></div></div>
+  <div id="amenu" role="menu" hidden></div><div id="gmenu" role="menu" hidden></div>
+  <div class="tabs" id="tabs"><button data-v="all">All Songs</button><button data-v="cats">Categories</button><button data-v="recent" title="Open recent">Recent</button></div>
+  <div class="crumb" id="crumb" hidden><button id="cBack">‹ My Categories</button><b id="cName" data-nt></b></div>
+  <div class="sb"><span class="sfield"><button class="mg" id="find" type="button" aria-label="Search" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg></button><input id="q" placeholder="Search title or artist…" aria-label="Search"><button class="clr" type="button" aria-label="Clear search" tabindex="-1"><svg viewBox="0 0 12 12" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg></button></span></div>
+  <div class="sb" id="actrow" hidden><button class="pill" id="act" style="flex:1"></button></div>
+  <div id="hvrow"><button id="hView" type="button" aria-label="Compact list" aria-pressed="false"><svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path id="hvi" d="M3 5h14M3 10h14M3 15h14"/></svg></button><button id="sortb" type="button" aria-label="Sort songs" aria-haspopup="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V4M3 7l3-3 3 3M14 4v12M11 13l3 3 3-3"/></svg></button></div>
+  <div id="items"></div>
+  <div id="fbg"></div>
+  <div id="fabm" role="menu">
+    <button id="nw" type="button" role="menuitem"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>New song</button>
+    <button id="slb" type="button" role="menuitem"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 5.5H16M7.5 10H16M7.5 14.5H16"/><path d="M3.5 5.5h.01M3.5 10h.01M3.5 14.5h.01" stroke-width="2.4"/></svg>Create setlist</button>
+    <button id="imp" type="button" role="menuitem"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3.5v9M6.5 9.5 10 13l3.5-3.5M4 16h12"/></svg>Import from file</button>
+    <button id="pst" type="button" role="menuitem"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="10" height="13" rx="2"/><path d="M8 4V3h4v1M8 9h4M8 12h4"/></svg>Paste as new song</button>
+  </div>
+  <button id="lastb" type="button" aria-label="Open lyrics"><span aria-hidden="true">L</span></button>
+  <button id="fab" type="button" aria-label="Add song" aria-haspopup="true" aria-expanded="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" aria-hidden="true"><path d="M10 3.5v13M3.5 10h13"/></svg></button>
+  <input type="file" id="file" accept=".txt,.text,.md,.markdown,.html,.htm,.rtf,.docx,.doc,.enex,.json,.zip,.pages,.backup,.dat,.db,text/plain,text/html,text/rtf,application/rtf,application/json,application/zip,application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple hidden>
+</section>
+
+<section id="play" class="v">
+  <div id="aura" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="hd">
+    <button class="ic" id="dr" type="button" aria-label="Song list">☰</button><div id="ptit" class="grow"></div><button id="tsv" type="button" aria-label="Save to Library"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 3.5h9v13l-4.5-3-4.5 3z"/><path d="M10 6.5v5M7.5 9h5"/></svg><span>Save</span></button><button class="ic" id="mn" type="button" aria-label="Menu" aria-haspopup="true" aria-expanded="false">⋮</button>
+  </div>
+  <div id="mbg"></div>
+  <div id="menu" role="menu"><button id="mE" type="button" role="menuitem">Edit song</button><button id="mR" type="button" role="menuitem">Restart</button><button id="mS" type="button" role="menuitem" hidden>Send to friend</button><button id="mV" type="button" role="menuitem" hidden>Save to Library</button><button id="mT" type="button" role="menuitem" hidden>Edit in Editor</button></div>
+  <div id="secs" data-nt></div>
+  <div id="lyr"><div id="txt"></div></div>
+  <button id="nxt" type="button" aria-label="Next song" aria-hidden="true" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6.5 15 12l-5.5 5.5"/></svg></button>
+  <button id="qtg" type="button" aria-label="Queue" aria-expanded="false" aria-controls="qp"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 5h10M3 10h10M3 15h6"/><path d="M14.5 12.5l3 2.5-3 2.5z" fill="currentColor" stroke="none"/></svg><b id="qn"></b></button>
+  <div id="qp" role="region" aria-label="Song queue"><div class="qh0"><span>Queue</span><button id="qx" type="button" aria-label="Hide queue"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg></button></div><div id="ql"></div><button id="qclr" type="button" hidden>Clear queue</button></div>
+  <div id="qbg"></div>
+  <div id="qpop" role="menu"><h4 id="qpt" data-nt></h4><button id="qpa" type="button" role="menuitem"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M3 5h9M3 10h6M3 15h6M15 9v6M12 12h6"/></svg>Add to Queue</button><button id="qpo" type="button" role="menuitem"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4.5 14 10l-7 5.5z"/></svg>Open</button></div>
+  <div id="shud" aria-hidden="true"><span>Speed</span><div class="trk"><i></i><u></u></div><b></b></div>
+  <div id="spc">
+    <div id="spp" role="group" aria-label="Speed"><div class="sph"><span>Speed</span><b id="spv"></b><button id="spx" type="button" aria-label="Close speed"><svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg></button></div><div class="spr"><button class="step" id="spMinus" type="button" aria-label="Decrease speed">−</button><input type="range" id="sp" min="1" max="25" step="any" aria-label="Scroll speed"><button class="step" id="spPlus" type="button" aria-label="Increase speed">+</button></div><div class="spm"><span>1</span><span>25</span></div></div>
+    <button id="spb" type="button" aria-label="Speed" aria-expanded="false" aria-controls="spp"><b id="spbv"></b><small>speed</small></button>
+    <div id="vsp" role="group" aria-label="Versions"><div class="vsh"><span>Versions</span><button id="vsg" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 2.5a14 14 0 0 1 0 19 14 14 0 0 1 0-19Z"/><path d="M2.5 12h19"/></svg>More version</button><button id="vsx" type="button" aria-label="Close versions"><svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg></button></div><div id="vsl"></div><p class="wlsrc">Lyrics from LRCLIB</p></div>
+    <button id="vsb" type="button" aria-label="Versions" aria-expanded="false" aria-controls="vsp"><b id="vsbv"></b><small>versions</small></button>
+  </div>
+  <div id="scrim"></div><div id="drawer"><div class="hd"><button class="pill" id="dBack">Home</button><span style="flex:1"></span><select class="fld" id="dcat" aria-label="Category"></select><button class="ic" id="dView" type="button" aria-label="Compact list" aria-pressed="false"><svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path id="dvi" d="M3 5h14M3 10h14M3 15h14"/></svg></button><button class="ic" id="dX" aria-label="Close">✕</button></div>
+    <div class="sb"><span class="sfield"><input id="dq" placeholder="Search…" aria-label="Search"><button class="clr" type="button" aria-label="Clear search" tabindex="-1"><svg viewBox="0 0 12 12" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg></button></span></div><div id="dItems"></div><button id="dTop" type="button" aria-label="Back to top" title="Back to top"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/><path d="M6 5h12"/></svg></button></div>
+</section>
+
+<section id="edit" class="v">
+  <div class="hd"><button class="ic" id="eX" aria-label="Exit">✕</button><input class="fld" id="et" placeholder="Title"><button class="pill" id="eS">Save</button></div>
+  <div class="sb" id="emeta"><input class="fld" id="ea" placeholder="Artist"><button type="button" class="fld catsel" id="ec" aria-label="Categories"></button><select class="fld" id="ek" aria-label="Base key"></select></div>
+  <div class="sb" id="etm"><input class="fld" id="eb" type="number" inputmode="numeric" min="30" max="300" placeholder="BPM" aria-label="Tempo in BPM"><select class="fld" id="ebl" aria-label="Beats per lyric line"><option value="2">2 beats/line</option><option value="4">4 beats/line</option><option value="8">8 beats/line</option></select><button type="button" class="fld" id="ebt" aria-label="Tap tempo">Tap</button><button type="button" class="fld" id="ebf" aria-label="Find tempo online">Find</button></div><div class="mut" id="ebn" hidden></div>
+  <div class="tb" id="etools" role="toolbar" aria-label="Editor tools">
+    <button id="eU" type="button" aria-label="Undo" title="Undo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg></button><button id="eR" type="button" aria-label="Redo" title="Redo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 14 5-5-5-5"/><path d="M4 20v-7a4 4 0 0 1 4-4h16"/></svg></button><i class="tsep"></i>
+    <button id="eP" type="button" aria-label="Paste" title="Paste"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></button><button id="eK" type="button" aria-label="Keyboard" title="Keyboard"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2.5"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h.01M18 14h.01M9.5 14h5"/></svg></button><i class="tsep"></i>
+    <button id="eH" type="button" aria-label="Highlight" title="Highlight"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg></button><button id="eN" type="button" aria-label="Notes and drawing" title="Notes and drawing"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 2.8a2.1 2.1 0 0 1 3 3L9 17.3 4.8 18.4l1.1-4.2Z"/><path d="M2.5 21.4c1.2-1.6 2.4-1.6 3.6 0s2.4 1.6 3.6 0 2.4-1.6 3.6 0 2.4 1.6 3.6 0 2.4-1.6 3.6 0"/></svg></button><button id="eSd" type="button" aria-label="Hide section panel" aria-pressed="true" aria-controls="side" style="margin-left:auto">Section</button>
+  </div>
+  <div class="tb" id="hlbar" hidden><span class="mut">Color</span><button id="hx" type="button">Remove</button></div>
+  <div class="tb" id="notebar" hidden><b id="nbn"></b><button id="nbEdit">Edit</button><button id="nbMove">Move</button><button id="nbRm">Delete</button></div>
+  <div class="tb" id="secbar" hidden><b id="sn" data-nt></b><button id="sstop" type="button" hidden></button><button id="rl">Remove label</button><button id="ds">Delete section</button></div>
+  <div class="ed"><textarea id="ta" inputmode="none" spellcheck="false" aria-label="Lyrics"></textarea><div id="side"></div></div>
+</section>
+
+<section id="friends" class="v">
+  <div class="hd"><button class="ic" id="frX" aria-label="Back">‹</button><h1 style="font-size:24px">Friends</h1></div>
+  <div id="frbody"></div>
+</section>
+
+<section id="profile" class="v">
+  <div class="hd"><button class="ic" id="pfX" aria-label="Back">‹</button><h1 style="font-size:24px">Profile</h1></div>
+  <div id="pfbody"></div>
+</section>
+
+<section id="prefs" class="v">
+  <div class="hd"><button class="ic" id="prX" aria-label="Back">‹</button><h1 style="font-size:24px">Preferences</h1></div>
+  <div id="prefbody" class="sbody"></div>
+</section>
+
+<section id="help" class="v">
+  <div class="hd"><button class="ic" id="hpX" aria-label="Back">‹</button><h1 style="font-size:24px">Help</h1></div>
+  <div id="helpbody" class="sbody"></div>
+</section>
+
+<section id="acct" class="v">
+  <div class="hd"><button class="ic" id="acX" aria-label="Back">‹</button><h1 style="font-size:24px">Account Settings</h1></div>
+  <div id="acctbody" class="sbody"></div>
+</section>
+
+<section id="doc" class="v">
+  <div class="hd"><button class="ic" id="dcX" aria-label="Back">‹</button><h1 style="font-size:24px" id="doctitle"></h1></div>
+  <div id="docbody" class="sbody doc"></div>
+</section>
+
+<section id="ann" class="v">
+  <div class="hd"><button class="ic" id="anX" aria-label="Cancel">✕</button><h1 style="font-size:20px">Annotate</h1><button class="pill" id="anOK">Done</button></div>
+  <div id="anl"><div id="antx" data-nt></div></div>
+  <div id="antools">
+    <div class="tb" id="anSel" hidden><b>Selected</b><button id="anEd">Edit text</button><button id="anDel">Delete</button></div>
+    <div class="tb" id="anShape" hidden><button data-s="r" aria-label="Rectangle">▭</button><button data-s="o" aria-label="Ellipse">◯</button><button data-s="t" aria-label="Triangle">△</button><button data-s="n" aria-label="Line">╱</button></div>
+    <div class="tb" id="anO"></div>
+    <div class="tb" id="anT"><button data-t="hand">Scroll</button><button data-t="pen">Pen</button><button data-t="text">Text</button><button data-t="shape">Shape</button><button id="anImg" hidden>Image</button><button data-t="sel">Move</button><button data-t="erase">Erase</button></div>
+  </div>
+  <input type="file" id="anFile" accept="image/*" hidden>
+</section>
+<section id="chd" class="v">
+  <div class="hd"><button class="ic" id="chX" aria-label="Cancel">✕</button><h1 style="font-size:20px">Chords</h1><button class="pill" id="chOK">Done</button></div>
+  <div id="chl"><div id="chtx" data-nt></div></div>
+  <div id="chkb" hidden></div>
+</section>
+<div id="notebox"><div class="sheet nsheet"><h3 id="nbt">New note</h3>
+  <textarea id="nbtx" rows="2" maxlength="160" placeholder="e.g. Drums stop here" aria-label="Note text"></textarea>
+  <div id="nbseg"></div>
+  <div id="nbprev" aria-label="Preview"></div>
+  <div class="nact"><button id="nbdel" type="button" class="del">Delete</button><button id="nbcancel" type="button">Cancel</button><button id="nbok" type="button" class="pill">Save</button></div></div></div>
+<div id="arr"><div class="hd"><button class="ic" id="arX" aria-label="Cancel">✕</button><h1 style="font-size:20px">Move notes</h1><button class="pill" id="arOK">Done</button></div>
+  <p class="mut" style="margin:0 14px 8px;font-size:13px">Hold a note by its handle (⋮⋮) and drag it to any line. Tap Done to apply.</p>
+  <div id="arl"></div></div>
+<div id="ctx"><div class="sheet" id="csheet"></div></div>
+<div id="nbox"><div class="sheet"><h3 id="nt">New category</h3><input id="nn" maxlength="30" placeholder="Category name" autocomplete="off"><div class="err" id="ne"></div><p class="mut" id="nhint" style="margin:0 10px 8px;font-size:13px"></p><button id="nok">Save</button><button id="ncx">Cancel</button></div></div>
+<div id="catbox"><div class="sheet"><h3>Categories</h3><div id="catl"></div><div class="nrow"><input id="cnew" maxlength="30" placeholder="+ Create new category" autocomplete="off"><button id="cadd">Create</button></div><div class="err" id="cerr"></div><button id="cdone">Done</button></div></div>
+<div id="addbox"><div class="asheet"><div class="ah"><button id="aX">Cancel</button><div><b id="aT">Add Songs</b><small id="aC">0 selected</small></div><button class="pill" id="aOK" disabled>Add</button></div><div class="sb"><span class="sfield"><input id="aq" placeholder="Search Master Library…" aria-label="Search Master Library"><button class="clr" type="button" aria-label="Clear search" tabindex="-1"><svg viewBox="0 0 12 12" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg></button></span></div><div id="aItems"></div></div></div>
+<div id="slbox"><div class="asheet"><div class="ah"><button id="slX">Cancel</button><div><b id="slT">Create setlist</b><small id="slC"></small></div><button class="pill" id="slDone">Set</button></div><div id="slRow"><div id="slBody"></div><aside id="slSide" aria-label="Setlist"></aside></div></div></div>
+<div id="ipbox"><div class="asheet"><div class="ah"><button id="ipX">Cancel</button><div><b id="ipT">Import</b><small id="ipC"></small></div><button class="pill" id="ipOK">Import</button></div><div id="ipOpt"></div><div id="ipItems"></div></div></div>
+<div id="imbox"><div class="asheet"><div class="ah"><button id="imX">Cancel</button><div><b id="imT">Category</b><small id="imC"></small></div><button class="pill" id="imOK">Save</button></div><div class="imn"><input id="imName" maxlength="30" aria-label="Category name" placeholder="Category name"><small id="imErr" class="mut"></small></div><div id="imItems"></div></div></div>
+<section id="welcome" class="v"><div class="wc"><svg class="lg" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="lgg3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffbe6b"/><stop offset="1" stop-color="#e8812a"/></linearGradient></defs><rect width="40" height="40" rx="11" fill="url(#lgg3)"/><g stroke="#15110e" stroke-width="3.2" stroke-linecap="round"><path d="M13 12.5h14" opacity=".45"/><path d="M10 20h20"/><path d="M15 27.5h10" opacity=".45"/></g></svg><h2>Evo<i>Lyric</i></h2>
+  <div id="wstep1"><p class="sub">A lyric teleprompter for live performers.</p><button class="gbtn" id="wgbtn" type="button"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span>Continue with Google</span></button><div class="err" id="werr" role="alert"></div><p class="priv">We only use your name, email and photo to set up your account. Your Google password is never shared with Evo Chord.</p><button class="wguest" id="wguest" type="button">Continue as guest</button><p class="priv">As a guest your songs are saved on this device only. Sign in any time to sync them and use Friends.</p><p class="legal-ok">By continuing you agree to the <button type="button" class="lnk lg-t">Terms of Service</button> and <button type="button" class="lnk lg-p">Privacy Policy</button>.</p></div>
+  <div id="wstep3" hidden><p class="sub">Signing you in…</p></div>
+  <div id="wstep2" hidden><h3>Choose a username</h3><p class="sub">Friends find you by this name. You can change it later in your profile.</p><div class="wu"><span>@</span><input id="wun" maxlength="20" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="username" aria-label="Username"></div><div class="err" id="wuerr" role="alert"></div><button class="pill wgo" id="wusave" type="button" disabled>Continue</button><button class="lnk" id="wout" type="button">Use a different account</button></div>
+</div></section>
+<div id="authbox" aria-hidden="true"><div class="acard" role="dialog" aria-modal="true" aria-labelledby="atT"><button class="ic xb" id="atX" aria-label="Close">✕</button><svg class="lg" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="url(#lgg)"/><g stroke="#15110e" stroke-width="3.2" stroke-linecap="round"><path d="M13 12.5h14" opacity=".45"/><path d="M10 20h20"/><path d="M15 27.5h10" opacity=".45"/></g></svg><h2 id="atT">Welcome to Evo Chord</h2><p class="sub">Sign in to access your personal song library.</p><button class="gbtn" id="gbtn" type="button"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span>Continue with Google</span></button><div class="err" id="aerr" role="alert"></div><p class="priv">We only use your name, email and photo to set up your account. Your Google password is never shared with Evo Chord.</p><p class="legal-ok">By continuing you agree to the <button type="button" class="lnk lg-t">Terms of Service</button> and <button type="button" class="lnk lg-p">Privacy Policy</button>.</p><p class="priv credit" hidden>Song tempo data by <a href="https://getsongbpm.com" target="_blank" rel="noopener">GetSongBPM.com</a></p><!-- v152: hidden while tempo is not in use --></div></div>
+<div id="pwabox" aria-hidden="true"><div class="acard" role="dialog" aria-modal="true" aria-labelledby="pwaT"><h2 id="pwaT"></h2><p class="sub" id="pwaM"></p><ol class="pwa-steps" id="pwaSteps" hidden></ol><div class="pwa-actions"><button class="dbtn pri" id="pwaYes" type="button"></button><button class="dbtn pwa-no" id="pwaNo" type="button"></button></div></div></div>
+<div id="note" role="status" aria-live="polite"></div>
+<button id="ntf" type="button" role="status" aria-live="polite" hidden></button>
+<div id="cbox"><div class="sheet"><h3>Custom label</h3><input id="cn" placeholder="Label name" maxlength="24"><div class="sws" id="sws"></div><button id="cok">Insert</button></div></div>
+
+<script src="config.js"></script>
+<script src="cloud.js"></script>
+<script src="legal.js"></script>
+<script src="import.js"></script>
+<script src="js/evocore.js"></script>
+<script src="app.js"></script>
+<script>if('serviceWorker' in navigator&&location.protocol.startsWith('http'))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));i18nRun();
+</script>
+</body>
+</html>
