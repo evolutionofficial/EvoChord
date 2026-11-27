@@ -1,0 +1,22 @@
+/* ===== Evo Chord: chord editor grid (file 52; files 50+ are Evo Chord's changes on top of EvoLyric) ===== */
+/* the grid never folds: every row keeps its boxes in line; scroll sideways when it is wider than the screen */
+#chtx{overflow-x:auto}
+.chrow{flex-wrap:nowrap}
+/* chord names never widen a box: the label is drawn over the boxes that follow it */
+.chn{width:0;min-width:100%;overflow:visible;position:relative}
+.chn:not(:empty){z-index:1;background:var(--bg)}
+/* boxes past the end of the text */
+.chx .chn{border-color:rgba(240,160,75,.22)}
+.chx .cht{min-width:1.1em;min-height:1.2em} /* empty cells keep the text height, so their box stays in the chord row */
+/* beat rows: monospace, quiet */
+.chbeat .cht{font-family:ui-monospace,Menlo,monospace;color:var(--mut)}
+.chbeat .chc{min-width:22px}
+.chbctl{display:flex;align-items:center;gap:4px;margin-left:8px;flex:none}
+.chbctl .chtsig{min-height:36px;padding:0 4px;border-radius:8px;border:1px solid var(--ln);background:var(--bg);color:var(--fg);font:700 13px/1 'Atkinson Hyperlegible',sans-serif}
+.chbctl .chbtn{min-width:36px;min-height:36px;padding:0;border-radius:8px;border:1px solid var(--ln);background:var(--bg);color:var(--fg);font:700 16px/1 'Atkinson Hyperlegible',sans-serif;display:inline-flex;align-items:center;justify-content:center}
+.chbctl .chbtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* section line and "+ Beats" buttons */
+.chsec{display:flex;align-items:center}
+.chtop{display:flex;margin:4px 0 6px}
+.chadd{margin-left:8px;padding:4px 10px;min-height:30px;border-radius:999px;border:1px dashed var(--acc);background:none;color:var(--acct);font:700 12px/1 'Atkinson Hyperlegible',sans-serif;cursor:pointer}
+.chtop .chadd{margin-left:0}

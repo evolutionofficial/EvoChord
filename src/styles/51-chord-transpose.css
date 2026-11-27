@@ -1,0 +1,34 @@
+/* Evo Chord card S1: key (transpose) button and panel. Same look as the Speed corner (#spb, #spp). */
+
+#tpb{position:relative;width:40px;height:40px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(34,28,23,.62);border:1px solid rgba(255,255,255,.12);color:var(--fg);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:.85;transition:transform .2s var(--spring),opacity .2s;margin-bottom:8px}
+#tpb b{font:800 14px/1 'Bricolage Grotesque',system-ui,sans-serif;color:var(--acct)}
+#tpb small{font:700 6.5px/1 'Atkinson Hyperlegible',system-ui,sans-serif;letter-spacing:1.1px;text-transform:uppercase;color:var(--mut);margin-top:2px}
+#tpb:active{transform:scale(.92)}
+#tpb.hid{opacity:0;transform:scale(.8);pointer-events:none}
+/* while the key panel is open, the Speed button steps aside */
+#tpp.open~#spb{opacity:0;transform:scale(.8);pointer-events:none}
+#tpp{position:absolute;right:0;bottom:0;width:min(196px,calc(100vw - 12px));padding:5px 8px 6px;background:rgba(34,28,23,.78);border:1px solid rgba(255,255,255,.1);border-radius:14px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 8px 22px rgba(0,0,0,.4);transform-origin:bottom right;opacity:0;transform:scale(.9);visibility:hidden;pointer-events:none;transition:opacity .16s var(--ease),transform .24s var(--ease),visibility 0s .24s}
+#tpp.open{opacity:1;transform:none;visibility:visible;pointer-events:auto;transition:opacity .18s var(--ease),transform .3s var(--spring),visibility 0s}
+#tpx{position:relative;margin-left:auto;width:30px;height:20px;display:flex;align-items:center;justify-content:center;color:var(--mut);border-radius:8px}#tpx:active{background:var(--ln)}
+#tpx::after{content:'';position:absolute;inset:-8px -6px}
+#tpp .sph b{min-width:26px;text-align:right}
+#tpp .tpr{display:flex;align-items:center;gap:6px;margin-top:4px}
+#tpp .tpr .step{width:34px;height:34px;flex:0 0 34px;border-radius:10px;font-size:20px;background:rgba(13,10,8,.45)}
+#tpk{flex:1;min-width:0;text-align:center;font:800 24px/1 'Bricolage Grotesque',system-ui,sans-serif;color:var(--acct);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tpp .tpf{display:flex;gap:6px;margin-top:6px}
+#tpp .tpbtn{flex:1;min-width:0;height:28px;border-radius:9px;font:700 10px/1 'Atkinson Hyperlegible',system-ui,sans-serif;letter-spacing:.6px;text-transform:uppercase;color:var(--fg);background:rgba(13,10,8,.45);border:1px solid rgba(255,255,255,.1)}
+#tpp .tpbtn.tpsave{color:var(--acct)}
+#tpp .tpbtn:active{background:var(--ln)}
+
+/* light theme: same as #spb and #spp in 10-light.css */
+:root[data-theme="light"] #tpb,:root[data-theme="light"] #tpp{background:rgba(255,255,255,.86);border:1px solid var(--ln)}
+:root[data-theme="light"] #tpp .tpr .step,:root[data-theme="light"] #tpp .tpbtn{background:rgba(0,0,0,.05)}
+
+/* auto-scroll fades the corner buttons like Speed (03-layout.css) */
+#play #tpb:not(.hid){opacity:1;transition:opacity .45s ease,transform .25s var(--spring),color .2s,border-color .2s,background-color .2s}
+#play.run #tpb:not(.hid){opacity:.08}
+#play.nodim.run #tpb:not(.hid){opacity:1}
+#play.run #tpb:active,#play.run #tpb:focus-visible{opacity:1;transition-duration:.15s}
+@media(prefers-reduced-motion:reduce){#tpb,#tpp,#tpp input{transition:none!important}#play #tpb{transition:none!important}}
+
+/* the LRC (plain lyric) view has no Speed button, so it has no key button either */

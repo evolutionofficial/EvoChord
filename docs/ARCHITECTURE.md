@@ -1,81 +1,75 @@
-# Evo Chord – Arsitektur
+# Evo Chord – Arsitektur ("Evo shell")
 
-Evo Chord adalah PWA untuk pemain musik: chord di atas lirik, transpose, auto-scroll, editor chord dengan keyboard khusus, dan impor dari Chordtela. Ini aplikasi saudara **EvoLyric** (untuk vokalis). Keduanya dirancang memakai **data lagu yang sama** supaya nanti bisa tersambung lewat satu akun Evo.
+Evo Chord memakai **seluruh UI/UX EvoLyric** – Home/library, layar lirik dengan auto-scroll, editor, setlist & antrian, kategori, teman, highlight & catatan, akun + sync cloud, backup, preferensi, bahasa EN/ID, tour, halaman legal – lalu menambah yang khas pemain musik: chord yang tidak saling tumpuk, transpose, editor kotak chord dengan baris ketukan, dan impor dari Chordtela.
 
-## Struktur modul
+Tujuannya satu cara pakai untuk semua produk Evo (EvoLyric, Evo Chord, EvoBeat): siapa pun yang bisa memakai satu aplikasi langsung bisa memakai yang lain.
+
+## Struktur
 
 ```
 src/
-  core/                 ← logika murni, tanpa DOM, bisa dites & dipakai di Worker
-    chord.js            nama chord: parse, transpose, tata bahasa keyboard chord
-    song.js             model lagu (sama dengan EvoLyric), baris siap-render, transpose lagu
-    chordsheet.js       lembar chord teks / halaman Chordtela → lagu Evo
-    remap.js            chord ikut pindah baris saat lirik diedit (sama dengan EvoLyric)
-    store.js            library lokal (localStorage) + preferensi
-    sync.js             kontrak baris cloud Supabase, sama dengan EvoLyric
-  features/
-    import/importer.js  impor dari link Chordtela (lewat Worker) atau teks tempel
-  ui/
-    app.js              router hash + siklus hidup view
-    dom.js              helper DOM (esc, icon, toast, confirmDialog)
-    libraryView.js      daftar lagu
-    songView.js         tampilan lagu: chord di atas lirik, transpose, ukuran huruf, auto-scroll
-    chordEditorView.js  kotak chord (1 kotak per 2 karakter) + keyboard chord
-    lyricEditView.js    judul, artis, nada, capo, lirik (teks polos)
-    importView.js       impor Chordtela / tempel teks, pratinjau, pilih versi
-  styles.css            token tema & komponen bersama
-worker/index.js         Cloudflare Worker: aset statis + /api/chordtela
-tests/                  Vitest (core + worker)
+  index.html            markup semua layar (dari EvoLyric); CSS disuntik saat build
+  styles/
+    01–13-*.css         CSS EvoLyric, dipecah per area (urutan = urutan asli)
+    50+-*.css           tampilan khas Evo Chord
+  app/
+    01–17-*.js          kode EvoLyric, dipecah per fitur (urutan = urutan asli):
+                        core, library, weblyric, import, prefs-i18n, settings-help, tour,
+                        account-backup, play, scroll-menu, queue-gestures, editor,
+                        notes-chords, auth-profile, friends, sync, welcome-init
+    50+-chord-*.js      perubahan khas Evo Chord (lihat di bawah)
+  core/                 mesin chord murni (ES modules, dites dengan Vitest):
+                        chord.js, song.js, beats.js, chordsheet.js, remap.js
+tools/build.mjs         src → www (lihat "Build")
+www/                    situs statis yang di-deploy (seperti EvoLyric)
+worker/index.js         Cloudflare Worker: aset + /api/chordtela
+tests/core/             Vitest untuk src/core + worker
+tests/e2e/              tes end-to-end EvoLyric (Playwright) – semuanya harus tetap lulus
 ```
 
-Aturan:
-- `core/` tidak boleh menyentuh DOM, `fetch`, atau storage global (store menerima storage sebagai parameter).
-- Tiap view punya CSS sendiri dengan prefix class (`lv-`, `sv-`, `ce-`, `le-`, `iv-`).
-- Semua teks lagu/pengguna masuk HTML lewat `esc()`.
+### Build
 
-## Model lagu (dibagi dengan EvoLyric)
+`node tools/build.mjs`:
+- `src/styles/*.css` digabung berurutan dan disuntik ke `<style>` di `www/index.html` (fitur nada warna EvoLyric membaca stylesheet itu).
+- `src/app/*.js` digabung berurutan menjadi **satu** skrip `www/app.js`. Karena satu skrip, perilakunya identik dengan EvoLyric yang satu file.
+- `src/core/index.js` dibundel menjadi `www/js/evocore.js` (`window.EvoCore`).
+
+### Aturan "ganti yang perlu diganti"
+
+File `01–17` adalah EvoLyric dan dibiarkan sedekat mungkin dengan aslinya, supaya pembaruan EvoLyric mudah dibawa ke sini. Perubahan Evo Chord ada di file `50+`:
+
+- Fungsi yang dideklarasikan ulang di file `50+` dengan nama yang sama **menggantikan** fungsi EvoLyric di mana pun (aturan JavaScript untuk deklarasi fungsi dalam satu skrip).
+- `const`/`let` tidak boleh dideklarasikan ulang – helper baru memakai nama baru.
+- Untuk EvoBeat: salin repo ini, ganti `50-chord-*` dengan `50-beat-*`.
+
+| File | Isi |
+|---|---|
+| `50-chord-render.js` | `chordApply` versi Evo Chord: nama chord ditranspose sementara, label tidak bertumpuk (teks di bawahnya bergeser), baris ketukan bergaya sendiri |
+| `51-chord-transpose.js` | tombol Nada di pojok (gaya sama dengan tombol Speed): naik/turun, reset, simpan nada |
+| `52-chord-editor.js` | editor chord: kotak seragam di semua baris, baris ketukan (+ Ketukan, birama, tambah/kurangi/hapus), tombol chord di toolbar editor |
+| `53-chord-web.js` | "Cari online" → Google khusus Chordtela → kembali → Ambil chord (link atau teks chord) → lagu sementara + Simpan ke Library + tombol Versi (chord dasar / original); tempel & bagikan memakai pembaca yang sama |
+
+## Data lagu (sama dengan EvoLyric)
 
 ```js
-{
-  id, title, artist,
-  lyrics: "[Verse]\nbaris lirik\n...",   // "[...]" = label section
-  key: "G", capo: 2,
-  chords: [{ l: 3, c: 8, n: "Am" }],       // l = index baris mentah, c = index karakter genap
-  source: { site: "chordtela", url },      // opsional
-  createdAt, updatedAt
-}
+{ id, title, artist, lyrics, key, capo, speed, font, colors, ann, stops,
+  chords: [{ l, c, n }],   // l = index baris lirik, c = index karakter genap (1 kotak = 2 karakter)
+  src: { site: 'chordtela', url } }  // opsional
 ```
 
-- Posisi chord memakai **teks terlihat** baris (markup warna EvoLyric `{r:...}` dibuang), satu kotak per 2 karakter. Format ini sama persis dengan fitur chord EvoLyric v180+, jadi chord yang diisi di satu aplikasi langsung tampil benar di aplikasi lain.
-- Baris instrumental hasil impor (intro/interlude tanpa lirik) berisi titik `·` di posisi chord. Evo Chord menampilkannya sebagai deretan chip chord; di EvoLyric tampil sebagai titik di bawah chord.
-- Field lain yang tidak dikenal (milik EvoLyric: `colors`, `ann`, `speed`, dll.) **tidak dibuang** oleh `normalizeSong`.
+- Baris ketukan adalah baris lirik biasa: `|• · • · • · • ·|` (1 kotak = ⅛ ketuk, `|` birama, `•` ketukan, `·` and), jadi EvoLyric juga menampilkannya.
+- Chord setelah kata terakhir: baris lirik diberi spasi sampai posisi chord, agar posisinya sama di kedua aplikasi.
+- Kunci localStorage dan format backup (`EVOLYRIC2`, file `.evolyric`) sengaja sama dengan EvoLyric.
 
-## Sambungan ke EvoLyric (rencana)
+## Akun & cloud
 
-EvoLyric menyimpan lagu di tabel Supabase `songs`:
-`{ id, user_id, local_id, title, artist, lyrics, app_data (JSONB), created_at, updated_at }`.
-Semua field selain `title/artist/lyrics` masuk `app_data`. `core/sync.js` (`toCloudRow`, `fromCloudRow`) memakai aturan yang sama dan sudah dites.
+`www/config.js` memakai project Supabase yang sama dengan EvoLyric (tabel `songs`, `app_data` JSONB). Satu akun Evo = satu library di semua aplikasi. Login Google memerlukan alamat Evo Chord terdaftar sebagai Redirect URL di Supabase Auth (lihat SETUP-AUTH di repo EvoLyric).
 
-Langkah untuk menyambungkan (belum aktif di v0.1):
-1. Login Supabase yang sama dengan EvoLyric (project & tabel yang sama).
-2. Pull: baris `songs` milik user → `fromCloudRow` → `store.put`.
-3. Push: lagu berubah → `toCloudRow` → upsert (onConflict `id`), dengan peta `local_id → id` seperti di EvoLyric `cloud.js`.
-4. Konflik: `updated_at` terbaru menang (sama dengan EvoLyric).
+## Impor Chordtela
 
-Pembagian peran: lirik lengkap (highlight, anotasi, warna) diedit di EvoLyric; Evo Chord hanya mengedit lirik sebagai teks polos dan fokus ke chord.
-
-## Impor Chordtela (eksperimen)
-
-`GET /api/chordtela?url=<halaman lagu chordtela>` di Worker:
-1. Hanya menerima `https://(www.)chordtela.com/YYYY/MM/<slug>.html`.
-2. Mengambil halaman, mengambil blok `<pre>` dengan chord terbanyak, membuang script/style.
-3. `parseChordtelaHtml` → judul & artis dari heading halaman, capo, section (Intro/Reff/…), "Back to Reff" diulang otomatis, dan **versi**: Chordtela sering memuat "chord dasar" lalu "ORIGINAL VERSION/CHORD"; keduanya dikembalikan di `versions`.
-4. Hasil di-cache 1 hari di edge.
-
-Diukur di 12 halaman nyata (Nov 2026): ambil halaman ±10–160 ms, proses ±1–3 ms per lagu.
-
-Catatan: fitur ini mengambil konten situs pihak ketiga. Sebelum dipakai di produk berbayar, minta izin/kerja sama dengan Chordtela. Fallback yang selalu aman: **Tempel teks** (parser yang sama, jalan offline).
+`GET /api/chordtela?url=` (Worker) membaca halaman lagu Chordtela – format `<pre>` baru maupun `div.telabox` lama – lalu mengembalikan judul, artis, capo, section, chord, baris ketukan untuk intro/interlude, dan versi (chord dasar / original). Cache edge 1 hari, dikunci dengan `PARSER_VERSION`. Catatan: konten milik situs pihak ketiga; minta izin Chordtela sebelum dipakai di produk berbayar. Tempel teks memakai pembaca yang sama dan berjalan offline.
 
 ## Tes
 
-`npm test` (Vitest): parser chord & lembar chord (termasuk contoh halaman Chordtela buatan sendiri di `tests/fixtures`), model lagu, remap, store, kontrak cloud, dan Worker (fetch di-mock).
+- `npm run test:core` – Vitest untuk mesin chord & Worker.
+- `npm run test:e2e` – semua tes end-to-end EvoLyric terhadap `www/` hasil build (jalankan `npm run build` dulu).

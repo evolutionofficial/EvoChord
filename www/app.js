@@ -2439,3 +2439,354 @@ async function initAuth(){
 })();
 initAuth();
 refresh();
+/* ===== src/app/50-chord-render.js ===== */
+/* ===== Evo Chord: chords in the lyrics screen =====
+   Files 01–17 are EvoLyric as it is. Files 50+ are what Evo Chord changes: a function declared here
+   with the same name as an EvoLyric function replaces it everywhere (the files are joined into one script).
+
+   Replaces chordApply (EvoLyric v180):
+   - the chord name can be transposed on the fly (cur._tp semitones, see 51-chord-transpose.js)
+   - chord names are kept apart: when a name would run into the next one, the text under the next chord
+     moves right just enough (no overlapping chords, as in a printed chord sheet)
+   - beat rows ("|• · • ·|", intros/interludes) get their own quiet monospace look
+   The anchor stays an empty inline element and the name is drawn by CSS, so the text itself, its
+   character offsets (annotations, tempo) and highlights do not change. */
+
+function chordTp(){return (cur&&cur._tp)|0}
+function chordFlats(){const k=(cur&&cur.key)||(cur&&cur.chords&&cur.chords[0]&&cur.chords[0].n)||'C';
+  return EvoCore.chord.prefersFlats(EvoCore.chord.transposeKey(k,chordTp()))}
+function chordName(n){const t=chordTp();return t?EvoCore.chord.transposeChord(String(n||''),t,{flats:chordFlats()}):String(n||'')}
+
+function chordApply(le,items){if(!le)return;
+  le.forEach(d=>{if(d&&d.classList&&d.classList.contains('ln')&&EvoCore.beats.isBeatLine(d.textContent))d.classList.add('beat')});
+  if(!items||!items.length)return;const by={};items.forEach(it=>{(by[it.l]=by[it.l]||[]).push(it)});
+  Object.keys(by).forEach(l=>{const d=le[+l];if(!d||!d.classList||!d.classList.contains('ln'))return;const len=(d.textContent||'').length;if(!len)return;
+    by[l].slice().sort((a,b)=>b.c-a.c).forEach(it=>{const c=Math.max(0,Math.min(it.c|0,len-1)),nodes=chNodes(d);
+      for(const[nd,o]of nodes){if(c>=o&&c<o+nd.data.length){const a=E('span','chd');a.dataset.c=chordName(it.n);const r=nd.splitText(c-o);r.parentNode.insertBefore(a,r);break}}});
+    d.classList.add('hasch')});
+  le.forEach(d=>{if(d&&d.classList&&d.classList.contains('beat'))chordBarBreaks(d)});
+  chordSpaceSoon()}
+/* A beat row only wraps between bars, so a bar is never split over two lines: each bar goes in a
+   no-wrap span with a <wbr> between bars. Only text and chord anchors are moved, never text changed,
+   so offsets (chords, highlights) stay the same. Rows with other markup inside are left as they are. */
+function chordBarBreaks(d){if([...d.childNodes].some(n=>n.nodeType===1&&!n.classList.contains('chd')))return;
+  [...d.childNodes].forEach(nd=>{if(nd.nodeType!==3)return;let i;if(nd.data.length>1&&nd.data[0]==='|'&&nd.previousSibling)nd=nd.splitText(1);while((i=nd.data.indexOf('|',1))>0&&i<nd.data.length-1)nd=nd.splitText(i+1)});
+  const kids=[...d.childNodes];let bar=null;
+  kids.forEach(n=>{if(!bar){bar=E('span','bar');d.insertBefore(bar,n)}bar.appendChild(n);
+    if(n.nodeType===3&&/\|$/.test(n.data)&&n!==kids[kids.length-1]){bar.after(document.createElement('wbr'));bar=null}});}
+
+/* Keep chord names apart. Measured after layout, again when the font size or the width changes. */
+let chordSpaceRaf=0;
+function chordSpaceSoon(){cancelAnimationFrame(chordSpaceRaf);chordSpaceRaf=requestAnimationFrame(()=>chordSpace($('#txt')))}
+const chordMeasure=document.createElement('canvas').getContext('2d');
+function chordLabelWidth(a){const cs=getComputedStyle(a,'::before');
+  chordMeasure.font=(cs.fontStyle||'normal')+' '+(cs.fontWeight||'800')+' '+(cs.fontSize||'16px')+' '+(cs.fontFamily||'sans-serif');
+  return chordMeasure.measureText(a.dataset.c||'').width}
+function chordSpace(t){if(!t)return;
+  t.querySelectorAll('.ln.hasch').forEach(line=>{const as=[...line.querySelectorAll('.chd')];as.forEach(a=>{a.style.marginLeft=''});
+    let right=-1e9,top=null;
+    for(const a of as){let r=a.getBoundingClientRect();
+      if(top!==null&&Math.abs(r.top-top)<2&&r.left<right){a.style.marginLeft=(right-r.left).toFixed(1)+'px';r=a.getBoundingClientRect()}
+      const gap=parseFloat(getComputedStyle(a,'::before').fontSize||'12')*.45;
+      right=r.left+chordLabelWidth(a)+gap;top=r.top}})}
+if(window.ResizeObserver){let rw=0,rh=0;new ResizeObserver(es=>{const r=es[0].contentRect;if(Math.abs(r.width-rw)>1||Math.abs(r.height-rh)>1){rw=r.width;rh=r.height;chordSpaceSoon()}}).observe($('#txt'))}
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(chordSpaceSoon);
+/* ===== src/app/51-chord-transpose.js ===== */
+/* ===== Evo Chord: key (transpose) button in the lyrics corner — card S1 =====
+   Sits above the Speed button (#spb) inside #spc and copies its look and idle behaviour.
+   The transpose is kept in cur._tp (-11..11) and drawn by chordName() in 50-chord-render.js.
+   Only "Save key" writes to the song (chords and key), and only for library songs. */
+
+let tpT=0,tpDown=0,tpSong=null;
+
+function tpKeyNow(){ /* key shown now, transposed; '' when the song has neither a key nor chords */
+  if(!cur)return '';
+  const base=cur.key||(cur.chords&&cur.chords[0]&&cur.chords[0].n)||'';
+  if(!base)return '';
+  try{return EvoCore.chord.transposeKey(base,cur._tp|0)}catch(e){return ''}
+}
+
+function tpBump(){clearTimeout(tpT);if($('#tpp').classList.contains('open'))tpT=setTimeout(()=>{if(tpDown)tpBump();else tpOpen(false)},3000)} /* idle -> back to the small corner button */
+
+function tpOpen(on){
+  const p=$('#tpp'),b=$('#tpb');
+  if(on==null)on=!p.classList.contains('open');
+  if(on&&$('#spp').classList.contains('open'))spOpen(false); /* one panel at a time */
+  p.classList.toggle('open',on);b.classList.toggle('hid',on);b.setAttribute('aria-expanded',on?'true':'false');
+  if(!on)p.classList.remove('act');
+  tpBump();
+}
+
+function tpPaint(){ /* labels, visibility and the song-change reset; runs after every lyrics redraw */
+  const tb=$('#tpb');if(!tb)return;
+  if(tpSong!==cur){if(tpSong)tpSong._tp=0;tpSong=cur;if(cur)cur._tp=0}
+  const has=!!(cur&&cur.chords&&cur.chords.length);
+  tb.style.display=has?'':'none';
+  if(!has){if($('#tpp').classList.contains('open'))tpOpen(false);return}
+  const t=cur._tp|0,k=tpKeyNow()||'–';
+  $('#tpbv').textContent=k;
+  $('#tpk').textContent=k;
+  $('#tpv').textContent=t>0?'+'+t:t<0?'−'+(-t):'0';
+  $('#tph').textContent=L('Key','Nada');
+  $('#tpbs').textContent=L('key','nada');
+  tb.setAttribute('aria-label',L('Key','Nada'));
+  $('#tpp').setAttribute('aria-label',L('Key','Nada'));
+  $('#tpx').setAttribute('aria-label',L('Close key','Tutup nada'));
+  $('#tpMinus').setAttribute('aria-label',L('Key down','Turunkan nada'));
+  $('#tpPlus').setAttribute('aria-label',L('Key up','Naikkan nada'));
+  $('#tpr').textContent=L('Reset','Reset');
+  $('#tps').textContent=L('Save key','Simpan nada');
+  $('#tpr').style.display=t?'':'none';
+  $('#tps').style.display=(t&&!isTemp(cur))?'':'none';
+}
+
+function tpSet(v){ /* -/+/Reset: redraw the lyrics with the new chord names, keep the scroll position */
+  if(!cur)return;
+  const ly=$('#lyr'),top=ly.scrollTop;
+  cur._tp=Math.max(-11,Math.min(11,v|0));
+  render();
+  ly.scrollTop=top;
+  tpBump();
+}
+
+function tpSave(){ /* writes the transposed chords and key into a library song */
+  if(!cur||isTemp(cur))return;
+  const t=cur._tp|0;if(!t)return;
+  const flats=EvoCore.chord.prefersFlats(EvoCore.chord.transposeKey(cur.key||(cur.chords&&cur.chords[0]?cur.chords[0].n:'C'),t));
+  (cur.chords||[]).forEach(c=>{if(c&&c.n)c.n=EvoCore.chord.transposeChord(String(c.n),t,{flats})});
+  if(cur.key)cur.key=EvoCore.chord.transposeKey(cur.key,t);
+  cur.md=Date.now();cur._tp=0;
+  save();render();note(L('Key saved','Nada disimpan'));
+  tpBump();
+}
+
+(function tpInit(){
+  const spc=$('#spc'),spb=$('#spb');
+  const tpp=document.createElement('div');
+  tpp.id='tpp';tpp.setAttribute('role','group');
+  tpp.innerHTML='<div class="sph"><span id="tph"></span><b id="tpv"></b><button id="tpx" type="button"><svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg></button></div>'
+    +'<div class="tpr"><button class="step" id="tpMinus" type="button">−</button><span id="tpk"></span><button class="step" id="tpPlus" type="button">+</button></div>'
+    +'<div class="tpf"><button class="tpbtn" id="tpr" type="button"></button><button class="tpbtn tpsave" id="tps" type="button"></button></div>';
+  const tpb=document.createElement('button');
+  tpb.id='tpb';tpb.type='button';tpb.setAttribute('aria-expanded','false');tpb.setAttribute('aria-controls','tpp');
+  tpb.innerHTML='<b id="tpbv"></b><small id="tpbs"></small>';
+  spc.insertBefore(tpp,spb);
+  spc.insertBefore(tpb,spb);
+
+  tpb.onclick=()=>tpOpen();
+  $('#tpx').onclick=()=>tpOpen(false);
+  $('#tpMinus').onclick=()=>tpSet((cur?cur._tp|0:0)-1);
+  $('#tpPlus').onclick=()=>tpSet((cur?cur._tp|0:0)+1);
+  $('#tpr').onclick=()=>tpSet(0);
+  $('#tps').onclick=()=>tpSave();
+  tpp.addEventListener('pointerdown',()=>{tpDown=1;tpBump()});
+  tpp.addEventListener('pointerup',()=>{tpDown=0;tpBump()});
+  tpp.addEventListener('pointercancel',()=>{tpDown=0;tpBump()});
+  tpp.addEventListener('click',tpBump);
+
+  new MutationObserver(tpPaint).observe($('#txt'),{childList:true});
+  tpPaint();
+})();
+/* ===== src/app/52-chord-editor.js ===== */
+/* ===== Evo Chord: chord editor (files 50+ replace EvoLyric's chord screen, 13-notes-chords.js) =====
+   Every lyric row and beat row has the same number of 2-character boxes (EvoCore.song.gridCells).
+   Beat rows ("|• · • ·|") get bar/time-signature/delete controls; "+ Beats" buttons add beat rows.
+   chKbBuild, chAdd, chCan, chVis, CH_TOK and CH_ROWS are still EvoLyric's. */
+
+function chKeepPos(){const p=chs&&chs.sel>=0&&chs.cells[chs.sel];return p?{l:p.l,c:p.c}:null}
+
+// Remove chords of row l from cell fromCell on.
+function chDrop(l,fromCell){for(const k of Object.keys(chs.map)){const p=k.split(':').map(Number);if(p[0]===l&&p[1]>=fromCell)delete chs.map[k]}}
+
+// Move chord keys of rows >= from by delta.
+function chShift(from,delta){const e=Object.entries(chs.map);chs.map={};for(const[k,n]of e){const p=k.split(':').map(Number);chs.map[(p[0]>=from?p[0]+delta:p[0])+':'+p[1]]=n}}
+
+function chAddBtn(text,aria,fn){const b=E('button','chadd',text);b.type='button';b.setAttribute('aria-label',aria);b.onclick=fn;return b}
+
+function openChd(){if(!ed)return;const lyr=ta.value;
+  if(ed.chords&&ed.chords.length&&ed.chLyr!=null&&ed.chLyr!==lyr)annRemap(ed.chords,ed.chLyr.split('\n'),lyr.split('\n'));ed.chLyr=lyr;
+  chs={map:{},sel:-1,cells:[],buf:'',lines:lyr.split('\n')};(ed.chords||[]).forEach(it=>{if(it&&it.n)chs.map[it.l+':'+it.c]=String(it.n)});
+  chKbBuild();chBuild();chs.start=JSON.stringify({lines:chs.lines,chords:chNow()});show('chd');$('#chl').scrollTop=0;chSelect(-1)}
+
+// Build the grid from chs.lines. keep = {l,c} box to keep selected if it still exists.
+function chBuild(keep=chKeepPos()){const box=$('#chtx');box.textContent='';chs.cells=[];
+  const lines=chs.lines,N=EvoCore.song.gridCells({lyrics:lines.join('\n'),chords:chNow()}),map={};
+  const top=E('div','chtop');top.append(chAddBtn(L('+ Beats at the start','+ Ketukan di awal'),L('Add beat row at the start','Tambah baris ketukan di awal'),()=>chInsertBeat(0)));
+  box.append(top);
+  lines.forEach((ln,l)=>{const tr=ln.trim();
+    if(!tr){box.append(E('div','chgap'));return}
+    if(/^\[.+\]$/.test(tr)){const s=E('div','chsec');s.append(E('span','',tr.slice(1,-1)),chAddBtn(L('+ Beats','+ Ketukan'),L('Add beat row','Tambah baris ketukan'),()=>chAddBeatAfter(l)));box.append(s);return}
+    if(EvoCore.song.isNoteLine(ln))return;
+    const beat=EvoCore.beats.isBeatLine(ln),v=EvoCore.song.visibleText(ln),row=E('div',beat?'chrow chbeat':'chrow');
+    for(let i=0;i<N;i++){const c=i*2,k=l+':'+c,cell=E('button','chc');cell.type='button';cell.dataset.i=chs.cells.length;
+      const name=E('b','chn',chs.map[k]||''),t=E('span','cht',v.slice(c,c+2));
+      if(c>=v.length)cell.classList.add('chx');
+      cell.append(name,t);row.append(cell);chs.cells.push({l,c,el:cell,nEl:name});if(chs.map[k])map[k]=chs.map[k]}
+    if(beat)row.append(chBeatCtl(l,ln));
+    box.append(row)});
+  chs.map=map;
+  chSelect(keep?chs.cells.findIndex(x=>x.l===keep.l&&x.c===keep.c):-1)}
+
+function chBeatCtl(l,ln){const ctl=E('div','chbctl');
+  const sel=E('select','chtsig');sel.setAttribute('aria-label',L('Time signature','Birama'));
+  const sig=EvoCore.beats.readBeatLine(ln).timeSig;
+  EvoCore.beats.TIME_SIGS.forEach(t=>{const o=E('option','',t);o.value=t;if(t===sig)o.selected=true;sel.append(o)});
+  sel.onchange=()=>chBeatSig(l,sel.value);
+  const mk=(html,label,fn)=>{const b=E('button','chbtn');b.type='button';b.innerHTML=html;b.setAttribute('aria-label',label);b.onclick=fn;return b};
+  ctl.append(sel,
+    mk('&minus;',L('Remove bar','Kurangi birama'),()=>chBeatResize(l,-1)),
+    mk('+',L('Add bar','Tambah birama'),()=>chBeatResize(l,1)),
+    mk('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>',L('Delete beat row','Hapus baris ketukan'),()=>chBeatDel(l)));
+  return ctl}
+
+function chBeatSig(l,sig){chs.lines[l]=EvoCore.beats.makeBeatLine(EvoCore.beats.readBeatLine(chs.lines[l]).bars,sig);chDrop(l,EvoCore.song.visibleText(chs.lines[l]).length);chBuild()}
+function chBeatResize(l,d){chs.lines[l]=EvoCore.beats.resizeBeatLine(chs.lines[l],d);chDrop(l,EvoCore.song.visibleText(chs.lines[l]).length);chBuild()}
+
+function chBeatDel(l){
+  const go=()=>{const p=chKeepPos(),keep=p&&p.l===l?null:p&&p.l>l?{l:p.l-1,c:p.c}:p;
+    chDrop(l,0);chShift(l+1,-1);chs.lines.splice(l,1);chBuild(keep)};
+  if(chNow().some(x=>x.l===l))ask(L('Delete this beat row?','Hapus baris ketukan ini?'),'',L('Delete','Hapus'),go);else go()}
+
+function chInsertBeat(k){const p=chKeepPos(),keep=p&&p.l>=k?{l:p.l+1,c:p.c}:p;
+  chShift(k,1);chs.lines.splice(k,0,EvoCore.beats.makeBeatLine(1,(cur&&cur.timeSig)||'4/4'));
+  chBuild(keep);chSelect(chs.cells.findIndex(x=>x.l===k&&x.c===0))}
+
+// A new beat row goes after the section line and any beat rows that already follow it.
+function chAddBeatAfter(l){let k=l+1;while(k<chs.lines.length&&EvoCore.beats.isBeatLine(chs.lines[k]))k++;chInsertBeat(k)}
+
+function chNow(){return Object.keys(chs.map).map(k=>{const p=k.split(':');return{l:+p[0],c:+p[1],n:chs.map[k]}}).sort((a,b)=>a.l-b.l||a.c-b.c)}
+
+function chSelect(i){if(!chs)return;chs.cells.forEach(x=>x.el.classList.remove('on'));const k=$('#chkb');
+  if(i<0||i>=chs.cells.length){chs.sel=-1;k.hidden=true;return}
+  chs.sel=i;const x=chs.cells[i];x.el.classList.add('on');k.hidden=false;chs.buf=chs.map[x.l+':'+x.c]||'';chKbState();
+  try{x.el.scrollIntoView({block:'nearest'})}catch(e){}}
+
+function chSet(n){const x=chs&&chs.cells[chs.sel];if(!x)return;const k=x.l+':'+x.c;if(n)chs.map[k]=n;else delete chs.map[k];x.nEl.textContent=n||'';chs.buf=n||'';chKbState()}
+
+function chKbState(){const k=$('#chkb');if(!chs)return;k.querySelector('.chcur').textContent=chs.buf||'–';
+  k.querySelectorAll('[data-k]').forEach(b=>{b.disabled=!chCan(chs.buf,b.dataset.k)});
+  const r=k.querySelector('.chrec');r.textContent='';const seen=[];chNow().forEach(it=>{if(!seen.includes(it.n))seen.push(it.n)});
+  seen.slice(0,10).forEach(n=>{const b=E('button','',n);b.type='button';b.dataset.r=n;r.append(b)})}
+
+function chDone(){if(!chs)return;const items=chNow();
+  if(JSON.stringify({lines:chs.lines,chords:items})!==chs.start){
+    const lyr=EvoCore.song.padLyricsForChords(chs.lines.join('\n'),items);
+    ta.value=lyr;ta.dispatchEvent(new Event('input'));
+    ed.chords=items;ed.chLyr=ta.value;ed.dirty=true}
+  chs=null;show('edit')}
+
+function chBack(){if(!chs){show('edit');return}if(JSON.stringify({lines:chs.lines,chords:chNow()})===chs.start){chs=null;show('edit');return}
+  ask(L('Discard chords?','Buang chord?'),L('Your chord changes on this page will be lost.','Perubahan chord di halaman ini akan hilang.'),L('Discard','Buang'),()=>{chs=null;show('edit')})}
+
+// Toolbar button for chords next to the notes button (opens the chord screen).
+(function(){const n=$('#eN');if(!n||$('#eCho'))return;
+  const b=document.createElement('button');b.id='eCho';b.type='button';
+  b.setAttribute('aria-label',L('Chords','Chord'));b.title=L('Chords','Chord');
+  b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
+  b.onclick=()=>openChd();n.after(b)})();
+/* ===== src/app/53-chord-web.js ===== */
+/* ===== Evo Chord: find chords online (Chordtela) =====
+   Files 01–17 are EvoLyric as it is. This file replaces the Web Lyric functions of 03-weblyric.js (and openTemp/tempSong/
+   saveTemp/textIn of 09 and 04) for Evo Chord: the globe button searches chords on Chordtela, not lyrics on LRCLIB.
+   A Chordtela link goes through /api/chordtela; a pasted chord sheet or copied lyrics open as a temporary song. */
+
+function webSearch(q){const a=document.createElement('a');a.href='https://www.google.com/search?q='+encodeURIComponent(q+' chord site:chordtela.com');a.target='_blank';a.rel='noopener noreferrer';a.style.display='none';document.body.append(a);a.click();setTimeout(()=>a.remove(),0)}
+
+function wlGo(q,btn){q=String(q||'').trim();if(!q)return toast('Ketik judul lagu dulu');wlGoogle(q,true)}
+
+function wlBack(q){wlRet=null;const c=csh();c.classList.add('wl');c.append(E('h3','',L('Copied the link?','Sudah salin link-nya?')));
+  const p=E('p','mut wlp',L('Copy the Chordtela page link (or the chords), then tap Get chords.','Salin link halaman Chordtela (atau teks chord-nya), lalu tekan Ambil chord.'));c.append(p);
+  const ok=E('button','wlok',L('Get chords','Ambil chord'));ok.type='button';ok.onclick=()=>wlClip(q);
+  const x=E('button','',L('Back','Kembali'));x.type='button';x.onclick=ctxClose;c.append(ok,x);$('#ctx').classList.add('on')}
+
+function wlClip(q){
+  if(!navigator.clipboard||!navigator.clipboard.readText)return wlPaste(q);
+  navigator.clipboard.readText().then(x=>chordIn(x,q)).catch(()=>wlPaste(q))}
+
+/* clipboard not readable (permission refused / old browser): a box to paste into by hand */
+function wlPaste(q){const c=csh();c.classList.add('wl');c.append(E('h3','',L('Paste the lyrics','Tempel liriknya')));
+  const t=document.createElement('textarea');t.className='wlta';t.placeholder=L('Paste the lyrics here','Tempel liriknya di sini');t.rows=6;c.append(t);
+  const ok=E('button','wlok',L('Get chords','Ambil chord'));ok.type='button';ok.onclick=()=>chordIn(t.value,q);
+  const x=E('button','',L('Back','Kembali'));x.type='button';x.onclick=ctxClose;c.append(ok,x);$('#ctx').classList.add('on');setTimeout(()=>t.focus(),60)}
+
+/* a Chordtela song link anywhere in the text -> its canonical https URL, or null */
+const CHORD_URL_RE=/(?:https?:\/\/)?(?:(?:www|m|amp)\.)?chordtela\.com\/\d{4}\/\d{2}\/[a-z0-9-]+\.html(?:\/amp\/?)?/i;
+function chordUrlIn(text){const m=CHORD_URL_RE.exec(String(text||''));if(!m)return null;let u=m[0];if(!/^https?:\/\//i.test(u))u='https://'+u;return EvoCore.sheet.normalizeChordtelaUrl(u)}
+
+/* what was copied or pasted: a Chordtela link (fetched), a chord sheet (opened as is), or plain lyrics. Resolves true when a song opened. */
+async function chordIn(text,fallbackTitle){
+  text=String(text||'');
+  const u=chordUrlIn(text);
+  if(u){
+    note(L('Getting chords…','Mengambil chord…'));
+    let res;
+    try{res=await fetch('/api/chordtela?url='+encodeURIComponent(u))}
+    catch(e){note(L('You are offline. Chords need an internet connection.','Kamu sedang offline. Ambil chord butuh internet.'),true);return false}
+    const r=await res.json().catch(()=>({error:'upstream'}));
+    const why=r.error||(!res.ok||!r.lyrics?'upstream':'');
+    if(why){
+      note(why==='bad_url'||why==='not_found'?L('That page was not found on Chordtela.','Halaman itu tidak ditemukan di Chordtela.')
+        :why==='no_chords'?L('No chords could be read on that page. Copy the chords as text instead.','Chord di halaman itu belum bisa dibaca. Salin teks chord-nya saja.')
+        :L('Chordtela cannot be reached right now.','Chordtela sedang tidak bisa dibuka.'),true);
+      return false}
+    ctxClose();clearTimeout(noteT);$('#note').classList.remove('on');
+    openTemp({title:r.title||fallbackTitle,artist:r.artist,lyrics:r.lyrics,chords:r.chords,key:r.key,capo:r.capo,src:'chordtela',srcId:0,
+      vers:(r.versions||[]).map((v,i)=>({...v,id:i,title:r.title,artist:r.artist})),srcUrl:r.source&&r.source.url});
+    return true}
+  const s=EvoCore.sheet.parseChordSheet(text);
+  if(s.chords.length>=2){ctxClose();openTemp({title:s.title||fallbackTitle,artist:s.artist,lyrics:s.lyrics,chords:s.chords,key:s.key,capo:s.capo,src:'paste'});return true}
+  const l=wlLyr(text);
+  if(!l){note(L('No lyrics copied yet. Copy the lyrics first, then try again.','Belum ada lirik yang disalin. Salin liriknya dulu, lalu coba lagi.'),true);return false}
+  ctxClose();openTemp({title:fallbackTitle,lyrics:l,src:'google'});return true}
+
+/* v136 temporary song, now with chords: a chord sheet keeps its key, capo and chord positions (lines are never re-sorted here) */
+function tempSong(o){o=o||{};const lyr=lyrNorm(o.lyrics),now=Date.now();
+  const first=lyr.split('\n').find(l=>l.trim()&&!/^\[.+\]$/.test(l.trim()))||'';
+  return{id:'tmp'+now.toString(36)+Math.random().toString(36).slice(2,6),_temp:true,src:o.src||'paste',srcId:o.srcId==null?null:o.srcId,vers:Array.isArray(o.vers)?o.vers:null,
+    title:String(o.title||'').trim()||first.trim().slice(0,60)||'Untitled',artist:String(o.artist||'').trim(),key:o.key||'',capo:o.capo|0,
+    /* lyrNorm can drop or merge blank lines: move the chords with their lines */
+    chords:Array.isArray(o.chords)&&o.chords.length?EvoCore.remap.remapChords(o.chords,String(o.lyrics||'').replace(/\r\n?/g,'\n'),lyr):[],srcUrl:o.srcUrl||'',lyrics:lyr,colors:{},
+    speed:o.speed||5,font:o.font||defFont(),fav:false,cr:now,md:now}}
+
+/* autoSec only for LRCLIB / Google lyrics: a chord sheet's chord positions follow its lines, so its layout is kept as it is */
+function openTemp(o){const t=isTemp(o)?o:tempSong(o);if(!t.lyrics)return null;
+  if((t.src==='lrclib'||t.src==='google')&&!t.lyrics.split('\n').some(secLbl)){const a=autoSec(t.lyrics);if(a)t.lyrics=a}
+  openSong(t);
+  if(t.src==='chordtela'&&t.vers&&t.vers.length>1){$('#play').classList.add('lrc');$('#vsbv').textContent=t.vers.length}
+  return t}
+
+/* Save to Library: the chords, key and capo come along; a Chordtela song keeps its page link */
+function saveTemp(force){const t=cur;if(!isTemp(t))return null;
+  const nt=normT(t.title),na=normT(t.artist);
+  if(!force&&nt&&songs.some(x=>normT(x.title)===nt&&(!na||!x.artist||normT(x.artist)===na))){
+    ask('You already have this song','A song with this title is already in your Library. Save another copy?','Save a copy',()=>{if(cur===t)saveTemp(true)});return null}
+  const now=Date.now(),s={id:'s'+now,title:t.title,artist:t.artist,key:t.key||'',capo:t.capo|0,lyrics:t.lyrics,chords:t.chords||[],colors:{},speed:t.speed,font:t.font,fav:false,cr:now,md:now};
+  if(t.srcUrl)s.src={site:'chordtela',url:t.srcUrl};
+  songs.push(s);save();cur=s;recAdd(s.id);try{localStorage.setItem('evo.lastsong',s.id)}catch(e){}
+  $('#play').classList.remove('tmp','lrc');vsOpen(false);return s}
+
+/* the versions panel: LRCLIB versions as before; Chordtela versions show their name and key, and tapping one swaps the chord sheet */
+function vsRender(){const l=$('#vsl');l.textContent='';const t=cur;if(!isTemp(t)||!t.vers)return;$('#vsbv').textContent=t.vers.length;
+  const ch=t.src==='chordtela';
+  t.vers.forEach(it=>{const b=E('button','wlv'+(it.id===t.srcId?' cur':''));b.type='button';if(it.id===t.srcId)b.setAttribute('aria-current','true');
+    if(ch){b.append(UE('b','',it.name||L('Chords','Chord')));const sm=E('small');sm.append(UE('span','',L('Key','Nada')+' '+(it.key||'–')));b.append(sm)}
+    else{b.append(UE('b','',it.title));const sm=E('small');sm.append(UE('span','',[it.artist,it.album,wlDur(it.dur)].filter(Boolean).join(' · ')));if(it.variant)sm.append(E('i','',it.variant));b.append(sm)}
+    b.onclick=()=>{if(it.id===t.srcId)return vsOpen(false);vsOpen(false);
+      if(ch)return openTemp({title:cur.title,artist:cur.artist,lyrics:it.lyrics,chords:it.chords,key:it.key,capo:it.capo,src:'chordtela',srcId:it.id,vers:cur.vers,srcUrl:cur.srcUrl,speed:cur.speed,font:cur.font});
+      wlOpen(it,t.vers,{speed:t.speed,font:t.font})};l.append(b)})}
+function vsOpen(on){const p=$('#vsp'),b=$('#vsb');if(!p)return;if(on==null)on=!p.classList.contains('open');if(on&&!(isTemp(cur)&&(cur.src==='lrclib'||cur.src==='chordtela')&&cur.vers&&cur.vers.length))on=false;
+  if(on)vsRender();p.classList.toggle('open',on);b.classList.toggle('hid',on);b.setAttribute('aria-expanded',on?'true':'false')}
+
+/* pasting a note or a link as a new song: a Chordtela link is fetched, a chord sheet opens in the editor with its chords */
+function textIn(x,pre){x=String(x||'');if(!x.trim())return false;if(restoreBackup(x))return true;
+  if(EVONOTE.test(x)){const r=evoImport(x,lib.v==='cat'&&curCat());save();refresh();evoNote(r);return true}
+  if(chordUrlIn(x)){chordIn(x,'');return true}
+  const s=EvoCore.sheet.parseChordSheet(x);
+  if(s.chords.length>=2){openEdit(null,s.lyrics,s.title||'',null,pre||[]);ed.chords=s.chords;ed.chLyr=ta.value;
+    if(s.key&&[...$('#ek').options].some(o=>o.value===s.key))$('#ek').value=s.key;return true}
+  const n=EvoImport.fromText(x);openEdit(null,n.lyrics,n.title,null,pre||[]);return true}
+
+/* Evo Chord searches Chordtela through Google (no LRCLIB): the "blocked new tab" fallback says so */
+function wlNeedTap(q){const c=csh();c.classList.add('wl');c.append(E('h3','',L('Search Chordtela','Cari di Chordtela')));
+  const g=E('button','',L('Search on Google','Cari di Google'));g.type='button';g.onclick=()=>{ctxClose();wlGoogle(q,true)};
+  const x=E('button','',L('Cancel','Batal'));x.type='button';x.onclick=()=>{wlRet=null;ctxClose()};c.append(g,x);$('#ctx').classList.add('on')}

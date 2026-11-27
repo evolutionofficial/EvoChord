@@ -758,6 +758,74 @@ html[data-lite] #drawer{background:var(--card)!important}
 html[data-lite] #shud{background:rgba(21,17,14,.94)!important}
 html[data-lite][data-theme="light"] #shud{background:rgba(255,255,255,.96)!important}
 html[data-lite] #dTop{background:rgba(21,17,14,.88)!important}
+/* ===== src/styles/50-chord.css ===== */
+/* ===== Evo Chord: chord sheet look (files 50+ are Evo Chord's changes on top of EvoLyric) ===== */
+/* chord names a little larger and higher than EvoLyric's chord preview, with room above each line */
+.ln.hasch{line-height:2.75;padding-top:.35em}
+.chd{position:relative;display:inline;width:0}
+.chd::before{content:attr(data-c);position:absolute;left:0;bottom:115%;font:800 .68em/1 'Bricolage Grotesque',system-ui,sans-serif;color:var(--acct);white-space:nowrap;letter-spacing:.01em;pointer-events:none}
+/* beat rows: "|• · • · • · • ·|" – one character pair per eighth, bar lines, quiet monospace */
+.ln.beat{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:400;color:var(--mut);letter-spacing:0;font-size:.8em}
+.ln.beat .bar{white-space:nowrap}
+.ln.beat .chd::before{font-size:.85em}
+/* ===== src/styles/51-chord-transpose.css ===== */
+/* Evo Chord card S1: key (transpose) button and panel. Same look as the Speed corner (#spb, #spp). */
+
+#tpb{position:relative;width:40px;height:40px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(34,28,23,.62);border:1px solid rgba(255,255,255,.12);color:var(--fg);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:.85;transition:transform .2s var(--spring),opacity .2s;margin-bottom:8px}
+#tpb b{font:800 14px/1 'Bricolage Grotesque',system-ui,sans-serif;color:var(--acct)}
+#tpb small{font:700 6.5px/1 'Atkinson Hyperlegible',system-ui,sans-serif;letter-spacing:1.1px;text-transform:uppercase;color:var(--mut);margin-top:2px}
+#tpb:active{transform:scale(.92)}
+#tpb.hid{opacity:0;transform:scale(.8);pointer-events:none}
+/* while the key panel is open, the Speed button steps aside */
+#tpp.open~#spb{opacity:0;transform:scale(.8);pointer-events:none}
+#tpp{position:absolute;right:0;bottom:0;width:min(196px,calc(100vw - 12px));padding:5px 8px 6px;background:rgba(34,28,23,.78);border:1px solid rgba(255,255,255,.1);border-radius:14px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 8px 22px rgba(0,0,0,.4);transform-origin:bottom right;opacity:0;transform:scale(.9);visibility:hidden;pointer-events:none;transition:opacity .16s var(--ease),transform .24s var(--ease),visibility 0s .24s}
+#tpp.open{opacity:1;transform:none;visibility:visible;pointer-events:auto;transition:opacity .18s var(--ease),transform .3s var(--spring),visibility 0s}
+#tpx{position:relative;margin-left:auto;width:30px;height:20px;display:flex;align-items:center;justify-content:center;color:var(--mut);border-radius:8px}#tpx:active{background:var(--ln)}
+#tpx::after{content:'';position:absolute;inset:-8px -6px}
+#tpp .sph b{min-width:26px;text-align:right}
+#tpp .tpr{display:flex;align-items:center;gap:6px;margin-top:4px}
+#tpp .tpr .step{width:34px;height:34px;flex:0 0 34px;border-radius:10px;font-size:20px;background:rgba(13,10,8,.45)}
+#tpk{flex:1;min-width:0;text-align:center;font:800 24px/1 'Bricolage Grotesque',system-ui,sans-serif;color:var(--acct);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tpp .tpf{display:flex;gap:6px;margin-top:6px}
+#tpp .tpbtn{flex:1;min-width:0;height:28px;border-radius:9px;font:700 10px/1 'Atkinson Hyperlegible',system-ui,sans-serif;letter-spacing:.6px;text-transform:uppercase;color:var(--fg);background:rgba(13,10,8,.45);border:1px solid rgba(255,255,255,.1)}
+#tpp .tpbtn.tpsave{color:var(--acct)}
+#tpp .tpbtn:active{background:var(--ln)}
+
+/* light theme: same as #spb and #spp in 10-light.css */
+:root[data-theme="light"] #tpb,:root[data-theme="light"] #tpp{background:rgba(255,255,255,.86);border:1px solid var(--ln)}
+:root[data-theme="light"] #tpp .tpr .step,:root[data-theme="light"] #tpp .tpbtn{background:rgba(0,0,0,.05)}
+
+/* auto-scroll fades the corner buttons like Speed (03-layout.css) */
+#play #tpb:not(.hid){opacity:1;transition:opacity .45s ease,transform .25s var(--spring),color .2s,border-color .2s,background-color .2s}
+#play.run #tpb:not(.hid){opacity:.08}
+#play.nodim.run #tpb:not(.hid){opacity:1}
+#play.run #tpb:active,#play.run #tpb:focus-visible{opacity:1;transition-duration:.15s}
+@media(prefers-reduced-motion:reduce){#tpb,#tpp,#tpp input{transition:none!important}#play #tpb{transition:none!important}}
+
+/* the LRC (plain lyric) view has no Speed button, so it has no key button either */
+/* ===== src/styles/52-chord-editor.css ===== */
+/* ===== Evo Chord: chord editor grid (file 52; files 50+ are Evo Chord's changes on top of EvoLyric) ===== */
+/* the grid never folds: every row keeps its boxes in line; scroll sideways when it is wider than the screen */
+#chtx{overflow-x:auto}
+.chrow{flex-wrap:nowrap}
+/* chord names never widen a box: the label is drawn over the boxes that follow it */
+.chn{width:0;min-width:100%;overflow:visible;position:relative}
+.chn:not(:empty){z-index:1;background:var(--bg)}
+/* boxes past the end of the text */
+.chx .chn{border-color:rgba(240,160,75,.22)}
+.chx .cht{min-width:1.1em;min-height:1.2em} /* empty cells keep the text height, so their box stays in the chord row */
+/* beat rows: monospace, quiet */
+.chbeat .cht{font-family:ui-monospace,Menlo,monospace;color:var(--mut)}
+.chbeat .chc{min-width:22px}
+.chbctl{display:flex;align-items:center;gap:4px;margin-left:8px;flex:none}
+.chbctl .chtsig{min-height:36px;padding:0 4px;border-radius:8px;border:1px solid var(--ln);background:var(--bg);color:var(--fg);font:700 13px/1 'Atkinson Hyperlegible',sans-serif}
+.chbctl .chbtn{min-width:36px;min-height:36px;padding:0;border-radius:8px;border:1px solid var(--ln);background:var(--bg);color:var(--fg);font:700 16px/1 'Atkinson Hyperlegible',sans-serif;display:inline-flex;align-items:center;justify-content:center}
+.chbctl .chbtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* section line and "+ Beats" buttons */
+.chsec{display:flex;align-items:center}
+.chtop{display:flex;margin:4px 0 6px}
+.chadd{margin-left:8px;padding:4px 10px;min-height:30px;border-radius:999px;border:1px dashed var(--acc);background:none;color:var(--acct);font:700 12px/1 'Atkinson Hyperlegible',sans-serif;cursor:pointer}
+.chtop .chadd{margin-left:0}
 </style>
 </head>
 <body>

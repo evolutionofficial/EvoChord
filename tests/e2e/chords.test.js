@@ -10,10 +10,10 @@ test('Chords: the last item of the Key dropdown opens the chord screen and keeps
   eq(await p.evaluate(()=>$('#chd').classList.contains('on')),true,'chord screen open');
   eq(await p.evaluate(()=>$('#ek').value),k0,'key unchanged');
   eq(t.errors,[],'no page errors');await t.close()});
-test('Chords: one box per 2 characters, typed with the chord keyboard, saved on the song',async()=>{
+test('Chords: one box per 2 characters, same number on every row, typed with the chord keyboard, saved on the song',async()=>{
   const t=await open(),p=t.page;await prep(p);await p.evaluate(()=>openEdit(songs[0]));await p.waitForTimeout(300);
   await p.selectOption('#ek','__chord');await p.waitForTimeout(300);
-  eq(await p.evaluate(()=>[...document.querySelectorAll('#chtx .chrow')].map(r=>r.querySelectorAll('.chc').length)),[6,4],'boxes per line');
+  eq(await p.evaluate(()=>[...document.querySelectorAll('#chtx .chrow')].map(r=>r.querySelectorAll('.chc').length)),[16,16],'every row has the same number of boxes (longest row + 4, at least 16)');
   await p.click('#chtx .chc >> nth=0');
   eq(await p.evaluate(()=>$('#chkb [data-k="#"]').disabled),true,'# needs a root first');
   await key(p,'C');await key(p,'#');await key(p,'m');await key(p,'7');
