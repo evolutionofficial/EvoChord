@@ -1,11 +1,11 @@
-const V='evochord-app-1',F='evochord-fonts';
+const V='evochord-app-2-06f80545',F='evochord-fonts';
 const TUTIMG=['g_home','g_add','g_edit2','g_play','g_queue','g_temp','g_prefs','g_gear'].flatMap(n=>['id','en'].map(l=>'man/'+n+'_'+l+'.webp'));
 const SHELL=['./','app.js','js/evocore.js','manifest.webmanifest','config.js','cloud.js','legal.js','import.js','tutorial.js',...TUTIMG,'vendor/supabase.js','icon-192.png','icon-512.png','apple-touch-icon.png'];
 /* v167: Safari refuses a page the service worker answers with a redirected response ("Response served by service worker has
    redirections"). The host redirects /index.html to /, so the shell is cached as ./ only, and any redirected response is rebuilt. */
 const clean=async x=>x&&x.redirected?new Response(await x.blob(),{status:x.status,statusText:x.statusText,headers:x.headers}):x;
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting()))});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==V&&x!==F&&x.startsWith('evolyric-')).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==V&&x!==F&&(x.startsWith('evochord-app-')||x.startsWith('evolyric-'))).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{
   const r=e.request;if(r.method!=='GET')return;const u=new URL(r.url);
   if(u.origin===location.origin){
