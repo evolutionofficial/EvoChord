@@ -57,3 +57,25 @@ describe('chord keyboard', () => {
     expect(backspace('C')).toBe('');
   });
 });
+
+import { chordFamily, normKey } from '../../src/core/chord.js';
+describe('chordFamily', () => {
+  it('major keys: I ii iii IV V vi vii° and V/7', () => {
+    expect(chordFamily('C')).toEqual(['C', 'Dm', 'Em', 'F', 'G', 'Am', 'Bdim', 'G/B']);
+    expect(chordFamily('G')).toEqual(['G', 'Am', 'Bm', 'C', 'D', 'Em', 'F#dim', 'D/F#']);
+    expect(chordFamily('Bb')).toEqual(['Bb', 'Cm', 'Dm', 'Eb', 'F', 'Gm', 'Adim', 'F/A']);
+  });
+  it('minor keys: i ii° III iv v VI VII and V', () => {
+    expect(chordFamily('Am')).toEqual(['Am', 'Bdim', 'C', 'Dm', 'Em', 'F', 'G', 'E']);
+    expect(chordFamily('Dm')).toEqual(['Dm', 'Edim', 'F', 'Gm', 'Am', 'Bb', 'C', 'A']);
+  });
+  it('no key, no family', () => { expect(chordFamily('')).toEqual([]); expect(chordFamily('xyz')).toEqual([]); });
+});
+
+describe('normKey', () => {
+  it('editor pairs become one spelling', () => {
+    expect(normKey('C#/Db')).toBe('Db'); expect(normKey('F#/Gb')).toBe('F#'); expect(normKey('A#/Bb')).toBe('Bb');
+    expect(normKey('G')).toBe('G'); expect(normKey('G/B')).toBe('G/B'); expect(normKey('')).toBe('');
+  });
+  it('family of an editor pair', () => { expect(chordFamily('A#/Bb')[0]).toBe('Bb'); });
+});

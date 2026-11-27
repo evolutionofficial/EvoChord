@@ -11,27 +11,31 @@
    character offsets (annotations, tempo) and highlights do not change. */
 
 function chordTp(){return (cur&&cur._tp)|0}
-function chordFlats(){const k=(cur&&cur.key)||(cur&&cur.chords&&cur.chords[0]&&cur.chords[0].n)||'C';
+function chordFlats(){const k=(cur&&EvoCore.chord.normKey(cur.key))||(cur&&cur.chords&&cur.chords[0]&&cur.chords[0].n)||'C';
   return EvoCore.chord.prefersFlats(EvoCore.chord.transposeKey(k,chordTp()))}
 function chordName(n){const t=chordTp();return t?EvoCore.chord.transposeChord(String(n||''),t,{flats:chordFlats()}):String(n||'')}
 
 function chordApply(le,items){if(!le)return;
   le.forEach(d=>{if(d&&d.classList&&d.classList.contains('ln')&&EvoCore.beats.isBeatLine(d.textContent))d.classList.add('beat')});
   if(!items||!items.length)return;const by={};items.forEach(it=>{(by[it.l]=by[it.l]||[]).push(it)});
-  Object.keys(by).forEach(l=>{const d=le[+l];if(!d||!d.classList||!d.classList.contains('ln'))return;const len=(d.textContent||'').length;if(!len)return;
+  le.forEach((d,l)=>{if(d&&d.classList&&d.classList.contains('beat'))chordBeatRow(d,by[l]||[])});
+  Object.keys(by).forEach(l=>{const d=le[+l];if(!d||!d.classList||!d.classList.contains('ln')||d.classList.contains('beat'))return;const len=(d.textContent||'').length;if(!len)return;
     by[l].slice().sort((a,b)=>b.c-a.c).forEach(it=>{const c=Math.max(0,Math.min(it.c|0,len-1)),nodes=chNodes(d);
       for(const[nd,o]of nodes){if(c>=o&&c<o+nd.data.length){const a=E('span','chd');a.dataset.c=chordName(it.n);const r=nd.splitText(c-o);r.parentNode.insertBefore(a,r);break}}});
     d.classList.add('hasch')});
-  le.forEach(d=>{if(d&&d.classList&&d.classList.contains('beat'))chordBarBreaks(d)});
   chordSpaceSoon()}
-/* A beat row only wraps between bars, so a bar is never split over two lines: each bar goes in a
-   no-wrap span with a <wbr> between bars. Only text and chord anchors are moved, never text changed,
-   so offsets (chords, highlights) stay the same. Rows with other markup inside are left as they are. */
-function chordBarBreaks(d){if([...d.childNodes].some(n=>n.nodeType===1&&!n.classList.contains('chd')))return;
-  [...d.childNodes].forEach(nd=>{if(nd.nodeType!==3)return;let i;if(nd.data.length>1&&nd.data[0]==='|'&&nd.previousSibling)nd=nd.splitText(1);while((i=nd.data.indexOf('|',1))>0&&i<nd.data.length-1)nd=nd.splitText(i+1)});
-  const kids=[...d.childNodes];let bar=null;
-  kids.forEach(n=>{if(!bar){bar=E('span','bar');d.insertBefore(bar,n)}bar.appendChild(n);
-    if(n.nodeType===3&&/\|$/.test(n.data)&&n!==kids[kids.length-1]){bar.after(document.createElement('wbr'));bar=null}});}
+/* Beat rows (intro, interlude) are shown short, the way chord sites write them: "C . C/E . | F . . . |",
+   one token per beat. The row's own text stays in the line, hidden, and the short form is drawn with CSS
+   from data-t (generated content is not text), so offsets of highlights and notes do not change. */
+function chordBeatRow(d,items){if(d.querySelector('.bview'))return;
+  const at={};items.forEach(it=>{at[it.c|0]=chordName(it.n)});
+  const bars=EvoCore.beats.compactBeatRow(d.textContent||'',c=>at[c]);if(!bars.length)return;
+  const raw=E('span','braw');while(d.firstChild)raw.append(d.firstChild);
+  const v=E('span','bview');
+  bars.forEach((bar,i)=>{const b=E('span','bbar');
+    bar.forEach(tk=>{const x=E('span',tk.chord?'bc':'bd');x.dataset.t=tk.t;b.append(x)});
+    const bl=E('span','bl');bl.dataset.t='|';b.append(bl);v.append(b);if(i<bars.length-1)v.append(document.createElement('wbr'))});
+  d.append(raw,v);d.classList.add('bshort')}
 
 /* Keep chord names apart. Measured after layout, again when the font size or the width changes. */
 let chordSpaceRaf=0;

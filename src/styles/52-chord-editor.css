@@ -20,3 +20,9 @@
 .chtop{display:flex;margin:4px 0 6px}
 .chadd{margin-left:8px;padding:4px 10px;min-height:30px;border-radius:999px;border:1px dashed var(--acc);background:none;color:var(--acct);font:700 12px/1 'Atkinson Hyperlegible',sans-serif;cursor:pointer}
 .chtop .chadd{margin-left:0}
+/* the song key's chord family, one tap each, above the chords already used */
+#chkb .chfam{display:flex;gap:6px;overflow-x:auto;margin:0 0 6px;padding-bottom:2px;align-items:center}
+#chkb .chfam .chfl{display:none;flex:none;font:800 11px/1 'Bricolage Grotesque',system-ui,sans-serif;color:var(--mut);letter-spacing:.06em;margin-right:2px}
+#chkb .chfam button{flex:1 0 auto;min-width:38px;padding:8px 5px;border-radius:12px;border:1px solid rgba(240,160,75,.45);background:rgba(240,160,75,.12);color:var(--acct);font:800 14px/1 'Bricolage Grotesque',system-ui,sans-serif}
+#chkb .chfam button.on{background:var(--acc);color:#15110e}
+#chkb .chfam[hidden]{display:none}

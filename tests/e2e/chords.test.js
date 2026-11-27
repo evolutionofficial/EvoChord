@@ -39,4 +39,25 @@ test('Chords: stay on their line when lines are added above, and Cancel asks bef
   await p.click('#chtx .chc >> nth=0');await key(p,'E');await p.click('#chX');await p.waitForTimeout(200);
   eq(await p.evaluate(()=>$('#chd').classList.contains('on')),true,'still open: a confirm is shown');
   await t.close()});
+test('Chords: the first keyboard row is the key\'s chord family; one tap writes it and moves on',async()=>{
+  const t=await open(),p=t.page;await prep(p);await p.evaluate(()=>openEdit(songs[0]));await p.waitForTimeout(300);
+  await p.selectOption('#ek','C');await p.selectOption('#ek','__chord');await p.waitForTimeout(300);
+  await p.click('#chtx .chc >> nth=0');
+  eq(await p.evaluate(()=>[...document.querySelectorAll('#chkb .chfam button')].map(b=>b.textContent)),['C','Dm','Em','F','G','Am','Bdim','G/B'],'family row of C');
+  await p.click('#chkb .chfam button[data-r="G/B"]');
+  eq(await p.evaluate(()=>document.querySelectorAll('#chtx .chc .chn')[0].textContent),'G/B','box 0 has G/B');
+  eq(await p.evaluate(()=>document.querySelectorAll('#chtx .chc')[1].classList.contains('on')),true,'box 1 selected');
+  eq(t.errors,[],'no page errors');await t.close()});
+test('Chords: minor keys are in the Key list and give the minor family',async()=>{
+  const t=await open(),p=t.page;await prep(p);await p.evaluate(()=>openEdit(songs[0]));await p.waitForTimeout(300);
+  await p.selectOption('#ek','Am');await p.selectOption('#ek','__chord');await p.waitForTimeout(300);
+  await p.click('#chtx .chc >> nth=0');
+  eq(await p.evaluate(()=>[...document.querySelectorAll('#chkb .chfam button')].map(b=>b.textContent)),['Am','Bdim','C','Dm','Em','F','G','E'],'family row of Am');
+  eq(t.errors,[],'no page errors');await t.close()});
+test('Chords: no key, no family row',async()=>{
+  const t=await open(),p=t.page;await prep(p);await p.evaluate(()=>openEdit(songs[0]));await p.waitForTimeout(300);
+  await p.selectOption('#ek','');await p.selectOption('#ek','__chord');await p.waitForTimeout(300);
+  await p.click('#chtx .chc >> nth=0');
+  eq(await p.isHidden('#chkb .chfam'),true,'family row hidden');
+  eq(t.errors,[],'no page errors');await t.close()});
 };

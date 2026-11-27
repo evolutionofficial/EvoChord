@@ -91,4 +91,14 @@ module.exports = ({ test, assert, eq, open }) => {
     eq(await p.evaluate(() => [isTemp(cur), cur.title, cur.chords.length > 5]), [true, 'Lagu Contoh', true], 'opened with chords');
     await t.close();
   });
+  test('Chord search: intro beat rows show the short form, one token per beat ("C . . . | G/B . . . |"), and follow the key', async () => {
+    const t = await open(), p = t.page; await route(t, ok);
+    await p.evaluate((l) => chordIn(l, 'x'), LINK); await p.waitForTimeout(800);
+    const row = () => p.evaluate(() => { const v = document.querySelector('#txt .ln.bshort .bview'); return v ? [...v.querySelectorAll('.bbar')].map((b) => [...b.children].map((x) => x.dataset.t).join(' ')) : null; });
+    eq((await row())[0], 'C . . . |', 'first bar');
+    eq(await p.evaluate(() => { const d = document.querySelector('#txt .ln.bshort'); return [EvoCore.beats.isBeatLine(d.textContent), getComputedStyle(d.querySelector('.braw')).display]; }), [true, 'none'], 'the dot row stays in the text, hidden');
+    await p.evaluate(() => tpSet(2)); await p.waitForTimeout(300);
+    eq((await row())[0], 'D . . . |', 'transposed');
+    eq(t.errors, [], 'no page errors'); await t.close();
+  });
 };

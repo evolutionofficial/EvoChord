@@ -75,7 +75,12 @@ function chSet(n){const x=chs&&chs.cells[chs.sel];if(!x)return;const k=x.l+':'+x
 
 function chKbState(){const k=$('#chkb');if(!chs)return;k.querySelector('.chcur').textContent=chs.buf||'–';
   k.querySelectorAll('[data-k]').forEach(b=>{b.disabled=!chCan(chs.buf,b.dataset.k)});
-  const r=k.querySelector('.chrec');r.textContent='';const seen=[];chNow().forEach(it=>{if(!seen.includes(it.n))seen.push(it.n)});
+  let fr=k.querySelector('.chfam');if(!fr){fr=E('div','chfam');k.querySelector('.chrec').before(fr)}
+  const kv=$('#ek').value,key=(kv==='__sep'||kv==='__chord')?'':kv,fam=EvoCore.chord.chordFamily(key);
+  fr.textContent='';fr.hidden=!fam.length;
+  if(fam.length){fr.append(E('span','chfl',EvoCore.chord.normKey(key)));
+    fam.forEach(n=>{const b=E('button','',n);b.type='button';b.dataset.r=n;b.setAttribute('aria-label',L('Chord ','Chord ')+n);if(n===chs.buf)b.classList.add('on');fr.append(b)})}
+  const r=k.querySelector('.chrec');r.textContent='';const seen=[];chNow().forEach(it=>{if(!seen.includes(it.n)&&!fam.includes(it.n))seen.push(it.n)});
   seen.slice(0,10).forEach(n=>{const b=E('button','',n);b.type='button';b.dataset.r=n;r.append(b)})}
 
 function chDone(){if(!chs)return;const items=chNow();

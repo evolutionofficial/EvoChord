@@ -91,3 +91,33 @@ export function press(buf, key) {
 
 /** Remove the last token (e.g. "maj7" as a whole). */
 export const backspace = (buf) => buf.replace(TOKEN_END, '');
+
+// ---------------------------------------------------------------------------
+// Chord family (diatonic chords) of a key, for the chord keyboard's first row.
+// Major key: I ii iii IV V vi vii° and V/7 (C: C Dm Em F G Am Bdim G/B).
+// Minor key: i ii° III iv v VI VII and V (Am: Am Bdim C Dm Em F G E).
+/** @returns {string[]} chord names; [] when the key is not a chord name */
+export function chordFamily(key) {
+  key = normKey(key);
+  const p = parseChord(key);
+  if (!p) return [];
+  const tonic = pitchClass(p.root + p.acc);
+  const minor = /^m(?!aj)/.test(p.quality);
+  const names = prefersFlats(key) ? FLAT : SHARP;
+  const at = (st) => names[(tonic + st) % 12];
+  if (!minor) {
+    const steps = [0, 2, 4, 5, 7, 9, 11], q = ['', 'm', 'm', '', '', 'm', 'dim'];
+    return [...steps.map((s, i) => at(s) + q[i]), at(7) + '/' + at(11)];
+  }
+  const steps = [0, 2, 3, 5, 7, 8, 10], q = ['m', 'dim', '', 'm', 'm', '', ''];
+  return [...steps.map((s, i) => at(s) + q[i]), at(7)];
+}
+
+/** The editor's key list has enharmonic pairs ("C#/Db"); pick the common spelling. Other keys are returned trimmed. */
+export function normKey(key) {
+  const k = String(key ?? '').trim();
+  const m = /^([A-G][#b]?)\/([A-G][#b]?)(m?)$/.exec(k);
+  if (!m || pitchClass(m[1]) !== pitchClass(m[2])) return k;
+  const pick = { 'C#': 'Db', 'D#': 'Eb', 'F#': 'F#', 'G#': 'Ab', 'A#': 'Bb' }[m[1]] || m[1];
+  return pick + (m[3] || '');
+}
