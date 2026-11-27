@@ -6,6 +6,7 @@
 //   src/core/index.js → www/js/evocore.js (window.EvoCore)
 import { readdirSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { build } from 'esbuild';
+import { createHash } from 'node:crypto';
 
 const cat = (dir, ext) =>
   readdirSync(dir)
@@ -22,3 +23,16 @@ writeFileSync('www/app.js', banner + cat('src/app', '.js'));
 mkdirSync('www/js', { recursive: true });
 await build({ entryPoints: ['src/core/index.js'], bundle: true, format: 'iife', globalName: 'EvoCore', minify: true, charset: 'ascii', outfile: 'www/js/evocore.js', logLevel: 'warning' });
 console.log('built www/index.html, www/app.js, www/js/evocore.js');
+
+// Cache version. The app opens offline-first from the service worker's cache, and a phone only fetches a
+// new version when sw.js itself changes. So every build stamps sw.js with APP_VER plus a hash of the
+// files the build makes: any change to the app gives a new cache name, and phones pick it up on the next launch.
+const ver = (readFileSync('www/app.js', 'utf8').match(/const APP_VER='(\d+)'/) || [])[1];
+if (!ver) throw new Error('APP_VER not found in www/app.js');
+const h = createHash('sha256');
+for (const f of ['index.html', 'app.js', 'js/evocore.js', 'manifest.webmanifest', 'tutorial.js', 'import.js']) h.update(f).update(readFileSync('www/' + f));
+const stamp = `evochord-app-${ver}-${h.digest('hex').slice(0, 8)}`;
+const sw = readFileSync('www/sw.js', 'utf8');
+if (!/const V='evochord-app-[^']*'/.test(sw)) throw new Error("www/sw.js lost its const V='evochord-app-…' line");
+writeFileSync('www/sw.js', sw.replace(/const V='evochord-app-[^']*'/, `const V='${stamp}'`));
+console.log('cache version ' + stamp);

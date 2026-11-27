@@ -51,5 +51,5 @@ test('Support: Help → Contact support opens a page with an email button to evo
   await p.click('#helpbody .srow:has-text("Hubungi dukungan")');await p.waitForTimeout(300);
   const h=await p.$eval('#docbody a.dbtn',a=>[a.textContent,a.getAttribute('href')]);
   eq(h[0],'Kirim email ke dukungan','button');assert(h[1].startsWith('mailto:evolution.studio.id@gmail.com?subject=EvoChords%20support&body='),'mailto: '+h[1].slice(0,80));
-  assert(decodeURIComponent(h[1]).includes('EvoChords 0.2'),'version included');await t.close()});
+  assert(decodeURIComponent(h[1]).includes('EvoChords 0.3'),'version included');await t.close()});
 };
