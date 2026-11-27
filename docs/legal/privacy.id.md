@@ -1,16 +1,16 @@
 # Kebijakan Privasi
 
-**Evo Chord** · Dikelola oleh Evolution Digital Studio
+**EvoChords** · Dikelola oleh Evolution Digital Studio
 Tanggal berlaku: 12 November 2026 · Versi 1.0
 Website: https://evochord.evolution-official-id.workers.dev · Email: evolution.studio.id@gmail.com
 
 ## 1. Pendahuluan
 
-Selamat datang di Evo Chord.
+Selamat datang di EvoChords.
 
-Evo Chord adalah aplikasi pencatatan digital (digital notepad) yang memungkinkan pengguna membuat, menyimpan, mengatur, menampilkan, dan berbagi catatan, termasuk lirik lagu, melalui berbagai perangkat.
+EvoChords adalah aplikasi pencatatan digital (digital notepad) yang memungkinkan pengguna membuat, menyimpan, mengatur, menampilkan, dan berbagi catatan, termasuk lirik lagu, melalui berbagai perangkat.
 
-Evo Chord dikembangkan dan dikelola oleh Evolution Digital Studio yang beroperasi dari Indonesia.
+EvoChords dikembangkan dan dikelola oleh Evolution Digital Studio yang beroperasi dari Indonesia.
 
 Kami menghargai privasi pengguna dan berkomitmen menjaga informasi pribadi serta konten yang disimpan melalui aplikasi ini. Kebijakan ini menjelaskan informasi apa yang kami proses, untuk apa, di mana disimpan, dan apa hak pengguna atas datanya.
 
@@ -25,7 +25,7 @@ Jika pengguna masuk dengan Google, kami menerima dari layanan autentikasi Google
 - Foto profil.
 - Identitas akun yang diperlukan untuk autentikasi.
 
-Evo Chord tidak pernah menerima atau menyimpan kata sandi Google.
+EvoChords tidak pernah menerima atau menyimpan kata sandi Google.
 
 ### B. Informasi profil
 
@@ -74,7 +74,7 @@ Jika pengguna menghubungi kami melalui tombol Hubungi dukungan, email yang dikir
 
 ## 3. Penggunaan sebagai Tamu dan dengan Login Google
 
-Evo Chord dapat digunakan **tanpa login** sebagai tamu. Sebagai tamu, pengguna dapat membuat, menyimpan, mengatur, dan menampilkan catatan, mencari lirik melalui LRCLIB, serta membuat backup. Semua data tamu **hanya tersimpan di perangkat tersebut**.
+EvoChords dapat digunakan **tanpa login** sebagai tamu. Sebagai tamu, pengguna dapat membuat, menyimpan, mengatur, dan menampilkan catatan, mencari lirik melalui LRCLIB, serta membuat backup. Semua data tamu **hanya tersimpan di perangkat tersebut**.
 
 Login Google diperlukan untuk:
 
@@ -92,13 +92,13 @@ Data berikut disimpan di perangkat pengguna agar aplikasi dapat dipakai secara o
 
 ### B. Penyimpanan cloud
 
-Bagi pengguna yang login, Library, profil, dan data yang diperlukan disimpan serta disinkronkan melalui Supabase. Project Supabase Evo Chord berada di region **Tokyo, Jepang**. Di tingkat database, setiap akun hanya dapat mengakses datanya sendiri.
+Bagi pengguna yang login, Library, profil, dan data yang diperlukan disimpan serta disinkronkan melalui Supabase. Project Supabase EvoChords berada di region **Tokyo, Jepang**. Di tingkat database, setiap akun hanya dapat mengakses datanya sendiri.
 
 Sinkronisasi membutuhkan koneksi internet. Data lokal yang belum tersinkron dapat hilang apabila data browser atau aplikasi dihapus, perangkat rusak, atau penyimpanan lokal dibersihkan. Data tamu tidak tersinkron sama sekali.
 
 ## 5. Backup, Restore, dan Ekspor
 
-Evo Chord menyediakan:
+EvoChords menyediakan:
 
 - **Backup**: satu file berformat **.evolyric** yang berisi seluruh catatan dan kategori.
 - **Restore**: memulihkan file .evolyric tanpa menimpa catatan yang sudah ada.
@@ -108,7 +108,7 @@ File yang telah diekspor berada sepenuhnya di bawah kendali pengguna. Pengguna b
 
 ## 6. Privasi Catatan dan Fitur Friends
 
-Catatan pengguna bersifat pribadi. Pengguna lain tidak dapat melihatnya kecuali pengguna sendiri mengirimkannya. Evo Chord tidak menyediakan ruang publik atau feed publik.
+Catatan pengguna bersifat pribadi. Pengguna lain tidak dapat melihatnya kecuali pengguna sendiri mengirimkannya. EvoChords tidak menyediakan ruang publik atau feed publik.
 
 Sebagai pengelola layanan, Evolution Digital Studio secara teknis memiliki akses ke database. Kami tidak membuka konten pengguna kecuali diperlukan untuk dukungan yang diminta pengguna, keamanan layanan, atau menindaklanjuti laporan penyalahgunaan.
 
@@ -126,7 +126,7 @@ Pengguna dapat **memblokir** pengguna lain. Pihak yang diblokir tidak lagi dapat
 
 Informasi yang diproses digunakan untuk:
 
-- Menyediakan dan mengoperasikan layanan Evo Chord.
+- Menyediakan dan mengoperasikan layanan EvoChords.
 - Mengelola autentikasi dan akun pengguna.
 - Menyimpan serta menyinkronkan Library.
 - Menyediakan fitur Friends dan berbagi catatan.
@@ -138,26 +138,26 @@ Informasi yang diproses digunakan untuk:
 
 ## 8. Layanan Pihak Ketiga
 
-Evo Chord menggunakan layanan eksternal berikut:
+EvoChords menggunakan layanan eksternal berikut:
 
 - **Google**: autentikasi akun (Google Sign-In), pemuatan font (Google Fonts), dan halaman Google Search yang dibuka bila lirik tidak ditemukan di LRCLIB atau bila pengguna memilihnya.
 - **Supabase**: database, autentikasi, profil, Library, fitur Friends, keamanan, dan sinkronisasi cloud.
-- **Cloudflare**: hosting dan infrastruktur web Evo Chord.
+- **Cloudflare**: hosting dan infrastruktur web EvoChords.
 - **LRCLIB**: pencarian lirik. Teks pencarian dikirim langsung dari perangkat pengguna ke LRCLIB.
 
 Setiap penyedia memiliki kebijakan privasi dan ketentuan penggunaannya sendiri, dan dapat mencatat informasi teknis seperti alamat IP dan waktu akses sesuai kebijakan mereka.
 
 ## 9. Iklan dan Monetisasi
 
-Pada peluncuran versi 1.0, Evo Chord disediakan secara gratis dan tidak menampilkan iklan.
+Pada peluncuran versi 1.0, EvoChords disediakan secara gratis dan tidak menampilkan iklan.
 
 Evolution Digital Studio tidak menjual data pribadi pengguna kepada pihak mana pun.
 
-Jika di kemudian hari Evo Chord menambahkan iklan, analitik, atau model monetisasi yang berdampak pada pemrosesan data, kebijakan ini akan diperbarui dan pengguna akan diberi tahu.
+Jika di kemudian hari EvoChords menambahkan iklan, analitik, atau model monetisasi yang berdampak pada pemrosesan data, kebijakan ini akan diperbarui dan pengguna akan diberi tahu.
 
 ## 10. Analitik dan Informasi Teknis
 
-Evo Chord tidak menggunakan layanan analitik, pelacak iklan, atau layanan pelaporan error pihak ketiga.
+EvoChords tidak menggunakan layanan analitik, pelacak iklan, atau layanan pelaporan error pihak ketiga.
 
 Penyedia infrastruktur (Cloudflare dan Supabase) dapat mencatat informasi teknis seperti alamat IP, waktu akses, dan jenis permintaan untuk keperluan operasional dan keamanan, sesuai kebijakan mereka.
 
@@ -193,7 +193,7 @@ Data tamu hanya ada di perangkat dan dapat dihapus dengan membersihkan data apli
 
 Kami menerapkan langkah keamanan yang sesuai dengan kemampuan dan infrastruktur layanan, antara lain:
 
-- Login melalui Google; Evo Chord tidak menyimpan kata sandi.
+- Login melalui Google; EvoChords tidak menyimpan kata sandi.
 - Koneksi terenkripsi (HTTPS).
 - Pembatasan akses di tingkat database sehingga setiap akun hanya dapat mengakses datanya sendiri.
 - Alamat email tidak pernah ditampilkan kepada pengguna lain.
@@ -203,7 +203,7 @@ Meskipun demikian, tidak ada sistem penyimpanan atau transmisi data melalui inte
 
 ## 13. Privasi Anak
 
-Evo Chord dapat digunakan oleh berbagai kelompok usia. Login dengan Google mengikuti ketentuan usia minimum akun Google di negara pengguna. Anak di bawah usia tersebut sebaiknya menggunakan Evo Chord dengan persetujuan dan pengawasan orang tua atau wali, dengan memperhatikan peraturan perlindungan data anak yang berlaku.
+EvoChords dapat digunakan oleh berbagai kelompok usia. Login dengan Google mengikuti ketentuan usia minimum akun Google di negara pengguna. Anak di bawah usia tersebut sebaiknya menggunakan EvoChords dengan persetujuan dan pengawasan orang tua atau wali, dengan memperhatikan peraturan perlindungan data anak yang berlaku.
 
 ## 14. Hak Pengguna
 

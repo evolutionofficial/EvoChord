@@ -17,7 +17,7 @@ function tempSong(o){o=o||{};const lyr=lyrNorm(o.lyrics),now=Date.now();
     title:String(o.title||'').trim()||first.trim().slice(0,60)||'Untitled',artist:String(o.artist||'').trim(),key:'',lyrics:lyr,colors:{},
     speed:o.speed||5,font:o.font||defFont(),fav:false,cr:now,md:now}}
 /* v137 – Web Lyric phase 3: LRCLIB lookup (https://lrclib.net – free, no key, CORS allowed). Called straight from the browser;
-   nothing is scraped and the Evo Chord worker is not involved. Not wired to any button yet (phase 4).
+   nothing is scraped and the EvoChords worker is not involved. Not wired to any button yet (phase 4).
    lrcFind(q) -> {state:'ok'|'none'|'offline'|'error'|'empty', items:[{id,title,artist,album,dur,variant,lyrics,synced}]}
    Results are cached for 10 minutes so the globe button can decide instantly (lrcPeek) after lrcPrefetch ran while typing. */
 const LRCLIB='https://lrclib.net/api',LRC_MS=7000,LRC_TTL=6e5,lrcCache=new Map();

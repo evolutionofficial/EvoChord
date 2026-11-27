@@ -1,4 +1,4 @@
-/* ===== Evo Chord: chord editor grid (file 52; files 50+ are Evo Chord's changes on top of EvoLyric) ===== */
+/* ===== EvoChords: chord editor grid (file 52; files 50+ are EvoChords's changes on top of EvoLyric) ===== */
 /* the grid never folds: every row keeps its boxes in line; scroll sideways when it is wider than the screen */
 #chtx{overflow-x:auto}
 .chrow{flex-wrap:nowrap}

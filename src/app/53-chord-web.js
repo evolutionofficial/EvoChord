@@ -1,6 +1,6 @@
-/* ===== Evo Chord: find chords online (Chordtela) =====
+/* ===== EvoChords: find chords online (Chordtela) =====
    Files 01–17 are EvoLyric as it is. This file replaces the Web Lyric functions of 03-weblyric.js (and openTemp/tempSong/
-   saveTemp/textIn of 09 and 04) for Evo Chord: the globe button searches chords on Chordtela, not lyrics on LRCLIB.
+   saveTemp/textIn of 09 and 04) for EvoChords: the globe button searches chords on Chordtela, not lyrics on LRCLIB.
    A Chordtela link goes through /api/chordtela; a pasted chord sheet or copied lyrics open as a temporary song. */
 
 function webSearch(q){const a=document.createElement('a');a.href='https://www.google.com/search?q='+encodeURIComponent(q+' chord site:chordtela.com');a.target='_blank';a.rel='noopener noreferrer';a.style.display='none';document.body.append(a);a.click();setTimeout(()=>a.remove(),0)}
@@ -99,7 +99,7 @@ function textIn(x,pre){x=String(x||'');if(!x.trim())return false;if(restoreBacku
     if(s.key&&[...$('#ek').options].some(o=>o.value===s.key))$('#ek').value=s.key;return true}
   const n=EvoImport.fromText(x);openEdit(null,n.lyrics,n.title,null,pre||[]);return true}
 
-/* Evo Chord searches Chordtela through Google (no LRCLIB): the "blocked new tab" fallback says so */
+/* EvoChords searches Chordtela through Google (no LRCLIB): the "blocked new tab" fallback says so */
 function wlNeedTap(q){const c=csh();c.classList.add('wl');c.append(E('h3','',L('Search Chordtela','Cari di Chordtela')));
   const g=E('button','',L('Search on Google','Cari di Google'));g.type='button';g.onclick=()=>{ctxClose();wlGoogle(q,true)};
   const x=E('button','',L('Cancel','Batal'));x.type='button';x.onclick=()=>{wlRet=null;ctxClose()};c.append(g,x);$('#ctx').classList.add('on')}

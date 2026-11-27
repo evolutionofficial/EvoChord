@@ -1,8 +1,8 @@
-# Evo Chord – Arsitektur ("Evo shell")
+# EvoChords – Arsitektur ("Evo shell")
 
-Evo Chord memakai **seluruh UI/UX EvoLyric** – Home/library, layar lirik dengan auto-scroll, editor, setlist & antrian, kategori, teman, highlight & catatan, akun + sync cloud, backup, preferensi, bahasa EN/ID, tour, halaman legal – lalu menambah yang khas pemain musik: chord yang tidak saling tumpuk, transpose, editor kotak chord dengan baris ketukan, dan impor dari Chordtela.
+EvoChords memakai **seluruh UI/UX EvoLyric** – Home/library, layar lirik dengan auto-scroll, editor, setlist & antrian, kategori, teman, highlight & catatan, akun + sync cloud, backup, preferensi, bahasa EN/ID, tour, halaman legal – lalu menambah yang khas pemain musik: chord yang tidak saling tumpuk, transpose, editor kotak chord dengan baris ketukan, dan impor dari Chordtela.
 
-Tujuannya satu cara pakai untuk semua produk Evo (EvoLyric, Evo Chord, EvoBeat): siapa pun yang bisa memakai satu aplikasi langsung bisa memakai yang lain.
+Tujuannya satu cara pakai untuk semua produk Evo (EvoLyric, EvoChords, EvoBeat): siapa pun yang bisa memakai satu aplikasi langsung bisa memakai yang lain.
 
 ## Struktur
 
@@ -11,13 +11,13 @@ src/
   index.html            markup semua layar (dari EvoLyric); CSS disuntik saat build
   styles/
     01–13-*.css         CSS EvoLyric, dipecah per area (urutan = urutan asli)
-    50+-*.css           tampilan khas Evo Chord
+    50+-*.css           tampilan khas EvoChords
   app/
     01–17-*.js          kode EvoLyric, dipecah per fitur (urutan = urutan asli):
                         core, library, weblyric, import, prefs-i18n, settings-help, tour,
                         account-backup, play, scroll-menu, queue-gestures, editor,
                         notes-chords, auth-profile, friends, sync, welcome-init
-    50+-chord-*.js      perubahan khas Evo Chord (lihat di bawah)
+    50+-chord-*.js      perubahan khas EvoChords (lihat di bawah)
   core/                 mesin chord murni (ES modules, dites dengan Vitest):
                         chord.js, song.js, beats.js, chordsheet.js, remap.js
 tools/build.mjs         src → www (lihat "Build")
@@ -36,7 +36,7 @@ tests/e2e/              tes end-to-end EvoLyric (Playwright) – semuanya harus 
 
 ### Aturan "ganti yang perlu diganti"
 
-File `01–17` adalah EvoLyric dan dibiarkan sedekat mungkin dengan aslinya, supaya pembaruan EvoLyric mudah dibawa ke sini. Perubahan Evo Chord ada di file `50+`:
+File `01–17` adalah EvoLyric dan dibiarkan sedekat mungkin dengan aslinya, supaya pembaruan EvoLyric mudah dibawa ke sini. Perubahan EvoChords ada di file `50+`:
 
 - Fungsi yang dideklarasikan ulang di file `50+` dengan nama yang sama **menggantikan** fungsi EvoLyric di mana pun (aturan JavaScript untuk deklarasi fungsi dalam satu skrip).
 - `const`/`let` tidak boleh dideklarasikan ulang – helper baru memakai nama baru.
@@ -44,7 +44,7 @@ File `01–17` adalah EvoLyric dan dibiarkan sedekat mungkin dengan aslinya, sup
 
 | File | Isi |
 |---|---|
-| `50-chord-render.js` | `chordApply` versi Evo Chord: nama chord ditranspose sementara, label tidak bertumpuk (teks di bawahnya bergeser), baris ketukan bergaya sendiri |
+| `50-chord-render.js` | `chordApply` versi EvoChords: nama chord ditranspose sementara, label tidak bertumpuk (teks di bawahnya bergeser), baris ketukan bergaya sendiri |
 | `51-chord-transpose.js` | tombol Nada di pojok (gaya sama dengan tombol Speed): naik/turun, reset, simpan nada |
 | `52-chord-editor.js` | editor chord: kotak seragam di semua baris, baris ketukan (+ Ketukan, birama, tambah/kurangi/hapus), tombol chord di toolbar editor |
 | `53-chord-web.js` | "Cari online" → Google khusus Chordtela → kembali → Ambil chord (link atau teks chord) → lagu sementara + Simpan ke Library + tombol Versi (chord dasar / original); tempel & bagikan memakai pembaca yang sama |
@@ -63,7 +63,7 @@ File `01–17` adalah EvoLyric dan dibiarkan sedekat mungkin dengan aslinya, sup
 
 ## Akun & cloud
 
-`www/config.js` memakai project Supabase yang sama dengan EvoLyric (tabel `songs`, `app_data` JSONB). Satu akun Evo = satu library di semua aplikasi. Login Google memerlukan alamat Evo Chord terdaftar sebagai Redirect URL di Supabase Auth (lihat SETUP-AUTH di repo EvoLyric).
+`www/config.js` memakai project Supabase yang sama dengan EvoLyric (tabel `songs`, `app_data` JSONB). Satu akun Evo = satu library di semua aplikasi. Login Google memerlukan alamat EvoChords terdaftar sebagai Redirect URL di Supabase Auth (lihat SETUP-AUTH di repo EvoLyric).
 
 ## Impor Chordtela
 

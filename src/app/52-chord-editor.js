@@ -1,4 +1,4 @@
-/* ===== Evo Chord: chord editor (files 50+ replace EvoLyric's chord screen, 13-notes-chords.js) =====
+/* ===== EvoChords: chord editor (files 50+ replace EvoLyric's chord screen, 13-notes-chords.js) =====
    Every lyric row and beat row has the same number of 2-character boxes (EvoCore.song.gridCells).
    Beat rows ("|• · • ·|") get bar/time-signature/delete controls; "+ Beats" buttons add beat rows.
    chKbBuild, chAdd, chCan, chVis, CH_TOK and CH_ROWS are still EvoLyric's. */
