@@ -3,7 +3,12 @@
 .ln.hasch{line-height:2.75;padding-top:.35em}
 .chd{position:relative;display:inline;width:0}
 .chd::before{content:attr(data-c);position:absolute;left:0;bottom:115%;font:800 .68em/1 'Bricolage Grotesque',system-ui,sans-serif;color:var(--acct);white-space:nowrap;letter-spacing:.01em;pointer-events:none}
-/* beat rows: "|• · • · • · • ·|" – one character pair per eighth, bar lines, quiet monospace */
+/* beat rows: the short form "C . C/E . | F . . . |" (one token per beat) drawn from data-t; the dot row itself stays hidden */
 .ln.beat{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:400;color:var(--mut);letter-spacing:0;font-size:.8em}
-.ln.beat .bar{white-space:nowrap}
-.ln.beat .chd::before{font-size:.85em}
+.ln.bshort{font:800 .72em/1.9 'Bricolage Grotesque',system-ui,sans-serif;letter-spacing:.01em}
+.ln.bshort .braw{display:none}
+.bview .bbar{display:inline-block;white-space:nowrap;margin-right:.45em}
+.bview .bc::before,.bview .bd::before,.bview .bl::before{content:attr(data-t)}
+.bview .bc{color:var(--acct);margin-right:.5em}
+.bview .bd{color:var(--fg);opacity:.75;margin-right:.75em}
+.bview .bl{color:var(--mut);font-weight:400}

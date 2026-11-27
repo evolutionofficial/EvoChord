@@ -45,3 +45,21 @@ describe('uniform chord grid', () => {
     expect(padLyricsForChords('halo dunia', [{ l: 0, c: 2, n: 'G' }])).toBe('halo dunia');
   });
 });
+
+import { compactBeatRow } from '../../src/core/beats.js';
+describe('compactBeatRow', () => {
+  const at = (m) => (c) => m[c];
+  const show = (rows) => rows.map((b) => b.map((x) => x.t).join(' ')).join(' | ');
+  it('one token per beat, chords in place of dots', () => {
+    const line = makeBeatLine(2);
+    expect(show(compactBeatRow(line, at({ 0: 'C', 8: 'C/E', 16: 'F' })))).toBe('C . C/E . | F . . .');
+  });
+  it('a chord on an "and" is kept', () => {
+    expect(show(compactBeatRow(makeBeatLine(1), at({ 0: 'Em', 8: 'Dm', 12: 'G' })))).toBe('Em . Dm G');
+    expect(show(compactBeatRow(makeBeatLine(1), at({ 0: 'C', 2: 'G' })))).toBe('C G . . .');
+  });
+  it('3/4 and 6/8', () => {
+    expect(show(compactBeatRow(makeBeatLine(1, '3/4'), at({ 0: 'D' })))).toBe('D . .');
+    expect(show(compactBeatRow(makeBeatLine(1, '6/8'), at({ 0: 'D', 6: 'A' })))).toBe('D A');
+  });
+});

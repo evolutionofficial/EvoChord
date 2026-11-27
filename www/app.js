@@ -467,7 +467,7 @@ function setLitePref(on){PREF.lite=on?1:0;prefSave();applyLite()}
    screens are covered automatically.
    RULE FOR NEW FEATURES: add the new English strings to ID / IDP. Run `node tools/i18n-audit.js` – it lists any
    English text that is still untranslated in Indonesia mode. Musical terms and user content are never translated. */
-const ID={'Backspace':'Hapus mundur','Chords':'Chord','Discard chords?':'Buang chord?','Next box':'Kotak berikutnya','Previous box':'Kotak sebelumnya','Your chord changes on this page will be lost.':'Perubahan chord di halaman ini akan hilang.','Clear Sections':'Hapus Section','Remove all section labels? The lyrics stay. Undo brings them back.':'Hapus semua label section? Liriknya tetap. Undo bisa mengembalikannya.','No section labels to clear':'Tidak ada label section untuk dihapus','Replace the existing section labels? Undo brings them back.':'Ganti label section yang sudah ada? Undo bisa mengembalikannya.','Replace':'Ganti','No sections recognised':'Tidak ada section yang dikenali','More version':'Lebih banyak','Loading the latest version…':'Memuat versi terbaru…','Versions':'Versi','versions':'versi','Close versions':'Tutup versi','Choose a version':'Pilih versi','Lyrics from LRCLIB':'Lirik dari LRCLIB','Copied the lyrics?':'Sudah copy liriknya?','Copy the lyrics on the Google page, then tap Show lyrics.':'Copy lirik di halaman Google, lalu ketuk Tampilkan lirik.','Show lyrics':'Tampilkan lirik','Not found on LRCLIB':'Tidak ditemukan di LRCLIB','Search Google':'Cari di Google','Paste the lyrics':'Tempel liriknya','Paste the lyrics here':'Tempel lirik di sini','No lyrics copied yet. Copy the lyrics first, then try again.':'Belum ada lirik yang di-copy. Copy liriknya dulu, lalu coba lagi.','You are offline. Lyrics search needs an internet connection.':'Kamu sedang offline. Pencarian lirik butuh koneksi internet.','Save to Library':'Simpan ke Library','Edit in Editor':'Edit di Editor','A song with this title is already in your Library. Save another copy?':'Lagu dengan judul ini sudah ada di Library-mu. Simpan salinan lain?','Clear queue':'Hapus antrean','Tap again':'Ketuk lagi','Search songs':'Cari lagu','Songs you add appear here, in order.':'Lagu yang kamu tambahkan muncul di sini, berurutan.','Select a song first':'Pilih lagu dulu','Open lyrics':'Buka lirik','Done':'Selesai','Back':'Kembali','Setlist':'Setlist','In setlist':'Ada di setlist','Choose a category':'Pilih kategori','Choose where to pick songs from. You can come back and pick from another place; press Set when the setlist is ready.':'Pilih dari mana lagunya diambil. Kamu bisa kembali dan memilih dari tempat lain; tekan Set kalau setlist sudah siap.','Create setlist':'Buat setlist','Your queue is not empty':'Antreanmu belum kosong','Replace the queue':'Ganti antrean','Add to the end':'Tambahkan di akhir','Send category':'Kirim kategori','This category has no songs yet':'Kategori ini belum punya lagu','Received category':'Kategori diterima','Save a copy':'Simpan salinan','Use mine':'Pakai punyaku','Skip':'Lewati','You already have this song':'Kamu sudah punya lagu ini','New':'Baru','Section panel':'Panel section','Hide section panel':'Sembunyikan panel section','Show section panel':'Tampilkan panel section','Song':'Lagu','Voicing':'Suara','Performance':'Penampilan',
+const ID={'Open last song':'Buka lagu terakhir','Backspace':'Hapus mundur','Chords':'Chord','Discard chords?':'Buang chord?','Next box':'Kotak berikutnya','Previous box':'Kotak sebelumnya','Your chord changes on this page will be lost.':'Perubahan chord di halaman ini akan hilang.','Clear Sections':'Hapus Section','Remove all section labels? The lyrics stay. Undo brings them back.':'Hapus semua label section? Liriknya tetap. Undo bisa mengembalikannya.','No section labels to clear':'Tidak ada label section untuk dihapus','Replace the existing section labels? Undo brings them back.':'Ganti label section yang sudah ada? Undo bisa mengembalikannya.','Replace':'Ganti','No sections recognised':'Tidak ada section yang dikenali','More version':'Lebih banyak','Loading the latest version…':'Memuat versi terbaru…','Versions':'Versi','versions':'versi','Close versions':'Tutup versi','Choose a version':'Pilih versi','Lyrics from LRCLIB':'Lirik dari LRCLIB','Copied the lyrics?':'Sudah copy liriknya?','Copy the lyrics on the Google page, then tap Show lyrics.':'Copy lirik di halaman Google, lalu ketuk Tampilkan lirik.','Show lyrics':'Tampilkan lirik','Not found on LRCLIB':'Tidak ditemukan di LRCLIB','Search Google':'Cari di Google','Paste the lyrics':'Tempel liriknya','Paste the lyrics here':'Tempel lirik di sini','No lyrics copied yet. Copy the lyrics first, then try again.':'Belum ada lirik yang di-copy. Copy liriknya dulu, lalu coba lagi.','You are offline. Lyrics search needs an internet connection.':'Kamu sedang offline. Pencarian lirik butuh koneksi internet.','Save to Library':'Simpan ke Library','Edit in Editor':'Edit di Editor','A song with this title is already in your Library. Save another copy?':'Lagu dengan judul ini sudah ada di Library-mu. Simpan salinan lain?','Clear queue':'Hapus antrean','Tap again':'Ketuk lagi','Search songs':'Cari lagu','Songs you add appear here, in order.':'Lagu yang kamu tambahkan muncul di sini, berurutan.','Select a song first':'Pilih lagu dulu','Open lyrics':'Buka lirik','Done':'Selesai','Back':'Kembali','Setlist':'Setlist','In setlist':'Ada di setlist','Choose a category':'Pilih kategori','Choose where to pick songs from. You can come back and pick from another place; press Set when the setlist is ready.':'Pilih dari mana lagunya diambil. Kamu bisa kembali dan memilih dari tempat lain; tekan Set kalau setlist sudah siap.','Create setlist':'Buat setlist','Your queue is not empty':'Antreanmu belum kosong','Replace the queue':'Ganti antrean','Add to the end':'Tambahkan di akhir','Send category':'Kirim kategori','This category has no songs yet':'Kategori ini belum punya lagu','Received category':'Kategori diterima','Save a copy':'Simpan salinan','Use mine':'Pakai punyaku','Skip':'Lewati','You already have this song':'Kamu sudah punya lagu ini','New':'Baru','Section panel':'Panel section','Hide section panel':'Sembunyikan panel section','Show section panel':'Tampilkan panel section','Song':'Lagu','Voicing':'Suara','Performance':'Penampilan',
 'Remove':'Hapus','Orange':'Jingga','Blue':'Biru','Indigo':'Nila','Violet':'Ungu',
 'A lyric teleprompter for live performers.':'Teleprompter lirik untuk musisi panggung.','Continue as guest (Demo)':'Lanjut sebagai tamu (Demo)','Signing you in…':'Sedang memasukkanmu…','Choose a username':'Pilih username','Friends find you by this name. You can change it later in your profile.':'Teman mencarimu lewat nama ini. Kamu bisa mengubahnya nanti di profil.','Continue':'Lanjut','Use a different account':'Pakai akun lain','Something went wrong. Try again.':'Terjadi kesalahan. Coba lagi.',
 '+ Create new category':'+ Buat kategori baru','+ New Category':'+ Kategori Baru','‹ My Categories':'‹ Kategori Saya','⚠ Not saved':'⚠ Belum disimpan',
@@ -547,7 +547,7 @@ function setLang(v){PREF.lang=v==='id'?'id':'en';prefSave();idCache.clear();i18n
 /* for tools/i18n-audit.js: visible text that has no Indonesian version */
 /* text that must stay as is: brand, musical terms, names, numbers, text already written in Indonesian via L() */
 const I18N_KEEP=new Set(['LRCLIB','ColorNote','Apple Notes','Samsung Notes','Google Keep','Simplenote','Evernote','Figtree (Open Font License)','Set','Setlist','Section','About Us','Evolution Digital Studio','Building Digital Solutions for the Music Industry.','Our Vision','Our Mission','Our Ecosystem','Our Philosophy','Technology Should Empower Creativity.','Innovation for Musicians. Technology for Creativity.','Evo','Lyric','EvoChords','Pro','Home','BPM','Keyboard','Menu','Intro','Verse','Pre-Chorus','Chorus','Interlude','Bridge','Coda','Sing Along','Free Style','Medley','Vocal 1','Vocal 2','Vocal 3','Vocal 4','Vocal 5','Rit','Rall','Custom…','GetSongBPM.com','Contoh Lagu','Instrumental','Outro','Tag','English','Indonesia','Email','Username','Bio','username','Font','Fonts','Demo','Mono','Serif','Control','Alt','Shift','Tab','Enter','Escape','Data tempo lagu oleh','Atkinson Hyperlegible (Braille Institute)','Bricolage Grotesque (Open Font License)']);
-const i18nKeep=e=>!/[A-Za-z]{3}/.test(e)||I18N_KEEP.has(e)||LID.has(e)||tr(e)!==e||/^#[0-9a-f]{6}$/i.test(e)||/@[\w.-]+/.test(e)||/^Versi \d+$/.test(e)||/^\[/.test(e)||/^(Intro|Verse|Pre-Chorus|Chorus|Interlude|Bridge|Coda|Outro|Male|Female)\b/.test(e)||(user&&(e===user.name||e===user.email));
+const i18nKeep=e=>!/[A-Za-z]{3}/.test(e)||I18N_KEEP.has(e)||LID.has(e)||tr(e)!==e||/^#[0-9a-f]{6}$/i.test(e)||/@[\w.-]+/.test(e)||/^Versi \d+$/.test(e)||/^\[/.test(e)||(window.EvoCore&&EvoCore.chord.isChord(e))||/^(Intro|Verse|Pre-Chorus|Chorus|Interlude|Bridge|Coda|Outro|Male|Female)\b/.test(e)||(user&&(e===user.name||e===user.email));
 window.i18nMissing=()=>{const out=new Set(),w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);for(let n;n=w.nextNode();){if(i18nSkip(n))continue;const o=I18N_EN.get(n),e=(o?o.e:n.nodeValue).trim();if(i18nKeep(e))continue;if(getComputedStyle(n.parentElement).display!=='none')out.add(e)}
   document.querySelectorAll('[placeholder],[title],[aria-label]').forEach(el=>I18N_ATTR.forEach(a=>{if(!el.hasAttribute(a))return;const M=I18N_EN.get(el),e=((M&&M[a])?M[a].e:el.getAttribute(a)).trim();if(!i18nKeep(e))out.add(a+': '+e)}));return [...out]};
 /* gear menu on Home */
@@ -2453,27 +2453,31 @@ refresh();
    character offsets (annotations, tempo) and highlights do not change. */
 
 function chordTp(){return (cur&&cur._tp)|0}
-function chordFlats(){const k=(cur&&cur.key)||(cur&&cur.chords&&cur.chords[0]&&cur.chords[0].n)||'C';
+function chordFlats(){const k=(cur&&EvoCore.chord.normKey(cur.key))||(cur&&cur.chords&&cur.chords[0]&&cur.chords[0].n)||'C';
   return EvoCore.chord.prefersFlats(EvoCore.chord.transposeKey(k,chordTp()))}
 function chordName(n){const t=chordTp();return t?EvoCore.chord.transposeChord(String(n||''),t,{flats:chordFlats()}):String(n||'')}
 
 function chordApply(le,items){if(!le)return;
   le.forEach(d=>{if(d&&d.classList&&d.classList.contains('ln')&&EvoCore.beats.isBeatLine(d.textContent))d.classList.add('beat')});
   if(!items||!items.length)return;const by={};items.forEach(it=>{(by[it.l]=by[it.l]||[]).push(it)});
-  Object.keys(by).forEach(l=>{const d=le[+l];if(!d||!d.classList||!d.classList.contains('ln'))return;const len=(d.textContent||'').length;if(!len)return;
+  le.forEach((d,l)=>{if(d&&d.classList&&d.classList.contains('beat'))chordBeatRow(d,by[l]||[])});
+  Object.keys(by).forEach(l=>{const d=le[+l];if(!d||!d.classList||!d.classList.contains('ln')||d.classList.contains('beat'))return;const len=(d.textContent||'').length;if(!len)return;
     by[l].slice().sort((a,b)=>b.c-a.c).forEach(it=>{const c=Math.max(0,Math.min(it.c|0,len-1)),nodes=chNodes(d);
       for(const[nd,o]of nodes){if(c>=o&&c<o+nd.data.length){const a=E('span','chd');a.dataset.c=chordName(it.n);const r=nd.splitText(c-o);r.parentNode.insertBefore(a,r);break}}});
     d.classList.add('hasch')});
-  le.forEach(d=>{if(d&&d.classList&&d.classList.contains('beat'))chordBarBreaks(d)});
   chordSpaceSoon()}
-/* A beat row only wraps between bars, so a bar is never split over two lines: each bar goes in a
-   no-wrap span with a <wbr> between bars. Only text and chord anchors are moved, never text changed,
-   so offsets (chords, highlights) stay the same. Rows with other markup inside are left as they are. */
-function chordBarBreaks(d){if([...d.childNodes].some(n=>n.nodeType===1&&!n.classList.contains('chd')))return;
-  [...d.childNodes].forEach(nd=>{if(nd.nodeType!==3)return;let i;if(nd.data.length>1&&nd.data[0]==='|'&&nd.previousSibling)nd=nd.splitText(1);while((i=nd.data.indexOf('|',1))>0&&i<nd.data.length-1)nd=nd.splitText(i+1)});
-  const kids=[...d.childNodes];let bar=null;
-  kids.forEach(n=>{if(!bar){bar=E('span','bar');d.insertBefore(bar,n)}bar.appendChild(n);
-    if(n.nodeType===3&&/\|$/.test(n.data)&&n!==kids[kids.length-1]){bar.after(document.createElement('wbr'));bar=null}});}
+/* Beat rows (intro, interlude) are shown short, the way chord sites write them: "C . C/E . | F . . . |",
+   one token per beat. The row's own text stays in the line, hidden, and the short form is drawn with CSS
+   from data-t (generated content is not text), so offsets of highlights and notes do not change. */
+function chordBeatRow(d,items){if(d.querySelector('.bview'))return;
+  const at={};items.forEach(it=>{at[it.c|0]=chordName(it.n)});
+  const bars=EvoCore.beats.compactBeatRow(d.textContent||'',c=>at[c]);if(!bars.length)return;
+  const raw=E('span','braw');while(d.firstChild)raw.append(d.firstChild);
+  const v=E('span','bview');
+  bars.forEach((bar,i)=>{const b=E('span','bbar');
+    bar.forEach(tk=>{const x=E('span',tk.chord?'bc':'bd');x.dataset.t=tk.t;b.append(x)});
+    const bl=E('span','bl');bl.dataset.t='|';b.append(bl);v.append(b);if(i<bars.length-1)v.append(document.createElement('wbr'))});
+  d.append(raw,v);d.classList.add('bshort')}
 
 /* Keep chord names apart. Measured after layout, again when the font size or the width changes. */
 let chordSpaceRaf=0;
@@ -2497,11 +2501,15 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(chordSpaceSoon
    The transpose is kept in cur._tp (-11..11) and drawn by chordName() in 50-chord-render.js.
    Only "Save key" writes to the song (chords and key), and only for library songs. */
 
-let tpT=0,tpDown=0,tpSong=null;
+let tpT=0,tpDown=0,tpSong=null,tpOptBase=null;
+
+function tpBase(){ /* the song's own key (normalised: 'Db' not 'C#/Db'), else its first chord, else '' */
+  if(!cur)return '';
+  return EvoCore.chord.normKey(cur.key)||(cur.chords&&cur.chords[0]&&cur.chords[0].n)||'';
+}
 
 function tpKeyNow(){ /* key shown now, transposed; '' when the song has neither a key nor chords */
-  if(!cur)return '';
-  const base=cur.key||(cur.chords&&cur.chords[0]&&cur.chords[0].n)||'';
+  const base=tpBase();
   if(!base)return '';
   try{return EvoCore.chord.transposeKey(base,cur._tp|0)}catch(e){return ''}
 }
@@ -2517,6 +2525,17 @@ function tpOpen(on){
   tpBump();
 }
 
+function tpFillKeys(base){ /* the 12 options of #tpk, in pitch order from C; value = semitone offset from the base (-5..+6) */
+  const sel=$('#tpk'),bpc=EvoCore.chord.pitchClass(base);
+  sel.innerHTML='';
+  for(let pc=0;pc<12;pc++){
+    let off=((pc-bpc)%12+12)%12;if(off>6)off-=12;
+    const o=document.createElement('option');
+    o.value=String(off);o.textContent=EvoCore.chord.transposeKey(base,off);
+    sel.appendChild(o);
+  }
+}
+
 function tpPaint(){ /* labels, visibility and the song-change reset; runs after every lyrics redraw */
   const tb=$('#tpb');if(!tb)return;
   if(tpSong!==cur){if(tpSong)tpSong._tp=0;tpSong=cur;if(cur)cur._tp=0}
@@ -2524,8 +2543,12 @@ function tpPaint(){ /* labels, visibility and the song-change reset; runs after 
   tb.style.display=has?'':'none';
   if(!has){if($('#tpp').classList.contains('open'))tpOpen(false);return}
   const t=cur._tp|0,k=tpKeyNow()||'–';
+  const base=tpBase()||'C';
+  if(tpOptBase!==base){tpOptBase=base;tpFillKeys(base)}
+  let n=((t%12)+12)%12;if(n>6)n-=12;
+  $('#tpk').value=String(n);
+  $('#tpk').setAttribute('aria-label',L('Key','Nada'));
   $('#tpbv').textContent=k;
-  $('#tpk').textContent=k;
   $('#tpv').textContent=t>0?'+'+t:t<0?'−'+(-t):'0';
   $('#tph').textContent=L('Key','Nada');
   $('#tpbs').textContent=L('key','nada');
@@ -2552,9 +2575,9 @@ function tpSet(v){ /* -/+/Reset: redraw the lyrics with the new chord names, kee
 function tpSave(){ /* writes the transposed chords and key into a library song */
   if(!cur||isTemp(cur))return;
   const t=cur._tp|0;if(!t)return;
-  const flats=EvoCore.chord.prefersFlats(EvoCore.chord.transposeKey(cur.key||(cur.chords&&cur.chords[0]?cur.chords[0].n:'C'),t));
+  const flats=EvoCore.chord.prefersFlats(EvoCore.chord.transposeKey(tpBase()||'C',t));
   (cur.chords||[]).forEach(c=>{if(c&&c.n)c.n=EvoCore.chord.transposeChord(String(c.n),t,{flats})});
-  if(cur.key)cur.key=EvoCore.chord.transposeKey(cur.key,t);
+  if(cur.key)cur.key=EvoCore.chord.transposeKey(EvoCore.chord.normKey(cur.key),t);
   cur.md=Date.now();cur._tp=0;
   save();render();note(L('Key saved','Nada disimpan'));
   tpBump();
@@ -2565,7 +2588,7 @@ function tpSave(){ /* writes the transposed chords and key into a library song *
   const tpp=document.createElement('div');
   tpp.id='tpp';tpp.setAttribute('role','group');
   tpp.innerHTML='<div class="sph"><span id="tph"></span><b id="tpv"></b><button id="tpx" type="button"><svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg></button></div>'
-    +'<div class="tpr"><button class="step" id="tpMinus" type="button">−</button><span id="tpk"></span><button class="step" id="tpPlus" type="button">+</button></div>'
+    +'<div class="tpr"><button class="step" id="tpMinus" type="button">−</button><span class="tpkw"><select id="tpk"></select></span><button class="step" id="tpPlus" type="button">+</button></div>'
     +'<div class="tpf"><button class="tpbtn" id="tpr" type="button"></button><button class="tpbtn tpsave" id="tps" type="button"></button></div>';
   const tpb=document.createElement('button');
   tpb.id='tpb';tpb.type='button';tpb.setAttribute('aria-expanded','false');tpb.setAttribute('aria-controls','tpp');
@@ -2579,6 +2602,7 @@ function tpSave(){ /* writes the transposed chords and key into a library song *
   $('#tpPlus').onclick=()=>tpSet((cur?cur._tp|0:0)+1);
   $('#tpr').onclick=()=>tpSet(0);
   $('#tps').onclick=()=>tpSave();
+  $('#tpk').onchange=()=>tpSet(+$('#tpk').value); /* tpSet redraws and restarts the idle timer (tpBump) */
   tpp.addEventListener('pointerdown',()=>{tpDown=1;tpBump()});
   tpp.addEventListener('pointerup',()=>{tpDown=0;tpBump()});
   tpp.addEventListener('pointercancel',()=>{tpDown=0;tpBump()});
@@ -2665,7 +2689,12 @@ function chSet(n){const x=chs&&chs.cells[chs.sel];if(!x)return;const k=x.l+':'+x
 
 function chKbState(){const k=$('#chkb');if(!chs)return;k.querySelector('.chcur').textContent=chs.buf||'–';
   k.querySelectorAll('[data-k]').forEach(b=>{b.disabled=!chCan(chs.buf,b.dataset.k)});
-  const r=k.querySelector('.chrec');r.textContent='';const seen=[];chNow().forEach(it=>{if(!seen.includes(it.n))seen.push(it.n)});
+  let fr=k.querySelector('.chfam');if(!fr){fr=E('div','chfam');k.querySelector('.chrec').before(fr)}
+  const kv=$('#ek').value,key=(kv==='__sep'||kv==='__chord')?'':kv,fam=EvoCore.chord.chordFamily(key);
+  fr.textContent='';fr.hidden=!fam.length;
+  if(fam.length){fr.append(E('span','chfl',EvoCore.chord.normKey(key)));
+    fam.forEach(n=>{const b=E('button','',n);b.type='button';b.dataset.r=n;b.setAttribute('aria-label',L('Chord ','Chord ')+n);if(n===chs.buf)b.classList.add('on');fr.append(b)})}
+  const r=k.querySelector('.chrec');r.textContent='';const seen=[];chNow().forEach(it=>{if(!seen.includes(it.n)&&!fam.includes(it.n))seen.push(it.n)});
   seen.slice(0,10).forEach(n=>{const b=E('button','',n);b.type='button';b.dataset.r=n;r.append(b)})}
 
 function chDone(){if(!chs)return;const items=chNow();
@@ -2790,3 +2819,10 @@ function textIn(x,pre){x=String(x||'');if(!x.trim())return false;if(restoreBacku
 function wlNeedTap(q){const c=csh();c.classList.add('wl');c.append(E('h3','',L('Search Chordtela','Cari di Chordtela')));
   const g=E('button','',L('Search on Google','Cari di Google'));g.type='button';g.onclick=()=>{ctxClose();wlGoogle(q,true)};
   const x=E('button','',L('Cancel','Batal'));x.type='button';x.onclick=()=>{wlRet=null;ctxClose()};c.append(g,x);$('#ctx').classList.add('on')}
+/* ===== src/app/54-chord-keys.js ===== */
+/* ===== EvoChords: minor keys in the song key list (file 54) =====
+   Runs once at load. Adds the minor keys to #ek (the Key list of the song editor, 12-editor.js) after the
+   major keys, before the separator. Existing options and their values are unchanged: EvoLyric shares the song data. */
+(function(){const s=$('#ek');if(!s)return;
+  const sep=[...s.options].find(o=>o.value==='__sep')||null;
+  ['Am','Bbm','Bm','Cm','C#m','Dm','Ebm','Em','Fm','F#m','Gm','G#m'].forEach(k=>{const o=E('option','',k);o.value=k;s.insertBefore(o,sep)})})();

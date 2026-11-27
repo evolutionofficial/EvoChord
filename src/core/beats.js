@@ -58,3 +58,29 @@ export function resizeBeatLine(line, delta) {
 export function barStartCell(bar, timeSig = '4/4') {
   return bar * barShape(timeSig).cells;
 }
+
+/**
+ * Short form of a beat row with its chords, the way chord sites write it: "C . C/E . | F . . . |".
+ * One token per beat (a chord or "."); a chord on an "and" is added after its beat.
+ * @param {string} line beat row
+ * @param {(c:number)=>string|undefined} chordAt chord name at a character offset (cells start at even offsets)
+ * @returns {{t:string, chord:boolean}[][]} tokens per bar
+ */
+export function compactBeatRow(line, chordAt) {
+  const s = String(line ?? '');
+  const { timeSig } = readBeatLine(s);
+  const { cells } = barShape(timeSig);
+  const out = [];
+  for (let start = 0; start < s.length - 1; start += cells * 2) {
+    const bar = [];
+    for (let i = 0; i < cells; i++) {
+      const c = start + i * 2;
+      if (c >= s.length - 1) break;
+      const n = chordAt(c);
+      if (n) bar.push({ t: n, chord: true });
+      else if (s[c + 1] === '•') bar.push({ t: '.', chord: false });
+    }
+    if (bar.length) out.push(bar);
+  }
+  return out;
+}

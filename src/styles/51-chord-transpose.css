@@ -14,7 +14,10 @@
 #tpp .sph b{min-width:26px;text-align:right}
 #tpp .tpr{display:flex;align-items:center;gap:6px;margin-top:4px}
 #tpp .tpr .step{width:34px;height:34px;flex:0 0 34px;border-radius:10px;font-size:20px;background:rgba(13,10,8,.45)}
-#tpk{flex:1;min-width:0;text-align:center;font:800 24px/1 'Bricolage Grotesque',system-ui,sans-serif;color:var(--acct);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tpkw{position:relative;display:inline-flex;align-items:center}
+.tpkw::after{content:'▾';margin-left:2px;font-size:10px;color:var(--mut);pointer-events:none}
+select#tpk{flex:1;min-width:64px;text-align:center;font:800 24px/1 'Bricolage Grotesque',system-ui,sans-serif;color:var(--acct);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:transparent;border:0;appearance:none;-webkit-appearance:none;cursor:pointer}
+#tpk option{background:var(--bg);color:var(--fg)}
 #tpp .tpf{display:flex;gap:6px;margin-top:6px}
 #tpp .tpbtn{flex:1;min-width:0;height:28px;border-radius:9px;font:700 10px/1 'Atkinson Hyperlegible',system-ui,sans-serif;letter-spacing:.6px;text-transform:uppercase;color:var(--fg);background:rgba(13,10,8,.45);border:1px solid rgba(255,255,255,.1)}
 #tpp .tpbtn.tpsave{color:var(--acct)}
