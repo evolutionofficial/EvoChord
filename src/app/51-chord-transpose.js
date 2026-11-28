@@ -77,8 +77,8 @@ function tpSet(v){ /* -/+/Reset: redraw the lyrics with the new chord names, kee
 function tpSave(){ /* writes the transposed chords and key into a library song */
   if(!cur||isTemp(cur))return;
   const t=cur._tp|0;if(!t)return;
-  const flats=EvoCore.chord.prefersFlats(EvoCore.chord.transposeKey(tpBase()||'C',t));
-  (cur.chords||[]).forEach(c=>{if(c&&c.n)c.n=EvoCore.chord.transposeChord(String(c.n),t,{flats})});
+  const to=EvoCore.chord.transposeKey(tpBase()||'C',t); /* the same transpose as the editor and the display */
+  (cur.chords||[]).forEach(c=>{if(c&&c.n)c.n=EvoCore.chord.transposeTo(String(c.n),t,to)});
   if(cur.key)cur.key=EvoCore.chord.transposeKey(EvoCore.chord.normKey(cur.key),t);
   cur.md=Date.now();cur._tp=0;
   save();render();note(L('Key saved','Nada disimpan'));
