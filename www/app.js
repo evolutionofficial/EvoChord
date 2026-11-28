@@ -2759,7 +2759,7 @@ async function chordIn(text,fallbackTitle){
         :L('Chordtela cannot be reached right now.','Chordtela sedang tidak bisa dibuka.'),true);
       return false}
     ctxClose();clearTimeout(noteT);$('#note').classList.remove('on');
-    openTemp({title:r.title||fallbackTitle,artist:r.artist,lyrics:r.lyrics,chords:r.chords,key:r.key,capo:r.capo,src:'chordtela',srcId:0,
+    openTemp({title:r.title||fallbackTitle,artist:r.artist,lyrics:r.lyrics,chords:r.chords,key:r.key,capo:r.capo,src:'chordtela',srcId:r.main|0,
       vers:(r.versions||[]).map((v,i)=>({...v,id:i,title:r.title,artist:r.artist})),srcUrl:r.source&&r.source.url});
     return true}
   const s=EvoCore.sheet.parseChordSheet(text);

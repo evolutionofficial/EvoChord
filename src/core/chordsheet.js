@@ -365,7 +365,8 @@ const VERSION_NOISE = /^\s*(?:-{3,}|lihat\s+pula\b.*|.*\bversi\s+chord\b.*)\s*$/
 
 /**
  * Parse a Chordtela song page into song fields (no id).
- * Top-level fields are the first version on the page; `versions` lists every version found
+ * Top-level fields are the original version when the page has one, else the first; `main` is its index in
+ * `versions`, which lists every version found in page order
  * ({ name, key, keyGuessed, capo, lyrics, chords }).
  */
 export function parseChordtelaHtml(html, url = '') {
@@ -388,7 +389,9 @@ function parseVersions(text, html, url) {
     versions.push({ name: label, key: r.key, keyGuessed: r.keyGuessed, capo: r.capo, lyrics: r.lyrics, chords: r.chords, _t: r });
   }
   if (!versions.length) return null;
-  const first = versions[0]._t;
+  // The original version is the one people play, so it opens first when the page has one.
+  const main = Math.max(0, versions.findIndex((v) => v.name === 'Versi original'));
+  const first = versions[main]._t;
   versions.forEach((v) => delete v._t);
   return {
     title: head.title || first.title,
@@ -399,6 +402,7 @@ function parseVersions(text, html, url) {
     lyrics: first.lyrics,
     chords: first.chords,
     versions,
+    main,
     source: url ? { site: 'chordtela', url } : undefined,
   };
 }
