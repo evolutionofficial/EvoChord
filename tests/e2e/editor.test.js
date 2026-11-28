@@ -10,9 +10,9 @@ test('Editor: changing title, artist and key and pressing Save updates the song'
 test('Editor: a new song can be created and saved to the library',async()=>{
   const t=await open(),p=t.page;
   await p.evaluate(()=>{fabOpen(true)});await p.click('#nw');await p.waitForTimeout(400);
-  await p.fill('#et','Lagu Baru');await p.click('#chtx .choadd button >> nth=1');await p.waitForTimeout(200);await p.click('#csheet button:text-is("Verse")');await p.waitForTimeout(200);
-  await p.fill('.chin','Satu dua tiga');await p.click('.chedit button >> nth=0');await p.click('#eS');await p.waitForTimeout(400);
-  eq(await p.evaluate(()=>songs.length),6,'song count');eq(await p.evaluate(()=>songs.find(s=>s.title==='Lagu Baru').lyrics),'[Verse]\nSatu dua tiga','lyrics');await t.close()});
+  await p.fill('#et','Lagu Baru');await p.click('#chtx .choadd button:text-is("+ Section")');await p.waitForTimeout(200);await p.click('#csheet button:text-is("Verse")');await p.waitForTimeout(200);
+  await p.click('#eS');await p.waitForTimeout(400);
+  eq(await p.evaluate(()=>songs.length),6,'song count');eq(await p.evaluate(()=>songs.find(s=>s.title==='Lagu Baru').lyrics),'[Verse]','lyrics');await t.close()});
 test('Editor: the Section panel has three groups and only one is open at a time',async()=>{
   const t=await open(),p=t.page;await p.evaluate(()=>openEdit(songs[0]));await p.waitForTimeout(400);
   const g=()=>p.evaluate(()=>[...document.querySelectorAll('#side .scw')].map(w=>[w.querySelector('.sch span').textContent,!w.classList.contains('shut')]));

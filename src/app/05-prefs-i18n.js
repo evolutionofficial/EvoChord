@@ -1,5 +1,5 @@
 /* ---------- v75: preferences, help and account settings ---------- */
-const APP_VER='2',APP_REL='0.3'; /* APP_VER = build (cache) number; APP_REL = the version people see */
+const APP_VER='3',APP_REL='0.4'; /* APP_VER = build (cache) number; APP_REL = the version people see */
 const PREF=(()=>{const o={theme:'dark',lang:'en',awake:1,dim:1,aura:1,fscr:1,font:32};try{Object.assign(o,JSON.parse(localStorage.getItem('evo.prefs')||'{}'))}catch(e){}return o})();
 const prefSave=()=>{try{localStorage.setItem('evo.prefs',JSON.stringify(PREF))}catch(e){}};
 const LID=new Set();

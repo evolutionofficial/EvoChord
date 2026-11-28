@@ -442,7 +442,7 @@ function shareTake(){let d=window.__evoShare||null;try{const v=sessionStorage.ge
 
 /* ===== src/app/05-prefs-i18n.js ===== */
 /* ---------- v75: preferences, help and account settings ---------- */
-const APP_VER='2',APP_REL='0.3'; /* APP_VER = build (cache) number; APP_REL = the version people see */
+const APP_VER='3',APP_REL='0.4'; /* APP_VER = build (cache) number; APP_REL = the version people see */
 const PREF=(()=>{const o={theme:'dark',lang:'en',awake:1,dim:1,aura:1,fscr:1,font:32};try{Object.assign(o,JSON.parse(localStorage.getItem('evo.prefs')||'{}'))}catch(e){}return o})();
 const prefSave=()=>{try{localStorage.setItem('evo.prefs',JSON.stringify(PREF))}catch(e){}};
 const LID=new Set();
@@ -2734,7 +2734,7 @@ function wlGo(q,btn){q=String(q||'').trim();if(!q)return toast('Ketik judul lagu
 function wlBack(q){wlRet=null;const c=csh();c.classList.add('wl');c.append(E('h3','',L('Copied the link?','Sudah salin link-nya?')));
   const p=E('p','mut wlp',L('Copy the Chordtela page link (or the chords), then tap Get chords.','Salin link halaman Chordtela (atau teks chord-nya), lalu tekan Ambil chord.'));c.append(p);
   const ok=E('button','wlok',L('Get chords','Ambil chord'));ok.type='button';ok.onclick=()=>wlClip(q);
-  const x=E('button','',L('Back','Kembali'));x.type='button';x.onclick=ctxClose;c.append(ok,x);$('#ctx').classList.add('on')}
+  const x=E('button','',L('Back','Kembali'));x.type='button';x.onclick=()=>{chordInto=false;ctxClose()};c.append(ok,x);$('#ctx').classList.add('on')}
 
 function wlClip(q){
   if(!navigator.clipboard||!navigator.clipboard.readText)return wlPaste(q);
@@ -2744,7 +2744,7 @@ function wlClip(q){
 function wlPaste(q){const c=csh();c.classList.add('wl');c.append(E('h3','',L('Paste the lyrics','Tempel liriknya')));
   const t=document.createElement('textarea');t.className='wlta';t.placeholder=L('Paste the lyrics here','Tempel liriknya di sini');t.rows=6;c.append(t);
   const ok=E('button','wlok',L('Get chords','Ambil chord'));ok.type='button';ok.onclick=()=>chordIn(t.value,q);
-  const x=E('button','',L('Back','Kembali'));x.type='button';x.onclick=ctxClose;c.append(ok,x);$('#ctx').classList.add('on');setTimeout(()=>t.focus(),60)}
+  const x=E('button','',L('Back','Kembali'));x.type='button';x.onclick=()=>{chordInto=false;ctxClose()};c.append(ok,x);$('#ctx').classList.add('on');setTimeout(()=>t.focus(),60)}
 
 /* a Chordtela song link anywhere in the text -> its canonical https URL, or null */
 const CHORD_URL_RE=/(?:https?:\/\/)?(?:(?:www|m|amp)\.)?chordtela\.com\/\d{4}\/\d{2}\/[a-z0-9-]+\.html(?:\/amp\/?)?/i;
@@ -2753,6 +2753,7 @@ function chordUrlIn(text){const m=CHORD_URL_RE.exec(String(text||''));if(!m)retu
 /* what was copied or pasted: a Chordtela link (fetched), a chord sheet (opened as is), or plain lyrics. Resolves true when a song opened. */
 async function chordIn(text,fallbackTitle){
   text=String(text||'');
+  if(chordInto&&$('#edit').classList.contains('on')&&chs)return chordImport(text); /* 58: the chords go onto the song in the editor */
   const u=chordUrlIn(text);
   if(u){
     note(L('Getting chords…','Mengambil chord…'));
@@ -2826,7 +2827,7 @@ function textIn(x,pre){x=String(x||'');if(!x.trim())return false;if(restoreBacku
 /* EvoChords searches Chordtela through Google (no LRCLIB): the "blocked new tab" fallback says so */
 function wlNeedTap(q){const c=csh();c.classList.add('wl');c.append(E('h3','',L('Search Chordtela','Cari di Chordtela')));
   const g=E('button','',L('Search on Google','Cari di Google'));g.type='button';g.onclick=()=>{ctxClose();wlGoogle(q,true)};
-  const x=E('button','',L('Cancel','Batal'));x.type='button';x.onclick=()=>{wlRet=null;ctxClose()};c.append(g,x);$('#ctx').classList.add('on')}
+  const x=E('button','',L('Cancel','Batal'));x.type='button';x.onclick=()=>{wlRet=null;chordInto=false;ctxClose()};c.append(g,x);$('#ctx').classList.add('on')}
 /* ===== src/app/54-chord-keys.js ===== */
 /* ===== EvoChords: minor keys in the song key list (file 54) =====
    Runs once at load. Adds the minor keys to #ek (the Key list of the song editor, 12-editor.js) after the
@@ -2850,6 +2851,8 @@ function oeLoad(){const lyr=ta.value;
   chKbBuild()}
 
 function oeStart(){if(!ed)return;oeLoad();oe={undo:[],ui:-1,busy:0,ed:null};
+  // the lyrics the song came with: these lines are locked (EvoChords only adds chords, beat rows and section labels)
+  oe.lyr=ed.s?songLyr(ed.s):(ed.base?songLyr(ed.base):chordOwnLyrics(ta.value));
   chBuild(null);chs.start=JSON.stringify({lines:chs.lines,chords:chNow()});$('#chl').scrollTop=0;chSelect(-1)}
 function openChd(){oeStart()}
 
@@ -2876,15 +2879,17 @@ function oeSectionMenu(){const c=csh();c.append(E('h3','',L('Add a section','Tam
   OE_SECTIONS.forEach(n=>{const b=E('button','',n);b.onclick=()=>{ctxClose();oeAddSection(n)};c.append(b)});
   const x=E('button','',L('Cancel','Batal'));x.onclick=ctxClose;c.append(x);$('#ctx').classList.add('on')}
 function oeAddSection(n){if(!chs)return;const ls=chs.lines;if(ls.length===1&&!ls[0].trim())ls.length=0;if(ls.length&&ls[ls.length-1].trim())ls.push('');
-  ls.push('['+n+']','');chBuild(null);oeEditRow(chs.lines.length-1,0)}
+  ls.push('['+n+']');chBuild(null)}
 
 // Build the grid from chs.lines. keep = {l,c} box to keep selected if it still exists. Every change ends in oeSnap.
 function chBuild(keep=chKeepPos()){const box=$('#chtx');box.textContent='';chs.cells=[];
-  const lines=chs.lines,N=EvoCore.song.gridCells({lyrics:lines.join('\n'),chords:chNow()}),map={};
+  const lines=chs.lines,N=EvoCore.song.gridCells({lyrics:lines.join('\n'),chords:chNow()}),map={},mask=EvoCore.layer.lyricMask(lines.join('\n'),oe.lyr||'');
   const top=E('div','chtop');top.append(chAddBtn(L('+ Beats at the start','+ Ketukan di awal'),L('Add beat row at the start','Tambah baris ketukan di awal'),()=>chInsertBeat(0)));
   box.append(top);
   lines.forEach((ln,l)=>{const tr=ln.trim();
-    if(/^\[.+\]$/.test(tr)){const s=E('div','chsec');s.append(E('span','',tr.slice(1,-1)),chAddBtn(L('+ Beats','+ Ketukan'),L('Add beat row','Tambah baris ketukan'),()=>chAddBeatAfter(l)),chSecDelBtn(l));box.append(s);return}
+    if(/^\[.+\]$/.test(tr)){const s=E('div','chsec');s.append(E('span','',tr.slice(1,-1)),chAddBtn(L('+ Beats','+ Ketukan'),L('Add beat row','Tambah baris ketukan'),()=>chAddBeatAfter(l)));
+      if(!mask[l])s.append(chSecDelBtn(l));/* the song's own labels cannot be deleted */
+      box.append(s);return}
     if(EvoCore.song.isNoteLine(ln))return;
     const beat=EvoCore.beats.isBeatLine(ln),v=EvoCore.song.visibleText(ln),row=E('div',beat?'chrow chbeat':(tr?'chrow':'chrow chempty'));
     for(let i=0;i<N;i++){const c=i*2,k=l+':'+c,cell=E('button','chc');cell.type='button';cell.dataset.i=chs.cells.length;
@@ -2896,8 +2901,7 @@ function chBuild(keep=chKeepPos()){const box=$('#chtx');box.textContent='';chs.c
   chs.map=map;
   chSelect(keep?chs.cells.findIndex(x=>x.l===keep.l&&x.c===keep.c):-1);
   const add=E('div','choadd');
-  add.append(chAddBtn(L('+ Lyric line','+ Baris lirik'),L('Add lyric line','Tambah baris lirik'),()=>{const ls=chs.lines;if(!ls.length||ls[ls.length-1].trim())ls.push('');chBuild(null);oeEditRow(ls.length-1,0)}),
-    chAddBtn(L('+ Section','+ Bagian'),L('Add section','Tambah bagian'),oeSectionMenu),
+  add.append(chAddBtn(L('+ Section','+ Bagian'),L('Add section','Tambah bagian'),oeSectionMenu),
     chAddBtn(L('+ Beats','+ Ketukan'),L('Add beat row at the end','Tambah baris ketukan di akhir'),()=>chInsertBeat(chs.lines.length)));
   box.append(add);
   oeSnap()}
@@ -2946,14 +2950,11 @@ function oeEditRow(l,at){if(!chs)return;
   inp.focus();try{const q=Math.max(0,Math.min(at||0,inp.value.length));inp.setSelectionRange(q,q)}catch(e){}
   try{wrap.scrollIntoView({block:'center'})}catch(e){}}
 
-// Tapping the letters of a lyric row types there; tapping the chord (top) part still selects the box for the chord keyboard.
-// Runs in the capture phase on the grid, so the box handler in 13 does not see these taps.
+// Every tap on a box (letters or chord part) selects that box for a chord. The lyric text is never typed here:
+// tapping the letters does not open a text field (EvoLyric owns the lyrics).
 $('#chtx').addEventListener('click',e=>{
   const cell=e.target.closest&&e.target.closest('.chc');if(!cell||!chs)return;
-  const x=chs.cells[+cell.dataset.i];if(!x||cell.parentNode.classList.contains('chbeat'))return;
-  if(e.target.closest('.chn')&&chs.map[x.l+':'+x.c])return;
-  if(!e.target.closest('.cht')&&!cell.classList.contains('chx'))return;
-  e.stopPropagation();oeEditRow(x.l,Math.min(x.c,EvoCore.song.visibleText(chs.lines[x.l]).length))},true);
+  chSelect(+cell.dataset.i)},true);
 
 function chDone(){oeFlush();chSelect(-1)}
 function chBack(){chSelect(-1)}
@@ -2975,14 +2976,14 @@ function chBack(){chSelect(-1)}
    The tour shows the grid instead of the text box and skips Auto Section and the side panel. */
 (function(){const i=TOUR.findIndex(s=>s.t==='#ta');if(i<0)return;
   TOUR[i]={...TOUR[i],t:'#chtx',p:r=>[r.left+r.width*.3,r.top+Math.min(r.height*.3,140)],
-    d:['Lyrics and chords are edited together: tap the words to type, tap a box to add a chord. We use a demo song; it is not saved.',
-       'Lirik dan chord diedit bersama: ketuk kata untuk mengetik, ketuk kotak untuk menambah chord. Kita pakai lagu contoh; lagu ini tidak disimpan.'],
+    d:['Lyrics come from EvoLyric and stay as they are; here you write the chords: tap a box above a word. We use a demo song; it is not saved.',
+       'Lirik datang dari EvoLyric dan tidak diubah; di sini kamu menulis chord: ketuk kotak di atas kata. Kita pakai lagu contoh; lagu ini tidak disimpan.'],
     go:()=>{if(!$('#edit').classList.contains('on')||!tour.ed){openEdit(null,autoSec(TOUR_LY)||TOUR_LY,TOUR_T);$('#ea').value=TOUR_A;tour.ed=1}}};
   /* same number of steps (07-tour.js counts them): the Auto Section and side panel steps show the chord boxes and the add buttons */
   const a=TOUR.findIndex(s=>s.t==='#eA');if(a>=0)TOUR[a]={t:'#chtx .chrow',g:'tap',h:['Chords','Chord'],
     d:['Tap a box above the words to write a chord. The first keyboard row has the chords of the song key.','Ketuk kotak di atas kata untuk menulis chord. Baris pertama keyboard berisi chord dari nada dasar lagu.']};
   const b=TOUR.findIndex(s=>s.t==='#side');if(b>=0)TOUR[b]={t:'#chtx .chsec .chadd',g:'tap',h:['Beats and sections','Ketukan dan bagian'],
-    d:['+ Beats adds a beat row for an intro or interlude. At the bottom: + Lyric line and + Section.','+ Ketukan menambah baris ketukan untuk intro atau interlude. Di paling bawah: + Baris lirik dan + Bagian.']};
+    d:['+ Beats adds a beat row for an intro or interlude. At the bottom: + Section and + Beats.','+ Ketukan menambah baris ketukan untuk intro atau interlude. Di paling bawah: + Bagian dan + Ketukan.']};
   const q=TOUR.find(s=>s.t==='#q');if(q){q.h=['Chords from the internet','Chord dari internet'];
     q.d=['Type a title in the search box. Not in your Library? Tap Search online: Google shows Chordtela pages; copy the link, come back and tap Get chords.',
          'Ketik judul di kolom cari. Tidak ada di Library? Ketuk Cari di internet: Google menampilkan halaman Chordtela; salin link-nya, kembali, lalu ketuk Ambil chord.']}})();
@@ -3021,3 +3022,82 @@ function chCan(b, k) {
     chSet(chs.buf.replace(TOK, ''));
   }, true);
 })();
+/* ===== src/app/57-chord-layer.js ===== */
+/* ===== EvoChords: the chord layer (file 57) =====
+   EvoLyric owns the lyrics. On this device a song is one sheet (lyric lines + beat rows, section labels and blank
+   lines EvoChords added); in the shared database the lyrics stay exactly as EvoLyric wrote them and EvoChords'
+   lines go to `rows` (EvoCore.layer). cloud.js calls evoSongIn when a song comes down and evoSongOut when it goes up.
+   song.lyr = the lyrics as they came (kept on the device, never uploaded). */
+
+// Lyrics of a song made in EvoChords (Chordtela, paste): the sheet without beat rows and trailing spaces.
+function chordOwnLyrics(sheet){return String(sheet||'').split('\n').filter(l=>!EvoCore.beats.isBeatLine(l)).map(l=>l.replace(/\s+$/,'')).join('\n').replace(/\n+$/,'')}
+
+// The lyrics a song came with (set once, then kept).
+function songLyr(s){if(!s)return'';if(s.lyr==null)s.lyr=chordOwnLyrics(s.lyrics);return s.lyr}
+
+window.evoSongIn=function(o){const m=EvoCore.layer.mergeLayer(o.lyrics,o.chords,o.rows);
+  const r=Object.assign({},o,{lyrics:m.lyrics,chords:m.chords,lyr:m.lyr});delete r.rows;return r};
+
+window.evoSongOut=function(s){const lyr=songLyr(s),x=EvoCore.layer.splitLayer(s.lyrics,s.chords||[],lyr);
+  const r=Object.assign({},s,{lyrics:x.lyrics,chords:x.chords,rows:x.rows});delete r.lyr;return r};
+
+/* A new song saved from the editor keeps the lyrics it was opened with (none for a blank song, the pasted text for
+   Paste as new song): sections and beat rows added here stay EvoChords' own lines, not lyrics. Runs after the
+   editor's own Save handler (registered later). */
+$('#eS').addEventListener('click',()=>{if(cur&&cur.lyr==null&&typeof oe==='object'&&oe&&oe.lyr!=null){cur.lyr=oe.lyr;save()}});
+/* ===== src/app/58-chord-import.js ===== */
+/* ===== EvoChords: "Get chords from Chordtela" for the song in the editor (file 58) =====
+   The chords of a Chordtela sheet (or of chord text pasted after the Google step) go onto the song's own lyric lines
+   (EvoCore.layer.importChords). The lyrics are never changed. chordIn (53) hands its text here while chordInto is set. */
+
+let chordInto=false;
+
+/* the Chordtela sheet behind a link (the same fetch and messages as chordIn), or the chord text itself.
+   Resolves {lyrics,chords} or null (the error is shown). */
+async function chordFetch(text){
+  text=String(text||'');
+  const u=chordUrlIn(text);
+  if(u){
+    note(L('Getting chords…','Mengambil chord…'));
+    let res;
+    try{res=await fetch('/api/chordtela?url='+encodeURIComponent(u),{cache:'no-cache'})}
+    catch(e){note(L('You are offline. Chords need an internet connection.','Kamu sedang offline. Ambil chord butuh internet.'),true);return null}
+    const r=await res.json().catch(()=>({error:'upstream'}));
+    const why=r.error||(!res.ok||!r.lyrics?'upstream':'');
+    if(why){
+      note(why==='bad_url'||why==='not_found'?L('That page was not found on Chordtela.','Halaman itu tidak ditemukan di Chordtela.')
+        :why==='no_chords'?L('No chords could be read on that page. Copy the chords as text instead.','Chord di halaman itu belum bisa dibaca. Salin teks chord-nya saja.')
+        :L('Chordtela cannot be reached right now.','Chordtela sedang tidak bisa dibuka.'),true);
+      return null}
+    /* the original version of the page (the one the song opens with) */
+    const v=(r.versions&&r.versions[r.main|0])||r;
+    return{lyrics:v.lyrics,chords:v.chords||[]}}
+  const s=EvoCore.sheet.parseChordSheet(text);
+  if(s.chords.length>=2)return{lyrics:s.lyrics,chords:s.chords};
+  note(L('No chords found in that text. Copy the chords first, then try again.','Tidak ada chord di teks itu. Salin chord-nya dulu, lalu coba lagi.'),true);
+  return null}
+
+/* the chords of src go onto the lines of the song in the editor; chords already there are replaced (after a question) */
+async function chordImport(text){
+  chordInto=false;
+  const src=await chordFetch(text);
+  ctxClose();
+  if(!src)return false;
+  const go=()=>{if(!chs)return;
+    const r=EvoCore.layer.importChords(chs.lines.join('\n'),chNow(),src.lyrics,src.chords,EvoCore.lineedit.editRow);
+    chs.lines=r.lyrics.split('\n');chs.map={};r.chords.forEach(x=>{chs.map[x.l+':'+x.c]=x.n});chBuild(null);
+    if(r.matched===0)note(L('No line matched these lyrics.','Tidak ada baris yang cocok dengan lirik lagu ini.'),true);
+    else note(L(`Chords added on ${r.matched} of ${r.lines} lines.`,`Chord ditempel di ${r.matched} dari ${r.lines} baris.`))};
+  if(chNow().length>0)ask(L('Replace the chords?','Ganti chord yang ada?'),L('Chords from Chordtela replace the chords on matching lines.','Chord dari Chordtela menggantikan chord di baris yang cocok.'),L('Replace','Ganti'),go);
+  else go();
+  return true}
+
+/* toolbar button next to the notes button: asks for the song on Google, then the usual return sheet brings the chords */
+(function(){const n=$('#eN');if(!n||$('#eCt'))return;
+  const b=document.createElement('button');b.id='eCt';b.type='button';
+  const lab=L('Get chords from Chordtela','Ambil chord dari Chordtela');b.setAttribute('aria-label',lab);b.title=lab;
+  b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>';
+  b.onclick=()=>{const t=$('#et').value.trim();
+    if(!t){note(L('Type the title first','Isi judul dulu'),true);return}
+    chordInto=true;wlGoogle((t+' '+$('#ea').value).trim(),true)};
+  n.after(b)})();
