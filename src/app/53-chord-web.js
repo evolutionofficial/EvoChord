@@ -10,7 +10,7 @@ function wlGo(q,btn){q=String(q||'').trim();if(!q)return toast('Ketik judul lagu
 function wlBack(q){wlRet=null;const c=csh();c.classList.add('wl');c.append(E('h3','',L('Copied the link?','Sudah salin link-nya?')));
   const p=E('p','mut wlp',L('Copy the Chordtela page link (or the chords), then tap Get chords.','Salin link halaman Chordtela (atau teks chord-nya), lalu tekan Ambil chord.'));c.append(p);
   const ok=E('button','wlok',L('Get chords','Ambil chord'));ok.type='button';ok.onclick=()=>wlClip(q);
-  const x=E('button','',L('Back','Kembali'));x.type='button';x.onclick=ctxClose;c.append(ok,x);$('#ctx').classList.add('on')}
+  const x=E('button','',L('Back','Kembali'));x.type='button';x.onclick=()=>{chordInto=false;ctxClose()};c.append(ok,x);$('#ctx').classList.add('on')}
 
 function wlClip(q){
   if(!navigator.clipboard||!navigator.clipboard.readText)return wlPaste(q);
@@ -20,7 +20,7 @@ function wlClip(q){
 function wlPaste(q){const c=csh();c.classList.add('wl');c.append(E('h3','',L('Paste the lyrics','Tempel liriknya')));
   const t=document.createElement('textarea');t.className='wlta';t.placeholder=L('Paste the lyrics here','Tempel liriknya di sini');t.rows=6;c.append(t);
   const ok=E('button','wlok',L('Get chords','Ambil chord'));ok.type='button';ok.onclick=()=>chordIn(t.value,q);
-  const x=E('button','',L('Back','Kembali'));x.type='button';x.onclick=ctxClose;c.append(ok,x);$('#ctx').classList.add('on');setTimeout(()=>t.focus(),60)}
+  const x=E('button','',L('Back','Kembali'));x.type='button';x.onclick=()=>{chordInto=false;ctxClose()};c.append(ok,x);$('#ctx').classList.add('on');setTimeout(()=>t.focus(),60)}
 
 /* a Chordtela song link anywhere in the text -> its canonical https URL, or null */
 const CHORD_URL_RE=/(?:https?:\/\/)?(?:(?:www|m|amp)\.)?chordtela\.com\/\d{4}\/\d{2}\/[a-z0-9-]+\.html(?:\/amp\/?)?/i;
@@ -29,6 +29,7 @@ function chordUrlIn(text){const m=CHORD_URL_RE.exec(String(text||''));if(!m)retu
 /* what was copied or pasted: a Chordtela link (fetched), a chord sheet (opened as is), or plain lyrics. Resolves true when a song opened. */
 async function chordIn(text,fallbackTitle){
   text=String(text||'');
+  if(chordInto&&$('#edit').classList.contains('on')&&chs)return chordImport(text); /* 58: the chords go onto the song in the editor */
   const u=chordUrlIn(text);
   if(u){
     note(L('Getting chords…','Mengambil chord…'));
@@ -102,4 +103,4 @@ function textIn(x,pre){x=String(x||'');if(!x.trim())return false;if(restoreBacku
 /* EvoChords searches Chordtela through Google (no LRCLIB): the "blocked new tab" fallback says so */
 function wlNeedTap(q){const c=csh();c.classList.add('wl');c.append(E('h3','',L('Search Chordtela','Cari di Chordtela')));
   const g=E('button','',L('Search on Google','Cari di Google'));g.type='button';g.onclick=()=>{ctxClose();wlGoogle(q,true)};
-  const x=E('button','',L('Cancel','Batal'));x.type='button';x.onclick=()=>{wlRet=null;ctxClose()};c.append(g,x);$('#ctx').classList.add('on')}
+  const x=E('button','',L('Cancel','Batal'));x.type='button';x.onclick=()=>{wlRet=null;chordInto=false;ctxClose()};c.append(g,x);$('#ctx').classList.add('on')}
