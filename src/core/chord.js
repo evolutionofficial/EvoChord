@@ -55,9 +55,20 @@ export function transposeChord(name, semis, { flats } = {}) {
   return root + p.quality + bass;
 }
 
+/**
+ * THE transpose of a chord name, used by the editor (permanent) and the song screen (display only), so both give the
+ * same result. Only roots move (slash bass too); the quality stays (m7b5, sus4, add9, alt …). # or b follows the
+ * target key (to F: Bb, not A#; to D: F#, not Gb). A whole number of octaves gives the name back unchanged.
+ */
+export function transposeTo(name, semis, targetKey) {
+  if (!(semis % 12)) return name;
+  const k = normKey(targetKey);
+  return transposeChord(name, semis, parseChord(k) ? { flats: prefersFlats(k) } : {});
+}
+
 /** Transpose a key name (e.g. "G", "Bbm"); spelling follows the target key's convention. */
 export function transposeKey(key, semis) {
-  if (!key || !semis) return key || '';
+  if (!key || !(semis % 12)) return key || '';
   const sharp = transposeChord(key, semis, { flats: false });
   return prefersFlats(sharp) ? transposeChord(key, semis, { flats: true }) : sharp;
 }

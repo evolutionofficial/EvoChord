@@ -13,7 +13,10 @@
 function chordTp(){return (cur&&cur._tp)|0}
 function chordFlats(){const k=(cur&&EvoCore.chord.normKey(cur.key))||(cur&&cur.chords&&cur.chords[0]&&cur.chords[0].n)||'C';
   return EvoCore.chord.prefersFlats(EvoCore.chord.transposeKey(k,chordTp()))}
-function chordName(n){const t=chordTp();return t?EvoCore.chord.transposeChord(String(n||''),t,{flats:chordFlats()}):String(n||'')}
+/* the same transpose as the editor (EvoCore.chord.transposeTo), here for display only */
+function chordName(n){const t=chordTp();if(!t)return String(n||'');
+  const k=(cur&&EvoCore.chord.normKey(cur.key))||(cur&&cur.chords&&cur.chords[0]&&cur.chords[0].n)||'C';
+  return EvoCore.chord.transposeTo(String(n||''),t,EvoCore.chord.transposeKey(k,t))}
 
 function chordApply(le,items){if(!le)return;
   le.forEach(d=>{if(d&&d.classList&&d.classList.contains('ln')&&EvoCore.beats.isBeatLine(d.textContent))d.classList.add('beat')});

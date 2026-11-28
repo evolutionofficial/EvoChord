@@ -2455,7 +2455,10 @@ refresh();
 function chordTp(){return (cur&&cur._tp)|0}
 function chordFlats(){const k=(cur&&EvoCore.chord.normKey(cur.key))||(cur&&cur.chords&&cur.chords[0]&&cur.chords[0].n)||'C';
   return EvoCore.chord.prefersFlats(EvoCore.chord.transposeKey(k,chordTp()))}
-function chordName(n){const t=chordTp();return t?EvoCore.chord.transposeChord(String(n||''),t,{flats:chordFlats()}):String(n||'')}
+/* the same transpose as the editor (EvoCore.chord.transposeTo), here for display only */
+function chordName(n){const t=chordTp();if(!t)return String(n||'');
+  const k=(cur&&EvoCore.chord.normKey(cur.key))||(cur&&cur.chords&&cur.chords[0]&&cur.chords[0].n)||'C';
+  return EvoCore.chord.transposeTo(String(n||''),t,EvoCore.chord.transposeKey(k,t))}
 
 function chordApply(le,items){if(!le)return;
   le.forEach(d=>{if(d&&d.classList&&d.classList.contains('ln')&&EvoCore.beats.isBeatLine(d.textContent))d.classList.add('beat')});
@@ -2865,10 +2868,10 @@ function oeFlush(){if(!chs||!ed)return;if(oe.ed)oe.ed.commit();
 function oeResync(){if(!chs||!ed||ta.value===ed.chLyr)return;oeLoad();chBuild(null)}
 
 // Undo history of the grid: one entry per state (lines and chord map), at most 100.
-function oeSnap(){if(oe.busy||!chs)return;const cur=JSON.stringify({lines:chs.lines,map:chs.map});
+function oeSnap(){if(oe.busy||!chs)return;const cur=JSON.stringify({lines:chs.lines,map:chs.map,key:$('#ek').value});
   if(oe.undo[oe.ui]===cur)return;oe.undo=oe.undo.slice(0,oe.ui+1);oe.undo.push(cur);if(oe.undo.length>100)oe.undo.shift();oe.ui=oe.undo.length-1}
 function oeTravel(d){const n=oe.ui+d;if(!chs||n<0||n>=oe.undo.length)return;oe.ui=n;const s=JSON.parse(oe.undo[n]);
-  chs.lines=s.lines;chs.map=s.map;oe.busy=1;try{chBuild(null)}finally{oe.busy=0}}
+  chs.lines=s.lines;chs.map=s.map;if(s.key!=null&&$('#ek').value!==s.key){$('#ek').value=s.key;ed.dirty=true}oe.busy=1;try{chBuild(null)}finally{oe.busy=0}}
 
 function oeRowChords(l){return chNow().filter(x=>x.l===l).map(({c,n})=>({c,n}))}
 // Replace the chords of row l by res.chords (from EvoCore.lineedit).
@@ -3101,3 +3104,296 @@ async function chordImport(text){
     if(!t){note(L('Type the title first','Isi judul dulu'),true);return}
     chordInto=true;wlGoogle((t+' '+$('#ea').value).trim(),true)};
   n.after(b)})();
+/* ===== src/app/59-smart-edit.js ===== */
+/* ===== EvoChords: smart editing (file 59) =====
+   "Per section" (#eLk, saved in localStorage 'evo.linkSections', on by default): a chord set in one section is also set in
+   the sections of the same kind (twins, EvoCore.smart). A chord that differs from its twins is "different": chs.map keeps it
+   as '*Name' (o:1 in ed.chords). "Follow again" (.chfollow) makes it match its twins again.
+   Chords move with ◀ ▶ (one box) and ⇤ ⇥ (whole line), by holding the button or by dragging the chord.
+   The rules are pure (EvoCore.smart); this file applies them to the grid. Wraps oeLoad, chBuild, chSelect and chKbState,
+   redeclares chNow and replaces chSet (by name, so the keyboard and the grid keep working as in 52/55). */
+
+function oeLinked(){try{return localStorage.getItem('evo.linkSections')!=='0'}catch(e){return true}}
+
+// chs.map values are 'Name', or '*Name' for a "different" chord. chNow gives {l,c,n} and o:1 for those.
+function chNow(){return Object.keys(chs.map).map(k=>{const p=k.split(':'),v=String(chs.map[k]),o=v[0]==='*';
+  return o?{l:+p[0],c:+p[1],n:v.slice(1),o:1}:{l:+p[0],c:+p[1],n:v}}).sort((a,b)=>a.l-b.l||a.c-b.c)}
+
+// Signature of a map, to tell whether a step changed anything.
+const chSig=m=>Object.keys(m).sort().map(k=>k+'='+m[k]).join('|');
+
+// After oeLoad (the song's chords): the '*' marks come from ed.chords.
+oeLoad=(function(orig){return function(){orig.apply(this,arguments);
+  chs.map={};(ed.chords||[]).forEach(it=>{if(it&&it.n)chs.map[it.l+':'+it.c]=(it.o?'*':'')+String(it.n)})}})(oeLoad);
+
+// After the grid is drawn: the boxes show the name without '*' ('ov' = different), and chs.at finds a box by l:c.
+chBuild=(function(orig){return function(){orig.apply(this,arguments);
+  chs.at={};chs.cells.forEach((x,i)=>{const k=x.l+':'+x.c,v=chs.map[k]||'',o=v[0]==='*';chs.at[k]=i;
+    x.nEl.textContent=o?v.slice(1):v;x.nEl.classList.toggle('ov',o)})}})(chBuild);
+
+// chs.buf is always the name without '*'.
+chSelect=(function(orig){return function(i){orig.apply(this,arguments);
+  if(chs&&chs.buf&&chs.buf[0]==='*'){chs.buf=chs.buf.slice(1);chKbState()}}})(chSelect);
+
+chKbState=(function(orig){return function(){if(!chs)return orig.apply(this,arguments);
+  if(chs.buf&&chs.buf[0]==='*')chs.buf=chs.buf.slice(1);
+  orig.apply(this,arguments);chMoveUI()}})(chKbState);
+
+// Put a chords array back into the grid. Changed boxes are updated in place; only a missing box rebuilds the grid.
+// keepL/keepC: the box to keep selected (default: the selected box). Every change is one undo step (oeSnap; none while oe.busy).
+function oeApply(chords,keepL,keepC){if(!chs)return;
+  const cur=chs.sel>=0&&chs.cells[chs.sel],pl=keepL!=null?keepL:(cur?cur.l:null),pc=keepC!=null?keepC:(cur?cur.c:null);
+  const nm={};(chords||[]).forEach(x=>{if(x&&x.n)nm[x.l+':'+x.c]=(x.o?'*':'')+String(x.n)});
+  const diff=[...new Set([...Object.keys(chs.map),...Object.keys(nm)])].filter(k=>(chs.map[k]||'')!==(nm[k]||''));
+  const missing=diff.some(k=>nm[k]&&!(chs.at&&chs.at[k]!=null&&chs.cells[chs.at[k]]));
+  chs.map=nm;
+  if(missing)chBuild(null);
+  else diff.forEach(k=>{const i=chs.at&&chs.at[k];if(i==null)return;const x=chs.cells[i],v=nm[k]||'',o=v[0]==='*';
+    x.nEl.textContent=o?v.slice(1):v;x.nEl.classList.toggle('ov',o)});
+  const i=pl!=null?chs.cells.findIndex(x=>x.l===pl&&x.c===pc):-1;
+  if(i>=0)chSelect(i);else chSelect(-1);
+  chKbState();oeSnap()}
+
+// Set (or with '' delete) the chord of the selected box.
+function chSet(n){const x=chs&&chs.cells[chs.sel];if(!x)return;
+  const chords=EvoCore.smart.setChord(chs.lines,chNow(),x.l,x.c,n||'',{linked:oeLinked()});
+  oeApply(chords,x.l,x.c);chs.buf=n||'';chKbState()}
+
+// ---- moving chords ----
+function chMaxC(l){return chs.cells.filter(x=>x.l===l).length*2}   // character columns of the row (2 per box)
+
+// One step for a hold or a tap. st = {l,c,row,dir}; st.c follows the chord. Returns true when something moved.
+function chMvOnce(st){
+  const before=chSig(chs.map);
+  if(st.row){
+    const chords=EvoCore.smart.moveRow(chs.lines,chNow(),st.l,st.dir,{linked:oeLinked(),maxC:chMaxC(st.l)});
+    const nm={};chords.forEach(x=>{nm[x.l+':'+x.c]=(x.o?'*':'')+x.n});
+    const name=chs.map[st.l+':'+st.c],far=st.c+2*st.dir;
+    if(name&&nm[st.l+':'+far]===name)st.c=far;   // the selected chord went one box on
+    oeApply(chords,st.l,st.c);
+    return chSig(nm)!==before}
+  const r=EvoCore.smart.moveChord(chs.lines,chNow(),st.l,st.c,st.dir,{linked:oeLinked(),maxC:chMaxC(st.l)});
+  oeApply(r.chords,st.l,r.c);st.c=r.c;
+  return chSig(chs.map)!==before}
+
+let chMvHold=null;
+// Press on a move button: one step now; holding repeats it (after 400 ms, every 120 ms) and the whole hold is one undo step.
+function chMvPress(e){const b=e.target.closest&&e.target.closest('button[data-mv],button[data-mr]');
+  if(!b||b.disabled||!chs||chs.sel<0||chMvHold)return;
+  const x=chs.cells[chs.sel],st={l:x.l,c:x.c,row:!!b.dataset.mr,dir:+(b.dataset.mv||b.dataset.mr)};
+  oe.busy=1;chMvHold={st,b,t:0};
+  const loop=()=>{if(chMvHold&&chMvOnce(st))chMvHold.t=setTimeout(loop,120)};
+  chMvOnce(st);
+  chMvHold.t=setTimeout(loop,400);
+  document.addEventListener('pointerup',chMvEnd);document.addEventListener('pointercancel',chMvEnd);b.addEventListener('pointerleave',chMvEnd)}
+function chMvEnd(){const h=chMvHold;if(!h)return;chMvHold=null;clearTimeout(h.t);
+  document.removeEventListener('pointerup',chMvEnd);document.removeEventListener('pointercancel',chMvEnd);h.b.removeEventListener('pointerleave',chMvEnd);
+  oe.busy=0;oeSnap()}
+
+// Drag: pointerdown on a chord, then a move of more than 8 px sideways. Each move steps the chord toward the box under the pointer.
+let chDrag=null;
+function chDragDown(e){const n=e.target.closest&&e.target.closest('.chn');if(!n||!chs||e.button>0||chMvHold)return;
+  const cell=n.closest('.chc'),x=cell&&chs.cells[+cell.dataset.i];if(!x||!chs.map[x.l+':'+x.c])return;
+  chDrag={id:e.pointerId,x0:e.clientX,l:x.l,c:x.c,on:0};
+  document.addEventListener('pointermove',chDragMove);document.addEventListener('pointerup',chDragEnd);document.addEventListener('pointercancel',chDragEnd)}
+function chDragMove(e){const d=chDrag;if(!d||(e.pointerId!=null&&e.pointerId!==d.id))return;
+  if(!d.on){if(Math.abs(e.clientX-d.x0)<=8)return;d.on=1;oe.busy=1}
+  const el=document.elementFromPoint(e.clientX,e.clientY),cell=el&&el.closest&&el.closest('.chc');if(!cell)return;
+  const tx=chs.cells[+cell.dataset.i];if(!tx||tx.l!==d.l||tx.c===d.c)return;
+  const dir=tx.c>d.c?1:-1;let g=0;
+  while(d.c!==tx.c&&g++<100){const r=EvoCore.smart.moveChord(chs.lines,chNow(),d.l,d.c,dir,{linked:oeLinked(),maxC:chMaxC(d.l)});
+    if(r.c===d.c)break;d.c=r.c;oeApply(r.chords,d.l,d.c)}}
+function chDragEnd(e){const d=chDrag;if(!d||(e&&e.pointerId!=null&&e.pointerId!==d.id))return;chDrag=null;
+  document.removeEventListener('pointermove',chDragMove);document.removeEventListener('pointerup',chDragEnd);document.removeEventListener('pointercancel',chDragEnd);
+  if(!d.on)return;oe.busy=0;oeSnap();
+  // a drag is not a tap: swallow the click that may follow it
+  const sw=ev=>{ev.stopPropagation();ev.preventDefault()};document.addEventListener('click',sw,true);setTimeout(()=>document.removeEventListener('click',sw,true),0)}
+
+// The chord keyboard's move row and "Follow again" button. Created once; their state follows the selected box.
+function chMoveUI(){const k=$('#chkb');if(!k||!chs)return;
+  let mv=k.querySelector('.chmove');
+  if(!mv){mv=E('div','chmove');mv.append(E('span','chmvl',L('Move','Geser')));
+    [['mv','-1','◀',L('Move chord left','Geser chord ke kiri')],['mv','1','▶',L('Move chord right','Geser chord ke kanan')],
+     ['mr','-1','⇤',L('Move the whole line left','Geser semua chord di baris ke kiri')],['mr','1','⇥',L('Move the whole line right','Geser semua chord di baris ke kanan')]]
+      .forEach(([a,v,t,aria])=>{const b=E('button','',t);b.type='button';b.dataset[a]=v;b.setAttribute('aria-label',aria);mv.append(b)});
+    mv.addEventListener('click',e=>e.stopPropagation());
+    k.prepend(mv)}
+  const x=chs.sel>=0?chs.cells[chs.sel]:null,v=(x&&chs.map[x.l+':'+x.c])||'';
+  const rowHas=!!x&&chNow().some(y=>y.l===x.l);
+  mv.querySelectorAll('[data-mv]').forEach(b=>{b.disabled=!v});
+  mv.querySelectorAll('[data-mr]').forEach(b=>{b.disabled=!rowHas});
+  let f=k.querySelector('.chfollow');
+  if(!f){f=E('button','chfollow',L('Follow again','Ikuti lagi'));f.type='button';
+    f.addEventListener('click',e=>{e.stopPropagation();const s=chs.cells[chs.sel];if(!s)return;
+      oeApply(EvoCore.smart.followAgain(chs.lines,chNow(),s.l,s.c),s.l,s.c)});
+    k.querySelector('.chcur').after(f)}
+  f.hidden=!(v&&v[0]==='*')}
+
+// Toolbar switch "Per section" (#eLk), after #eCt (or #eN).
+(function(){const after=$('#eCt')||$('#eN');if(!after||$('#eLk'))return;
+  const b=E('button','',L('Per section','Per bagian'));b.id='eLk';b.type='button';
+  const paint=()=>{const on=oeLinked();b.classList.toggle('on',on);b.setAttribute('aria-pressed',on?'true':'false')};
+  b.onclick=()=>{try{localStorage.setItem('evo.linkSections',oeLinked()?'0':'1')}catch(e){}paint()};
+  paint();after.after(b)})();
+
+$('#chtx').addEventListener('pointerdown',chDragDown);
+$('#chkb').addEventListener('pointerdown',chMvPress);
+
+/* The key is part of the undo history (the editor's transpose changes it): a key picked by hand is its own step. */
+$('#ek').addEventListener('change',()=>{if(typeof oe==='object'&&oe&&chs)oeSnap()});
+/* ===== src/app/60-smart-tools.js ===== */
+/* ===== EvoChords: smart tools (file 60) =====
+   Long press on a chord button (family row, recent chords, a root letter) opens its variants; the toolbar has
+   "Pattern" (fill a progression into a section) and "♯♭" (transpose the song or a section, one undo step);
+   changing one chord from A to B offers to change every A in the song. The rules are in EvoCore.smart; this file
+   puts them on the grid. Wraps chSelect, chMvOnce, chDragMove and oeStart by assignment (59 and 55 keep working). */
+
+const smKey=()=>{const v=$('#ek').value;return v==='__sep'||v==='__chord'?'':v};
+
+// ---- 1. variants on long press ----
+let smLp=null,smPop=null,smRp=null,smRpBar=null,smRpT=0;
+
+function smLpTarget(t){const b=t&&t.closest&&t.closest('#chkb button');if(!b||b.disabled)return null;
+  if(b.closest('.chfam,.chrec'))return{btn:b,name:b.dataset.r||b.textContent};
+  if(/^[A-G]$/.test(b.dataset.k||''))return{btn:b,name:b.dataset.k};
+  return null}
+function smLpClose(){if(smPop)smPop.remove();smPop=null;document.removeEventListener('pointerdown',smLpOutside,true)}
+function smLpOutside(e){if(smPop&&!smPop.contains(e.target))smLpClose()}
+function smLpOpen(name,btn){smLpClose();const k=$('#chkb');if(!k)return;
+  const pop=E('div','chvar');pop.setAttribute('role','group');pop.setAttribute('aria-label',L('Chord variants','Variasi chord'));
+  EvoCore.smart.variants(name,smKey()).forEach(v=>{const b=E('button','',v);b.type='button';b.dataset.v=v;
+    b.onclick=()=>{smLpClose();if(!chs||chs.sel<0)return;chSet(v);chSelect(Math.min(chs.sel+1,chs.cells.length-1))};pop.append(b)});
+  pop.addEventListener('click',e=>e.stopPropagation());
+  const kr=k.querySelector('.kr');if(kr)kr.before(pop);else k.append(pop);
+  smPop=pop;document.addEventListener('pointerdown',smLpOutside,true)}
+
+// A press on a chord button starts a timer; 450 ms and still held = variants. The click that follows the release is swallowed.
+document.addEventListener('pointerdown',e=>{smLp=null;
+  const t=e.target;if(t&&t.closest&&t.closest('#chkb .chfollow'))smRp=null},true);
+$('#chkb').addEventListener('pointerdown',e=>{
+  if(!chs||chs.sel<0)return;
+  const h=smLpTarget(e.target);if(!h)return;
+  const s={btn:h.btn,name:h.name,x:e.clientX,y:e.clientY,fired:false,t:0};smLp=s;
+  s.t=setTimeout(()=>{if(smLp!==s||!chs||chs.sel<0)return;s.fired=true;smLpOpen(s.name,s.btn)},450)});
+document.addEventListener('pointermove',e=>{const s=smLp;if(!s||s.fired||e.clientX==null)return;
+  if(Math.hypot(e.clientX-s.x,e.clientY-s.y)>10){clearTimeout(s.t);smLp=null}});
+const smLpUp=()=>{const s=smLp;if(!s)return;clearTimeout(s.t);if(!s.fired){smLp=null;return}
+  setTimeout(()=>{if(smLp===s)smLp=null},500)};
+document.addEventListener('pointerup',smLpUp);document.addEventListener('pointercancel',smLpUp);
+document.addEventListener('click',e=>{const s=smLp;
+  if(s&&s.fired&&s.btn.contains(e.target)){e.stopPropagation();e.preventDefault();smLp=null}},true);
+
+// ---- 2. "change every one like it" ----
+const smName=(l,c)=>String((chs&&chs.map[l+':'+c])||'').replace(/^\*/,'');
+function smRpHide(){clearTimeout(smRpT);if(smRpBar)smRpBar.remove();smRpBar=null}
+function smRpShow(A,B){smRpHide();if(!chs)return;const n=EvoCore.smart.countNamed(chNow(),A);if(n<1)return;
+  const bar=E('div','chrall'),t=E('span','',L(`Change every ${A} to ${B}? (${n})`,`Ganti semua ${A} jadi ${B}? (${n})`));
+  const go=E('button','ok',L('Change','Ganti')),x=E('button','','✕');go.type='button';x.type='button';x.setAttribute('aria-label',L('Close','Tutup'));
+  go.onclick=()=>{smRpHide();if(!chs)return;oeApply(EvoCore.smart.replaceAll(chNow(),A,B))};
+  x.onclick=smRpHide;bar.append(t,go,x);
+  const k=$('#chkb');if(k&&!k.hidden)k.before(bar);else $('#edit').append(bar);
+  smRpBar=bar;smRpT=setTimeout(smRpHide,6000)}
+// The box being left: its name at selection (A) against its name now (B). Moves, follow-again and patterns clear smRp first.
+function smRpLeave(){const s=smRp;smRp=null;if(!s||!chs)return;
+  const B=smName(s.l,s.c),A=s.name;if(!A||!B||A===B)return;smRpShow(A,B)}
+
+// ---- 3. Pattern button ----
+function smPatBtn(){const b=$('#ePt');if(!b)return;const on=!!(chs&&chs.sel>=0);b.classList.toggle('off',!on);b.setAttribute('aria-disabled',on?'false':'true')}
+
+function smPattern(){
+  if(!chs||chs.sel<0){note(L('Pick a box in the section first','Pilih kotak di bagian itu dulu'),true);return}
+  const x=chs.cells[chs.sel],l=x.l,c=x.c;
+  let lb='';for(let k=l;k>=0;k--){const m=/^\s*\[([^\]]+)\]\s*$/.exec(chs.lines[k]||'');if(m){lb=m[1];break}}
+  const sh=csh(),inp=E('input','smin');inp.type='text';inp.placeholder='G - D - Em - C';inp.setAttribute('autocapitalize','characters');inp.setAttribute('spellcheck','false');
+  sh.append(E('h3','',L('Fill a progression','Isi progresi')),inp);
+  let per=2;const seg=E('div','smseg');
+  [1,2,4].forEach(n=>{const b=E('button',n===per?'on':'',String(n));b.type='button';b.dataset.pl=String(n);
+    b.setAttribute('aria-label',n+' '+L('per line','per baris'));
+    b.onclick=()=>{per=n;[...seg.children].forEach(q=>q.classList.toggle('on',q===b))};seg.append(b)});
+  sh.append(E('p','mut',L('Chords per line','Chord per baris')),seg);
+  sh.append(E('p','mut',L('Section: ','Bagian: ')+(lb||L('this part','bagian ini'))));
+  if(oeLinked())sh.append(E('p','mut',L('Also into the other sections of this kind','Juga ke bagian lain yang sejenis')));
+  const go=E('button','ok',L('Fill','Isi'));go.type='button';
+  const run=()=>{const pat=inp.value.split(/[\s,–—-]+/).filter(t=>EvoCore.chord.isChord(t));
+    if(!pat.length){note(L('Type chords, e.g. G - D - Em - C','Ketik chord, misalnya G - D - Em - C'),true);return}
+    if(!chs)return;smRp=null;
+    oeApply(EvoCore.smart.fillPattern(chs.lines,chNow(),l,pat,{perRow:per,linked:oeLinked()}),l,c);ctxClose()};
+  go.onclick=run;inp.addEventListener('keydown',e=>{if(e.key==='Enter')run()});
+  const cx=E('button','',L('Cancel','Batal'));cx.type='button';cx.onclick=ctxClose;
+  sh.append(go,cx);$('#ctx').classList.add('on');inp.focus()}
+
+// ---- 4. Transpose button ----
+function smTranspose(){
+  if(!chs)return;
+  const sel=chs.sel>=0?chs.cells[chs.sel]:null;
+  const base=EvoCore.chord.normKey(smKey())||(chNow()[0]&&chNow()[0].n)||'C';
+  const st={semis:0,scope:'whole'};
+  const sh=csh();sh.append(E('h3','',L('Transpose chords','Transpose chord')));
+  const row=E('div','smtp'),dn=E('button','','−'),up=E('button','','+'),val=E('span','smv','0');
+  dn.type='button';up.type='button';dn.dataset.tp='-1';up.dataset.tp='1';
+  dn.setAttribute('aria-label',L('Down a semitone','Turun setengah nada'));up.setAttribute('aria-label',L('Up a semitone','Naik setengah nada'));
+  const ks=E('select','smks');ks.setAttribute('aria-label',L('Target key','Nada tujuan'));
+  for(let s=-5;s<=6;s++){const o=E('option','',EvoCore.chord.transposeKey(base,s));o.value=String(s);ks.append(o)}
+  const seg=E('div','smseg'),sB=E('button','on',L('Whole song','Seluruh lagu')),sS=E('button','',L('This section','Bagian ini'));
+  sB.type='button';sS.type='button';sB.dataset.sc='whole';sS.dataset.sc='section';sS.disabled=!sel;
+  seg.append(sB,sS);
+  const hint=E('p','mut',''),prev=E('p','mut',''),go=E('button','ok',L('Apply','Terapkan')),cx=E('button','',L('Cancel','Batal'));
+  go.type='button';cx.type='button';cx.onclick=ctxClose;
+  const lineNow=()=>(st.scope==='section'&&sel?sel.l:null);
+  function paint(){
+    const off=((st.semis%12)+12)%12;ks.value=String(off>6?off-12:off);
+    val.textContent=st.semis>0?'+'+st.semis:st.semis<0?'−'+(-st.semis):'0';
+    sB.classList.toggle('on',st.scope==='whole');sS.classList.toggle('on',st.scope==='section');
+    hint.textContent=st.scope==='section'&&oeLinked()?L('Also the same kind of sections, except chords marked different','Juga bagian sejenis, kecuali chord yang ditandai berbeda'):'';
+    const cur=chNow(),r=EvoCore.smart.transposeChords(chs.lines,cur,st.semis,{key:EvoCore.chord.normKey(smKey()),line:lineNow(),linked:oeLinked()}),seen=new Map();
+    cur.forEach((x,i)=>{const y=r.chords[i];if(y&&y.n!==x.n&&!seen.has(x.n))seen.set(x.n,y.n)});
+    const pairs=[...seen].map(([a,b])=>a+' → '+b);
+    prev.textContent=pairs.length?pairs.slice(0,6).join(', ')+(pairs.length>6?' …':''):'—'}
+  dn.onclick=()=>{st.semis=Math.max(-11,st.semis-1);paint()};
+  up.onclick=()=>{st.semis=Math.min(11,st.semis+1);paint()};
+  ks.onchange=()=>{st.semis=+ks.value;paint()};
+  sB.onclick=()=>{st.scope='whole';paint()};
+  sS.onclick=()=>{if(!sel)return;st.scope='section';paint()};
+  go.onclick=()=>{
+    if(!chs||!st.semis){ctxClose();return}
+    smRp=null;const line=lineNow();
+    if(line!=null){
+      const r=EvoCore.smart.transposeChords(chs.lines,chNow(),st.semis,{key:EvoCore.chord.normKey(smKey()),line,linked:oeLinked()});
+      oe.tpBase=null;oeApply(r.chords);ed.dirty=true;
+    }else{
+      // whole song: the same result as a fresh transpose, but transposing back to the start gives the exact original names
+      const cj=JSON.stringify(chNow()),tb=oe.tpBase;let bc,bk,tot;
+      if(tb&&cj===tb.last){bc=JSON.parse(tb.chords);bk=tb.key;tot=tb.total+st.semis}
+      else{bc=chNow();bk=EvoCore.chord.normKey(smKey());tot=st.semis}
+      const r=EvoCore.smart.transposeChords(chs.lines,bc,tot,{key:bk});
+      const base0=JSON.stringify(bc);
+      if(r.key){const want=EvoCore.chord.normKey(r.key),o=[...$('#ek').options].find(q=>EvoCore.chord.normKey(q.value)===want);if(o)$('#ek').value=o.value}
+      oeApply(r.chords);
+      oe.tpBase={chords:base0,key:bk,total:tot,last:JSON.stringify(chNow())};ed.dirty=true}
+    ctxClose()};
+  row.append(dn,val,up);
+  sh.append(row,ks,seg,hint,prev,go,cx);paint();$('#ctx').classList.add('on')}
+
+// ---- toolbar: Pattern and ♯♭ after "Per section" ----
+(function(){const after=$('#eLk');if(!after||$('#ePt'))return;
+  const pt=E('button','',L('Pattern','Pola'));pt.id='ePt';pt.type='button';
+  pt.onclick=()=>{if(!chs||chs.sel<0){note(L('Pick a box in the section first','Pilih kotak di bagian itu dulu'),true);return}smPattern()};
+  const tp=E('button','','♯♭');tp.id='eTp';tp.type='button';tp.setAttribute('aria-label',L('Transpose','Transpose'));
+  tp.onclick=()=>{if(chs)smTranspose()};
+  after.after(pt);pt.after(tp);smPatBtn()})();
+
+// ---- wrappers (by assignment, like 59) ----
+chSelect=(function(orig){return function(i){
+  const t=(chs&&i>=0&&chs.cells[i])||null;
+  if(!(t&&smRp&&t.l===smRp.l&&t.c===smRp.c)){smRpLeave();smRp=t?{l:t.l,c:t.c,name:smName(t.l,t.c)}:null}
+  if(i<0)smLpClose();
+  smPatBtn();
+  return orig.apply(this,arguments)}})(chSelect);
+
+chMvOnce=(function(orig){return function(st){smRp=null;return orig.apply(this,arguments)}})(chMvOnce);
+
+chDragMove=(function(orig){return function(e){const d=chDrag;
+  if(d&&(d.on||(e&&e.clientX!=null&&Math.abs(e.clientX-d.x0)>8)))smRp=null;
+  return orig.apply(this,arguments)}})(chDragMove);
+
+oeStart=(function(orig){return function(){smRp=null;smRpHide();smLpClose();orig.apply(this,arguments);if(oe)oe.tpBase=null}})(oeStart);
