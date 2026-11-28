@@ -30,7 +30,7 @@ test('PWA install: the welcome choices wait for YES or NO; dismissal is remember
   await p.evaluate(()=>{localStorage.setItem('evolyric-pwa-install-declined',String(Date.now()));$('#werr').textContent='';showWelcome(1)});await p.click('#wguest');await p.waitForTimeout(120);
   eq(await p.evaluate(()=>[$('#pwabox').classList.contains('on'),isGuest()]),[false,true],'remembered NO never blocks a later guest choice');
   await p.evaluate(()=>{show('list');prefOpen()});await p.waitForTimeout(100);
-  assert(await p.evaluate(()=>[...document.querySelectorAll('#prefbody .srow')].some(r=>/Install EvoChords/.test(r.textContent))),'Preferences keeps a manual install path');
+  assert(await p.evaluate(()=>[...document.querySelectorAll('#prefbody .srow')].some(r=>/Install EvoChord/.test(r.textContent))),'Preferences keeps a manual install path');
   await t.close()});
 test('PWA install: iOS instructions and a native browser prompt both resume the pending action',async()=>{
   const t=await open(),p=t.page;

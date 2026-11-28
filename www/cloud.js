@@ -1,4 +1,4 @@
-/* EvoChords cloud sync (Supabase). One module, no second Supabase client: it receives the app's client through hooks.
+/* EvoChord cloud sync (Supabase). One module, no second Supabase client: it receives the app's client through hooks.
  *
  * Model
  *  - Local library (songs[] / cats[]) stays the source of the UI and is always cached in localStorage.
@@ -101,7 +101,7 @@
       if (seenS[lid]) lid = lid + '~' + String(row.id).slice(0, 8);
       seenS[lid] = 1; u2s[row.id] = lid;
       var obj = Object.assign({}, row.app_data || {}, { id: lid, title: row.title || '', artist: row.artist || '', lyrics: row.lyrics || '' });
-      if (typeof window.evoSongIn === 'function') obj = window.evoSongIn(obj); /* EvoChords: lyrics + chord layer → one sheet */
+      if (typeof window.evoSongIn === 'function') obj = window.evoSongIn(obj); /* EvoChord: lyrics + chord layer → one sheet */
       C.s[lid] = { uuid: row.id, obj: obj, json: sRec(obj) }; C.os.push(lid);
     });
     res[1].forEach(function (row) {
@@ -169,7 +169,7 @@
     /* 2. rows */
     var sRows = d.sUp.map(function (x) {
       var s = sById[x];
-      if (typeof window.evoSongOut === 'function') s = window.evoSongOut(s); /* EvoChords: the sheet → EvoLyric's lyrics untouched + chord layer */
+      if (typeof window.evoSongOut === 'function') s = window.evoSongOut(s); /* EvoChord: the sheet → EvoLyric's lyrics untouched + chord layer */
       return { id: M.s[x], user_id: uid, local_id: x, title: s.title || '', artist: s.artist || '', lyrics: s.lyrics || '', app_data: rest(s, RS), updated_at: now };
     });
     for (a of chunk(sRows, 200)) ck(await sb.from('songs').upsert(a, { onConflict: 'id' }));
@@ -346,7 +346,7 @@
     } catch (e) {
       lastRun = Date.now();
       if (isNet(e)) { setSt('offline'); toastOnce('off', 'Offline. Changes are saved on this device and will sync later.', false); }
-      else { var m = (e && e.message) ? e.message : 'Unknown error'; setSt('error', m); toastOnce('err', 'Saved on this device, but cloud sync failed: ' + m, true); console.warn('EvoChords sync:', e); }
+      else { var m = (e && e.message) ? e.message : 'Unknown error'; setSt('error', m); toastOnce('err', 'Saved on this device, but cloud sync failed: ' + m, true); console.warn('EvoChord sync:', e); }
       scheduleRetry();
     }
   }

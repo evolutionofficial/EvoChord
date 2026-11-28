@@ -1,4 +1,4 @@
-/* EvoChords: "Search online" looks for chords on Chordtela (through Google) instead of LRCLIB lyrics.
+/* EvoChord: "Search online" looks for chords on Chordtela (through Google) instead of LRCLIB lyrics.
    Same flow and screens as EvoLyric's Web Lyric: Google → come back → one tap → temporary song → Save to Library. */
 const path = require('path'), fs = require('fs');
 const FIX = path.join(__dirname, '../core/fixtures/chordtela-sample.html');
@@ -41,7 +41,7 @@ module.exports = ({ test, assert, eq, open }) => {
     await vis(p, false); await p.bringToFront(); await p.waitForTimeout(500);
     const sh = await sheet(p); eq([sh[0], sh[2], sh[3]], ['Copied the link?', 'Get chords', 'Back'], 'return question');
     await p.click('#csheet .wlok'); await p.waitForTimeout(800);
-    eq(hits.length, 1, 'asked the EvoChords server once'); assert(hits[0].includes('url=' + LINK), 'normalised link: ' + hits[0]);
+    eq(hits.length, 1, 'asked the EvoChord server once'); assert(hits[0].includes('url=' + LINK), 'normalised link: ' + hits[0]);
     const r = await p.evaluate(() => [$('#play').classList.contains('on'), isTemp(cur), cur.title, cur.artist, cur.src, cur.capo, cur.chords.length > 5, songs.length]);
     eq(r, [true, true, 'Lagu Contoh', 'Evo Band', 'chordtela', 0, false, 5], 'temporary chord song, library untouched');
     eq(await p.evaluate(() => [cur.srcId, cur.chords.map((c) => c.n).join(' ')]), [1, 'D Bm A'], 'the original version opens first');

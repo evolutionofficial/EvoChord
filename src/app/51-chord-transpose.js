@@ -1,4 +1,4 @@
-/* ===== EvoChords: key (transpose) button in the lyrics corner — card S1 =====
+/* ===== EvoChord: key (transpose) button in the lyrics corner — card S1 =====
    Sits above the Speed button (#spb) inside #spc and copies its look and idle behaviour.
    The transpose is kept in cur._tp (-11..11) and drawn by chordName() in 50-chord-render.js.
    Only "Save key" writes to the song (chords and key), and only for library songs. */

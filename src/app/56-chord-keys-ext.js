@@ -1,4 +1,4 @@
-/* ===== EvoChords: extensions and altered chords on the chord keyboard (file 56) =====
+/* ===== EvoChord: extensions and altered chords on the chord keyboard (file 56) =====
    Rows: C D E F G A B | # b m 7 maj7 sus / | 2 4 5 6 9 11 13 | dim aug add alt.
    # and b after a root letter are its accidental (C#, Bb); after a number they alter it (C7b9, C7#11, Cm7b5, C7b13).
    After an alteration only 5, 9, 11 and 13 make sense. Backspace removes 11, 13 and alt in one go.

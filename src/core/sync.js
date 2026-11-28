@@ -2,7 +2,7 @@
 //
 // EvoLyric stores each song as { id, user_id, local_id, title, artist, lyrics, app_data, ... }
 // where app_data holds every other song field (key, chords, colors, speed, ...).
-// EvoChords uses exactly the same mapping, so a song edited in one app appears in the other
+// EvoChord uses exactly the same mapping, so a song edited in one app appears in the other
 // once both apps sign in to the same Evo account. Sync itself is not switched on yet (v0.1):
 // this module is the contract, tested, ready for the sync step.
 

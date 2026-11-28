@@ -1,4 +1,4 @@
-// Smart editor: section-linked chord editing for EvoChords.
+// Smart editor: section-linked chord editing for EvoChord.
 //
 // The sheet is `lines` (lyric lines + beat rows + labels) and `chords` [{l, c, n, o?}]: line, character offset (even, one
 // box = 2 characters), name, and o = 1 for a chord that is "different" (overridden) in its section.

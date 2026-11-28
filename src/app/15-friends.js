@@ -21,8 +21,8 @@ async function susCheck(){if(!user||!sb)return;try{const{data,error}=await sb.rp
   susp.on=!!(d&&d.suspended);susp.mode=susp.on?d.mode:null;susp.until=susp.on?d.until:null;susp.reason=susp.on?d.reason:null}catch(e){return}susLock()}
 function susLock(){let o=$('#susp');const lock=susp.on&&susp.mode==='full'&&!!user;if(!lock){if(o)o.remove();return}
   if(!o){o=E('div');o.id='susp';o.setAttribute('role','alertdialog');o.setAttribute('aria-modal','true');document.body.append(o)}o.textContent='';
-  const c=E('div','spc2');c.append(E('h2','',L('Your account is suspended','Akunmu sedang dibekukan')),E('p','',L('This account cannot use EvoChords right now.','Akun ini tidak bisa memakai EvoChords untuk saat ini.')),(()=>{const q=E('p','mut',susText());q.setAttribute('data-nt','');return q})());
-  const a=E('a','dbtn pri',L('Contact support','Hubungi dukungan'));a.href=supportMail('EvoChords: suspended account');a.target='_blank';a.rel='noopener';
+  const c=E('div','spc2');c.append(E('h2','',L('Your account is suspended','Akunmu sedang dibekukan')),E('p','',L('This account cannot use EvoChord right now.','Akun ini tidak bisa memakai EvoChord untuk saat ini.')),(()=>{const q=E('p','mut',susText());q.setAttribute('data-nt','');return q})());
+  const a=E('a','dbtn pri',L('Contact support','Hubungi dukungan'));a.href=supportMail('EvoChord: suspended account');a.target='_blank';a.rel='noopener';
   const so=E('button','dbtn',L('Sign out','Keluar'));so.type='button';so.onclick=()=>{o.remove();signOut()};c.append(a,so);o.append(c)}
 const SEENK='evolyric-seen:';
 function seenLoad(){try{return new Set(JSON.parse(localStorage.getItem(SEENK+(user&&user.id))||'[]'))}catch(e){return new Set()}}
@@ -81,7 +81,7 @@ function frRender(){const body=$('#frbody');if(!$('#friends').classList.contains
   if(!ok.length)body.append(E('p','mut','No friends yet. Search a username above to send a request.'));
   ok.forEach(f=>{const r=frRow(f,[]);r.classList.add('tap');r.setAttribute('role','button');r.tabIndex=0;r.append(E('span','chev','›'));r.onclick=()=>frFriendMenu(f);r.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();frFriendMenu(f)}};body.append(r)});
   if(fr.blocked.length){sec(L('Blocked','Diblokir'),fr.blocked.length);fr.blocked.forEach(u=>{const r=frRow({display_name:u.display_name||u.username||'—',username:u.username||'—',avatar_url:u.avatar_url},[[L('Unblock','Buka blokir'),()=>frCall('unblock_user',{p_user:u.id},L('Unblocked','Blokir dibuka'))]]);body.append(r)})}
-  if(susp.on){const w=E('div','susb');{const st=E('span','',susText());st.setAttribute('data-nt','');w.append(E('b','',L('Your account is suspended','Akunmu sedang dibekukan')),st)}const a=E('a','',L('Contact support','Hubungi dukungan'));a.href=supportMail('EvoChords: suspended account');a.target='_blank';a.rel='noopener';w.append(a);body.prepend(w)}}
+  if(susp.on){const w=E('div','susb');{const st=E('span','',susText());st.setAttribute('data-nt','');w.append(E('b','',L('Your account is suspended','Akunmu sedang dibekukan')),st)}const a=E('a','',L('Contact support','Hubungi dukungan'));a.href=supportMail('EvoChord: suspended account');a.target='_blank';a.rel='noopener';w.append(a);body.prepend(w)}}
 async function frSaveSong(m){let d=null;
   try{const{data,error}=await sb.rpc('get_inbox_item',{p_id:m.id});if(error||!data)throw 0;d=data}catch(e){note(navigator.onLine?'Could not open this delivery. Try again.':'You are offline',true);frRender();return}
   const arr=Array.isArray(d.songs)?d.songs:[d],t=Date.now();let n=0;

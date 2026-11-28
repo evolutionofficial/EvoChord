@@ -1,12 +1,12 @@
 /* ---------- v83: welcome / first sign-in, username step, and staying signed in ---------- */
 const GK='evolyric-guest';
 /* v160: guest mode is back – the app can be used without signing in; songs stay on this device (sign in to sync and use Friends) */
-/* v161: EvoChords moved to evolyric.com. On the old address, Home shows how to bring your songs along (data on a phone belongs to one web address). */
-const NEW_HOME='https://evolyric.com',OLD_HOST=false; /* EvoChords: the EvoChords "moved" notice never applies here */
+/* v161: EvoChord moved to evolyric.com. On the old address, Home shows how to bring your songs along (data on a phone belongs to one web address). */
+const NEW_HOME='https://evolyric.com',OLD_HOST=false; /* EvoChord: the EvoChord "moved" notice never applies here */
 /* v169: paused – on 12 Nov 2026 some Indonesian mobile networks could not reach the new evolyric.com yet, so the old address must not push people away. Set MOVED_PAUSE=false to show the banner again. */
 const MOVED_PAUSE=true;
 function movedBanner(){if(!(OLD_HOST||window.__evoOldHost)||(MOVED_PAUSE&&!window.__evoOldHost)||$('#moved'))return;const w=E('div');w.id='moved';w.setAttribute('role','status');
-  const t=E('div','mvt');t.append(E('b','',L('EvoChords has moved to evolyric.com','EvoChords pindah ke evolyric.com')),E('span','',user?L('Open evolyric.com and sign in with the same Google account: your songs come along from the cloud.','Buka evolyric.com lalu masuk dengan akun Google yang sama: lagumu ikut dari cloud.'):L('Guest songs stay on this address. Make a Backup here, then Restore it on evolyric.com.','Lagu tamu tertinggal di alamat ini. Buat Backup di sini, lalu Restore di evolyric.com.')));
+  const t=E('div','mvt');t.append(E('b','',L('EvoChord has moved to evolyric.com','EvoChord pindah ke evolyric.com')),E('span','',user?L('Open evolyric.com and sign in with the same Google account: your songs come along from the cloud.','Buka evolyric.com lalu masuk dengan akun Google yang sama: lagumu ikut dari cloud.'):L('Guest songs stay on this address. Make a Backup here, then Restore it on evolyric.com.','Lagu tamu tertinggal di alamat ini. Buat Backup di sini, lalu Restore di evolyric.com.')));
   const a=E('a','pill',L('Open evolyric.com','Buka evolyric.com'));a.href=NEW_HOME;a.target='_blank';a.rel='noopener';const r=E('div','mvb');r.append(a);
   if(!user&&songs.length){const bk=E('button','pill',L('Backup','Backup'));bk.type='button';bk.setAttribute('data-nt','');bk.onclick=()=>saveFile('evolyric-backup-'+ymd()+'.evolyric',backupText(),'application/octet-stream',()=>note(L('Backup file saved','File cadangan disimpan')));r.append(bk)}
   w.append(t,r);const tabs=$('#tabs');tabs.parentNode.insertBefore(w,tabs)}
@@ -51,8 +51,8 @@ async function initAuth(){
     if(h){user=h;unameLoad(h.id);renderAuth()} /* could not reach the server: stay signed in with the saved login */
     else{user=null;renderAuth();if(window.Cloud)Cloud.signedOut();gateCheck()}}
   if(er&&!$('#welcome').classList.contains('on'))openAuth(er)}
-/* v41: Android Back button. In the installed app a stray Back press used to close EvoChords. Now Back closes the open panel or goes up one
-   screen, asks before leaving a song / discarding edits, and on Home asks "Exit EvoChords?". Only active in the installed app or on Android. */
+/* v41: Android Back button. In the installed app a stray Back press used to close EvoChord. Now Back closes the open panel or goes up one
+   screen, asks before leaving a song / discarding edits, and on Home asks "Exit EvoChord?". Only active in the installed app or on Android. */
 (function(){
   let on=false;try{const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1); /* v67: never on iPhone/iPad — there the edge swipe would reveal the guard page; iOS has no Back button to protect */
     on=!ios&&(matchMedia('(display-mode: standalone)').matches||/Android/i.test(navigator.userAgent))}catch(e){}
@@ -102,9 +102,9 @@ async function initAuth(){
     if(v==='edit'){if(ed&&ed.dirty)return void ask('Discard changes?','Your edits to this song have not been saved.','Discard',()=>{ed.dirty=false;$('#eX').onclick()});return void $('#eX').onclick()}
     if(v==='friends'||v==='profile'||v==='prefs'||v==='help'||v==='acct')return void show('list');
     if(v==='doc')return void $('#dcX').onclick();
-    if(v==='welcome')return void ask('Exit EvoChords?','Press Exit to close the app.','Exit',()=>{exiting=true;history.go(-Math.max(2,history.length-L0+1))});
+    if(v==='welcome')return void ask('Exit EvoChord?','Press Exit to close the app.','Exit',()=>{exiting=true;history.go(-Math.max(2,history.length-L0+1))});
     if(lib.v==='cat')return void $('#cBack').onclick();
-    ask('Exit EvoChords?','Press Exit to close the app.','Exit',()=>{exiting=true;history.go(-Math.max(2,history.length-L0+1))})}
+    ask('Exit EvoChord?','Press Exit to close the app.','Exit',()=>{exiting=true;history.go(-Math.max(2,history.length-L0+1))})}
   addEventListener('popstate',ev=>{blog('pop st='+JSON.stringify(ev.state));if(exiting)return;arm();needTouch=true;goBack()});
 })();
 initAuth();

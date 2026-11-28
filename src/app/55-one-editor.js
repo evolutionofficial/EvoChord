@@ -1,4 +1,4 @@
-/* ===== EvoChords: one editor (file 55) =====
+/* ===== EvoChord: one editor (file 55) =====
    The song editor page holds the chord grid: the lyrics are typed in the grid rows and the chords stay on their
    letters (EvoCore.lineedit does the edits). There is no separate lyrics text box and no separate chord screen.
    ta (the hidden text box) and ed.chords are only written when the grid is flushed (oeFlush, before Save/Exit/Notes).
@@ -13,7 +13,7 @@ function oeLoad(){const lyr=ta.value;
   chKbBuild()}
 
 function oeStart(){if(!ed)return;oeLoad();oe={undo:[],ui:-1,busy:0,ed:null};
-  // the lyrics the song came with: these lines are locked (EvoChords only adds chords, beat rows and section labels)
+  // the lyrics the song came with: these lines are locked (EvoChord only adds chords, beat rows and section labels)
   oe.lyr=ed.s?songLyr(ed.s):(ed.base?songLyr(ed.base):chordOwnLyrics(ta.value));
   chBuild(null);chs.start=JSON.stringify({lines:chs.lines,chords:chNow()});$('#chl').scrollTop=0;chSelect(-1)}
 function openChd(){oeStart()}

@@ -1,4 +1,4 @@
-/* EvoChords card S1: key (transpose) button and panel. Same look as the Speed corner (#spb, #spp). */
+/* EvoChord card S1: key (transpose) button and panel. Same look as the Speed corner (#spb, #spp). */
 
 #tpb{position:relative;width:40px;height:40px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(34,28,23,.62);border:1px solid rgba(255,255,255,.12);color:var(--fg);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:.85;transition:transform .2s var(--spring),opacity .2s;margin-bottom:8px}
 #tpb b{font:800 14px/1 'Bricolage Grotesque',system-ui,sans-serif;color:var(--acct)}

@@ -1,4 +1,4 @@
-/* ===== EvoChords: smart editing (file 59): Per section, "different" chords, moving chords, one undo step per hold ===== */
+/* ===== EvoChord: smart editing (file 59): Per section, "different" chords, moving chords, one undo step per hold ===== */
 module.exports=({test,assert,eq,open})=>{
 const LYR='[Verse 1]\npagi datang\nsampai pagi tiba\n\n[Chorus]\nkita bernyanyi\n\n[Verse 2]\nmalam datang\nbulan bersinar\n\n[Chorus]\nkita bernyanyi';
 const prep=async(p,chords=[],linked)=>{await p.evaluate(([lyr,ch,lk])=>{songs[0].lyrics=lyr;songs[0].chords=ch;songs[0].key='C';save();

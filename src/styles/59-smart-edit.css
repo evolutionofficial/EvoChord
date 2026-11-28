@@ -1,4 +1,4 @@
-/* EvoChords: smart editing (file 59): "different" chords, the Per section switch, the move row, Follow again. */
+/* EvoChord: smart editing (file 59): "different" chords, the Per section switch, the move row, Follow again. */
 .chn.ov{position:relative}
 .chn.ov::after{content:'';position:absolute;top:-3px;right:-3px;width:7px;height:7px;border-radius:50%;background:#e0a050;box-shadow:0 0 0 2px var(--bg)}
 /* the box can be dragged sideways; the page still scrolls up and down */

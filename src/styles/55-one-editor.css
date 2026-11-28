@@ -1,4 +1,4 @@
-/* ===== EvoChords: one editor (file 55): the chord grid is the body of the song editor ===== */
+/* ===== EvoChord: one editor (file 55): the chord grid is the body of the song editor ===== */
 /* the text box, the lyrics toolbar buttons that only the text box needs, and the bars for it are not shown */
 #edit.one .ed,#edit.one #hlbar,#edit.one #notebar,#edit.one #secbar{display:none!important}
 #edit.one #eP,#edit.one #eK,#edit.one #eH,#edit.one #eCho{display:none}
