@@ -10,7 +10,7 @@ import { normalizeChordtelaUrl, parseChordtelaHtml, describeHtml } from '../src/
 
 const CACHE_SECONDS = 86400;
 // Bump when the chord-sheet reader changes, so cached imports are read again with the new rules.
-export const PARSER_VERSION = 4;
+export const PARSER_VERSION = 5;
 const UA = 'EvoChord/0.1 (+https://github.com/evolutionofficial/evochord)';
 
 const json = (status, body, extra = {}) =>

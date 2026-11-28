@@ -18,7 +18,8 @@ describe('/api/chordtela', () => {
     const j = await r.json();
     expect(j.title).toBe('Lagu Contoh');
     expect(j.source.url).toBe('https://www.chordtela.com/2026/01/evo-band-lagu-contoh.html');
-    expect(j.chords.length).toBeGreaterThan(10);
+    expect(j.versions[0].chords.length).toBeGreaterThan(10);
+    expect([j.main, j.chords.map((c) => c.n).join(' ')]).toEqual([1, 'D Bm A']); // opens on the original version
   });
   it('maps upstream failures', async () => {
     expect((await importChordtela('https://www.chordtela.com/2026/01/x.html', { fetchImpl: async () => new Response('', { status: 404 }) })).status).toBe(404);

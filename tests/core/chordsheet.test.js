@@ -78,7 +78,8 @@ describe('Chordtela page', () => {
     expect(t).not.toContain('other unrelated');
   });
   it('parses title, artist, capo, sections, chords and Back to Reff', () => {
-    const r = parseChordtelaHtml(html, 'https://www.chordtela.com/2026/01/evo-band-lagu-contoh.html');
+    const page = parseChordtelaHtml(html, 'https://www.chordtela.com/2026/01/evo-band-lagu-contoh.html');
+    const r = { ...page, ...page.versions[0] }; // the easy version holds the whole song in this sample
     expect(r.artist).toBe('Evo Band');
     expect(r.title).toBe('Lagu Contoh');
     expect(r.capo).toBe(2);
@@ -96,6 +97,9 @@ describe('Chordtela page', () => {
   it('splits the easy and original versions and drops page scripts', () => {
     const r = parseChordtelaHtml(html, '');
     expect(r.versions.map((v) => v.name)).toEqual(['Chord dasar', 'Versi original']);
+    expect(r.main).toBe(1);
+    expect(r.versions[0].lyrics).not.toContain('ORIGINAL');
+    expect(r.versions[0].lyrics).not.toContain('versi chord');
     expect(r.lyrics).not.toContain('ORIGINAL');
     expect(r.lyrics).not.toContain('versi chord');
     const o = r.versions[1];
@@ -108,6 +112,7 @@ describe('Chordtela page', () => {
     const r = parseChordtelaHtml(page);
     expect(r.versions.map((v) => [v.name, v.chords[0].n])).toEqual([['Chord dasar', 'C'], ['Versi original', 'D']]);
     expect(r.lyrics).toBe('satu');
+    expect([r.main, r.chords[0].n]).toEqual([1, 'D']); // the original version opens first
   });
   it('takes the title from the page heading when the sheet starts with chords', () => {
     const page = '<h1>Kunci Gitar Grup X - Judul Y Chord Dasar</h1><pre>Capo ♪ fret 3\n\nIntro : <a class="tbi-tooltip">C</a>\n\n<a class="tbi-tooltip">C</a>\nhalo</pre>';

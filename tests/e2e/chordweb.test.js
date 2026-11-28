@@ -43,8 +43,9 @@ module.exports = ({ test, assert, eq, open }) => {
     await p.click('#csheet .wlok'); await p.waitForTimeout(800);
     eq(hits.length, 1, 'asked the EvoChords server once'); assert(hits[0].includes('url=' + LINK), 'normalised link: ' + hits[0]);
     const r = await p.evaluate(() => [$('#play').classList.contains('on'), isTemp(cur), cur.title, cur.artist, cur.src, cur.capo, cur.chords.length > 5, songs.length]);
-    eq(r, [true, true, 'Lagu Contoh', 'Evo Band', 'chordtela', 2, true, 5], 'temporary chord song, library untouched');
-    eq(await p.evaluate(() => document.querySelectorAll('#txt .chd').length > 5), true, 'chords drawn');
+    eq(r, [true, true, 'Lagu Contoh', 'Evo Band', 'chordtela', 0, false, 5], 'temporary chord song, library untouched');
+    eq(await p.evaluate(() => [cur.srcId, cur.chords.map((c) => c.n).join(' ')]), [1, 'D Bm A'], 'the original version opens first');
+    eq(await p.evaluate(() => document.querySelectorAll('#txt .chd').length), 3, 'chords drawn');
     eq(t.errors, [], 'no page errors'); await t.close();
   });
 
@@ -56,8 +57,11 @@ module.exports = ({ test, assert, eq, open }) => {
     eq(await p.evaluate(() => [getComputedStyle($('#vsb')).display, $('#vsbv').textContent]), ['flex', '2'], 'versions button shows 2');
     await p.click('#vsb'); await p.waitForTimeout(250);
     eq(await p.evaluate(() => [...document.querySelectorAll('#vsl .wlv b')].map((b) => b.textContent)), ['Chord dasar', 'Versi original'], 'version names');
-    await p.click('#vsl .wlv >> nth=1'); await p.waitForTimeout(500);
-    eq(await p.evaluate(() => [isTemp(cur), cur.chords.map((c) => c.n).join(' ')]), [true, 'D Bm A'], 'original version shown, still temporary');
+    eq(await p.evaluate(() => document.querySelector('#vsl .wlv[aria-current]').textContent.includes('Versi original')), true, 'original is the current one');
+    await p.click('#vsl .wlv >> nth=0'); await p.waitForTimeout(500);
+    eq(await p.evaluate(() => [isTemp(cur), cur.chords[0].n, cur.capo]), [true, 'C', 2], 'easy version shown, still temporary');
+    await p.click('#vsb'); await p.waitForTimeout(250); await p.click('#vsl .wlv >> nth=1'); await p.waitForTimeout(500);
+    eq(await p.evaluate(() => [isTemp(cur), cur.chords.map((c) => c.n).join(' ')]), [true, 'D Bm A'], 'original version again, still temporary');
     await p.evaluate(() => saveTemp(true)); await p.waitForTimeout(200);
     const s = await p.evaluate(() => { const x = songs[songs.length - 1]; return [isTemp(cur), x.title, x.chords.length, x.capo, !!x.key, songs.length]; });
     eq(s, [false, 'Lagu Contoh', 3, 0, true, 6], 'saved with its chords');
@@ -88,12 +92,13 @@ module.exports = ({ test, assert, eq, open }) => {
   test('Chord search: Share / Paste as new song with a Chordtela link imports the chords', async () => {
     const t = await open(), p = t.page; await route(t, ok);
     await p.evaluate((l) => textIn('Coba lagu ini ' + l, []), LINK); await p.waitForTimeout(800);
-    eq(await p.evaluate(() => [isTemp(cur), cur.title, cur.chords.length > 5]), [true, 'Lagu Contoh', true], 'opened with chords');
+    eq(await p.evaluate(() => [isTemp(cur), cur.title, cur.chords.length]), [true, 'Lagu Contoh', 3], 'opened with chords');
     await t.close();
   });
   test('Chord search: intro beat rows show the short form, one token per beat ("C . . . | G/B . . . |"), and follow the key', async () => {
     const t = await open(), p = t.page; await route(t, ok);
     await p.evaluate((l) => chordIn(l, 'x'), LINK); await p.waitForTimeout(800);
+    await p.click('#vsb'); await p.waitForTimeout(250); await p.click('#vsl .wlv >> nth=0'); await p.waitForTimeout(500); // the intro is in the easy version
     const row = () => p.evaluate(() => { const v = document.querySelector('#txt .ln.bshort .bview'); return v ? [...v.querySelectorAll('.bbar')].map((b) => [...b.children].map((x) => x.dataset.t).join(' ')) : null; });
     eq((await row())[0], 'C . . . |', 'first bar');
     eq(await p.evaluate(() => { const d = document.querySelector('#txt .ln.bshort'); return [EvoCore.beats.isBeatLine(d.textContent), getComputedStyle(d.querySelector('.braw')).display]; }), [true, 'none'], 'the dot row stays in the text, hidden');
