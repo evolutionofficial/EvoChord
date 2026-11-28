@@ -122,8 +122,8 @@ test('Smart: changing a chord offers to change every one like it',async()=>{
   eq(t.errors,[],'no page errors');await t.close()});
 
 test('Smart: transpose the whole song in the editor (+2) changes chords and key; undo brings all back in one step',async()=>{
-  const t=await open(),p=t.page;await prep(p,[{l:1,c:0,n:'D/F#'},{l:2,c:0,n:'C#m7b5'}],'1');await openSong(p);
-  await p.selectOption('#ek','D');
+  const t=await open(),p=t.page;await prep(p,[{l:1,c:0,n:'D/F#'},{l:2,c:0,n:'C#m7b5'}],'1');
+  await p.evaluate(()=>{songs[0].key='D';save()});await openSong(p); // the song is in D (picking D in the editor would move the chords: the key is the anchor)
   await p.click('#eTp');await p.waitForTimeout(150);
   await p.click('#csheet [data-tp="1"]');await p.click('#csheet [data-tp="1"]');
   await p.click('#csheet .ok');await p.waitForTimeout(120);
@@ -172,5 +172,25 @@ test('Smart: song mode and editor give the same names',async()=>{
   const shown=await p.evaluate(()=>[...document.querySelectorAll('#txt .chd')].map(e=>e.dataset.c));
   const want=await p.evaluate(()=>{const s=songs[0];return EvoCore.smart.transposeChords(s.lyrics.split('\n'),s.chords,2,{key:'C'}).chords.map(x=>x.n)});
   eq(shown,want,'song mode shows the same names as the editor transpose');
+  eq(t.errors,[],'no page errors');await t.close()});
+test('Smart: the key is the anchor – picking another key moves the chords; the first key or its relative only names it',async()=>{
+  const t=await open(),p=t.page;
+  await p.evaluate(()=>{songs[0].lyrics='[Verse]\npagi datang perlahan';songs[0].key='';songs[0].chords=[{l:1,c:0,n:'C'},{l:1,c:6,n:'Am'},{l:1,c:12,n:'F/A'}];save();openEdit(songs[0])});
+  await p.waitForTimeout(400);
+  const names=()=>p.evaluate(()=>chNow().map(x=>x.n).join(' '));
+  await p.selectOption('#ek','C');await p.waitForTimeout(150);
+  eq(await names(),'C Am F/A','first key: chords stay');
+  await p.selectOption('#ek','D');await p.waitForTimeout(150);
+  eq(await names(),'D Bm G/B','C → D moves every chord');
+  await p.selectOption('#ek','F');await p.waitForTimeout(150);
+  eq(await names(),'F Dm Bb/D','spelling follows the new key');
+  await p.selectOption('#ek','C');await p.waitForTimeout(150);
+  eq(await names(),'C Am F/A','back to C: the exact old names');
+  await p.selectOption('#ek','Am');await p.waitForTimeout(150);
+  eq(await names(),'C Am F/A','C → Am (relative) only names the key');
+  await p.click('#eU');await p.waitForTimeout(150);await p.click('#eU');await p.waitForTimeout(150);
+  eq([await names(),await p.evaluate(()=>$('#ek').value)],['F Dm Bb/D','F'],'undo: key and chords together, one step each');
+  await p.click('#eS');await p.waitForTimeout(300);
+  eq(await p.evaluate(()=>[songs[0].key,songs[0].chords.map(x=>x.n).join(' ')]),['F','F Dm Bb/D'],'saved');
   eq(t.errors,[],'no page errors');await t.close()});
 };

@@ -124,7 +124,8 @@ function chMoveUI(){const k=$('#chkb');if(!k||!chs)return;
 
 // Toolbar switch "Per section" (#eLk), after #eCt (or #eN).
 (function(){const after=$('#eCt')||$('#eN');if(!after||$('#eLk'))return;
-  const b=E('button','',L('Per section','Per bagian'));b.id='eLk';b.type='button';
+  const b=E('button','');b.id='eLk';b.type='button';b.setAttribute('aria-label',L('Per section','Per bagian'));b.title=L('Per section: an edit goes to every section of the same kind','Per bagian: edit berlaku ke semua bagian sejenis');
+  b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
   const paint=()=>{const on=oeLinked();b.classList.toggle('on',on);b.setAttribute('aria-pressed',on?'true':'false')};
   b.onclick=()=>{try{localStorage.setItem('evo.linkSections',oeLinked()?'0':'1')}catch(e){}paint()};
   paint();after.after(b)})();
@@ -132,5 +133,6 @@ function chMoveUI(){const k=$('#chkb');if(!k||!chs)return;
 $('#chtx').addEventListener('pointerdown',chDragDown);
 $('#chkb').addEventListener('pointerdown',chMvPress);
 
-/* The key is part of the undo history (the editor's transpose changes it): a key picked by hand is its own step. */
-$('#ek').addEventListener('change',()=>{if(typeof oe==='object'&&oe&&chs)oeSnap()});
+/* The key is part of the undo history (the editor's transpose changes it): a key picked by hand is its own step,
+   together with the chords it moved (oeKeyChanged, 60). */
+$('#ek').addEventListener('change',()=>{if(typeof oe==='object'&&oe&&chs){oeKeyChanged();oeSnap()}});
