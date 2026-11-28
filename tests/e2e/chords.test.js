@@ -63,4 +63,14 @@ test('Chords: extensions and altered chords – 11, 13, alt, and # / b after a n
   eq(await dis('9'),true,'nothing after alt');
   await act(p,'bs');eq(await cur(),'G7','backspace removes alt');
   eq(t.errors,[],'no page errors');await t.close()});
+test('Chords: names close together move apart above the text (and stay on screen); the word itself is not split',async()=>{
+  const t=await open(),p=t.page;
+  await p.evaluate(()=>{songs[0].lyrics='[Verse]\nhidup pun akan ku beri';songs[0].chords=[{l:1,c:0,n:'E'},{l:1,c:18,n:'D#m'},{l:1,c:20,n:'G#m'}];save();openSong(songs[0])});
+  await p.waitForTimeout(700);
+  const r=await p.evaluate(()=>{const as=[...document.querySelectorAll('#txt .chd')];
+    const box=a=>{const r=a.getBoundingClientRect(),dx=parseFloat(a.style.getPropertyValue('--dx'))||0;return{l:r.left+dx,r:r.left+dx+chordLabelWidth(a)}};
+    const b=as.map(box);return{margins:as.map(a=>a.style.marginLeft),apart:b[2].l>=b[1].r,moved:as.some(a=>Math.abs(parseFloat(a.style.getPropertyValue('--dx'))||0)>0),text:document.querySelector('#txt .ln.hasch').textContent}});
+  eq(r.margins,['','',''],'no space pushed into the text');
+  eq([r.apart,r.moved,r.text],[true,true,'hidup pun akan ku beri'],'a label moved, labels apart, text unchanged');
+  eq(t.errors,[],'no page errors');await t.close()});
 };
