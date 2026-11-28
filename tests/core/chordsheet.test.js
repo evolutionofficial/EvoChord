@@ -194,7 +194,7 @@ describe('Chordtela: "[[VERSI ORIGINAL]]" divider and author notes (Mahen – Pu
     }
   });
   it('other divider spellings', () => {
-    for (const d of ['[Versi Asli]', '**ORIGINAL VERSION**', 'Versi Original', 'VERSI ORIGINAL :']) {
+    for (const d of ['[[[VERSI ORIGINAL]]]', '<b><span style="color: red;">[[[VERSI ORIGINAL]]]</span></b>', '[Versi Asli]', '**ORIGINAL VERSION**', 'Versi Original', 'VERSI ORIGINAL :']) {
       const r = parseChordtelaHtml('<pre>' + a('C') + '\nsatu\n\n' + d + '\n\n' + a('D') + '\nsatu</pre>');
       expect([d, r.main, r.chords[0].n]).toEqual([d, 1, 'D']);
     }

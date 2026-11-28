@@ -363,9 +363,9 @@ function pageTitle(html) {
 // Chordtela pages often hold an easy "chord dasar" version first and the original version after a divider.
 // "===ORIGINAL VERSION===", "===ORIGINAL CHORD===", "== VERSI ASLI =="
 const VERSION_SPLIT = /^\s*(?:-{3,}\s*)?={2,}\s*([^=\n]*?(?:version|versi|chord|original|asli)[^=\n]*?)\s*={2,}\s*$/im;
-// Other ways pages write the divider: "[[VERSI ORIGINAL]]", "[Versi Asli]", "**ORIGINAL VERSION**", or the words alone on a line.
+// Other ways pages write the divider: "[[[VERSI ORIGINAL]]]" (any number of brackets), "[Versi Asli]", "**ORIGINAL VERSION**", or the words alone on a line.
 // They are rewritten to the "===…===" form before splitting.
-const VERSION_ALT = /^[ \t]*(?:\[{1,2}[ \t]*([^\[\]\n]*?(?:versi|version)[^\[\]\n]*?)[ \t]*\]{1,2}|\*{2,}[ \t]*([^*\n]*?(?:versi|version|original|asli)[^*\n]*?)[ \t]*\*{2,}|((?:versi|version)[ \t]+(?:original|asli)|original[ \t]+(?:version|chord)))[ \t]*:?[ \t]*$/gim;
+const VERSION_ALT = /^[ \t]*(?:\[+[ \t]*([^\[\]\n]*?(?:versi|version)[^\[\]\n]*?)[ \t]*\]+|\*{2,}[ \t]*([^*\n]*?(?:versi|version|original|asli)[^*\n]*?)[ \t]*\*{2,}|((?:versi|version)[ \t]+(?:original|asli)|original[ \t]+(?:version|chord)))[ \t]*:?[ \t]*$/gim;
 const normalizeDividers = (text) => text.replace(VERSION_ALT, (m, a, b, c) => '===' + (a || b || c).trim() + '===');
 const VERSION_NOISE = /^\s*(?:-{3,}|lihat\s+pula\b.*|.*\bversi\s+chord\b.*)\s*$/gim;
 
