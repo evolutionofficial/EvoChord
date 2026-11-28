@@ -33,7 +33,7 @@ async function chordIn(text,fallbackTitle){
   if(u){
     note(L('Getting chords…','Mengambil chord…'));
     let res;
-    try{res=await fetch('/api/chordtela?url='+encodeURIComponent(u))}
+    try{res=await fetch('/api/chordtela?url='+encodeURIComponent(u),{cache:'no-cache'}) /* the server keeps its own copy; a phone must not reuse yesterday's answer after the reader improves */}
     catch(e){note(L('You are offline. Chords need an internet connection.','Kamu sedang offline. Ambil chord butuh internet.'),true);return false}
     const r=await res.json().catch(()=>({error:'upstream'}));
     const why=r.error||(!res.ok||!r.lyrics?'upstream':'');
