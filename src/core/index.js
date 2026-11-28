@@ -6,3 +6,4 @@ export * as sheet from './chordsheet.js';
 export * as remap from './remap.js';
 export * as lineedit from './lineedit.js';
 export * as layer from './layer.js';
+export * as smart from './smart.js';

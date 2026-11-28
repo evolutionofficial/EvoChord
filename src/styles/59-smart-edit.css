@@ -1,0 +1,15 @@
+/* EvoChords: smart editing (file 59): "different" chords, the Per section switch, the move row, Follow again. */
+.chn.ov{position:relative}
+.chn.ov::after{content:'';position:absolute;top:-3px;right:-3px;width:7px;height:7px;border-radius:50%;background:#e0a050;box-shadow:0 0 0 2px var(--bg)}
+/* the box can be dragged sideways; the page still scrolls up and down */
+#chtx .chc{touch-action:pan-y}
+
+#etools button#eLk{width:auto;padding:0 10px;font-size:13px;font-weight:600;color:var(--mut);background:transparent;border:1px solid var(--ln)}
+#etools button#eLk.on{background:var(--acc);border-color:var(--acc);color:#15110e}
+
+#chkb .chmove{display:flex;align-items:center;gap:5px;margin:0 0 6px}
+#chkb .chmove .chmvl{flex:none;font:800 11px/1 'Bricolage Grotesque',system-ui,sans-serif;color:var(--mut);letter-spacing:.06em;margin-right:2px}
+#chkb .chmove button{flex:1;min-width:0;height:36px;padding:0;border-radius:9px;border:1px solid var(--ln);background:var(--bg);color:var(--fg);font:700 15px/1 'Bricolage Grotesque',system-ui,sans-serif;touch-action:manipulation;user-select:none}
+#chkb .chmove button:disabled{opacity:.3}
+#chkb .chfollow{display:block;margin:-2px auto 6px;padding:5px 12px;border-radius:16px;border:1px solid var(--acc);background:none;color:var(--acct);font:800 13px/1 'Bricolage Grotesque',system-ui,sans-serif}
+#chkb .chfollow[hidden]{display:none}

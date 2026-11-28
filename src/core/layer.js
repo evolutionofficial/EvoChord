@@ -23,12 +23,12 @@ export function mergeLayer(lyrics, chords, rows) {
   for (let i = 0; i <= L.length; i++) {
     while (k < R.length && R[k].at === i) {
       const r = R[k++];
-      for (const x of r.ch || []) ch.push({ l: out.length, c: x.c | 0, n: String(x.n) });
+      for (const x of r.ch || []) ch.push({ ...x, l: out.length, c: x.c | 0, n: String(x.n) });
       out.push(String(r.text ?? ''));
     }
     if (i < L.length) { idx[i] = out.length; out.push(L[i]); }
   }
-  for (const x of chords || []) if (x && x.l >= 0 && x.l < L.length) ch.push({ l: idx[x.l], c: x.c | 0, n: String(x.n) });
+  for (const x of chords || []) if (x && x.l >= 0 && x.l < L.length) ch.push({ ...x, l: idx[x.l], c: x.c | 0, n: String(x.n) });
   ch.sort((a, b) => a.l - b.l || a.c - b.c);
   return { lyrics: out.join('\n'), chords: ch, lyr };
 }
@@ -66,8 +66,8 @@ export function splitLayer(sheet, chords, lyr) {
   const out = [];
   for (const x of chords || []) {
     if (!x || x.l < 0 || x.l >= S.length) continue;
-    if (map[x.l] >= 0) out.push({ l: map[x.l], c: x.c | 0, n: String(x.n) });
-    else rows[rowOf.get(x.l)].ch.push({ c: x.c | 0, n: String(x.n) });
+    if (map[x.l] >= 0) out.push({ ...x, l: map[x.l], c: x.c | 0, n: String(x.n) });
+    else { const { l, ...rest } = x; rows[rowOf.get(x.l)].ch.push({ ...rest, c: x.c | 0, n: String(x.n) }); }
   }
   // a sheet that is all layer and no lyrics, and blank rows at the very end, need not be kept
   while (rows.length && rows[rows.length - 1].at === nL && !rows[rows.length - 1].text && !rows[rows.length - 1].ch.length) rows.pop();

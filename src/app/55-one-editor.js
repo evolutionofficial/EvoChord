@@ -27,10 +27,10 @@ function oeFlush(){if(!chs||!ed)return;if(oe.ed)oe.ed.commit();
 function oeResync(){if(!chs||!ed||ta.value===ed.chLyr)return;oeLoad();chBuild(null)}
 
 // Undo history of the grid: one entry per state (lines and chord map), at most 100.
-function oeSnap(){if(oe.busy||!chs)return;const cur=JSON.stringify({lines:chs.lines,map:chs.map});
+function oeSnap(){if(oe.busy||!chs)return;const cur=JSON.stringify({lines:chs.lines,map:chs.map,key:$('#ek').value});
   if(oe.undo[oe.ui]===cur)return;oe.undo=oe.undo.slice(0,oe.ui+1);oe.undo.push(cur);if(oe.undo.length>100)oe.undo.shift();oe.ui=oe.undo.length-1}
 function oeTravel(d){const n=oe.ui+d;if(!chs||n<0||n>=oe.undo.length)return;oe.ui=n;const s=JSON.parse(oe.undo[n]);
-  chs.lines=s.lines;chs.map=s.map;oe.busy=1;try{chBuild(null)}finally{oe.busy=0}}
+  chs.lines=s.lines;chs.map=s.map;if(s.key!=null&&$('#ek').value!==s.key){$('#ek').value=s.key;ed.dirty=true}oe.busy=1;try{chBuild(null)}finally{oe.busy=0}}
 
 function oeRowChords(l){return chNow().filter(x=>x.l===l).map(({c,n})=>({c,n}))}
 // Replace the chords of row l by res.chords (from EvoCore.lineedit).
