@@ -1,4 +1,4 @@
-/* ===== EvoChords: smart editing (file 59) =====
+/* ===== EvoChord: smart editing (file 59) =====
    "Per section" (#eLk, saved in localStorage 'evo.linkSections', on by default): a chord set in one section is also set in
    the sections of the same kind (twins, EvoCore.smart). A chord that differs from its twins is "different": chs.map keeps it
    as '*Name' (o:1 in ed.chords). "Follow again" (.chfollow) makes it match its twins again.

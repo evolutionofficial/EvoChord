@@ -1,4 +1,4 @@
-/* ===== EvoChords: smart tools (file 60) =====
+/* ===== EvoChord: smart tools (file 60) =====
    Long press on a chord button (family row, recent chords, a root letter) opens its variants; the toolbar has
    "Pattern" (fill a progression into a section) and "♯♭" (transpose the song or a section, one undo step);
    changing one chord from A to B offers to change every A in the song. The rules are in EvoCore.smart; this file

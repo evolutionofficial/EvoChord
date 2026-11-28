@@ -1,4 +1,4 @@
-/* ===== EvoChords: "Get chords from Chordtela" for the song in the editor (file 58) =====
+/* ===== EvoChord: "Get chords from Chordtela" for the song in the editor (file 58) =====
    The chords of a Chordtela sheet (or of chord text pasted after the Google step) go onto the song's own lyric lines
    (EvoCore.layer.importChords). The lyrics are never changed. chordIn (53) hands its text here while chordInto is set. */
 

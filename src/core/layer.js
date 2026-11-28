@@ -1,10 +1,10 @@
-// The chord layer: EvoLyric owns the lyrics, EvoChords only adds to them.
+// The chord layer: EvoLyric owns the lyrics, EvoChord only adds to them.
 //
-// In the shared database a song keeps EvoLyric's lyrics untouched. EvoChords' additions are stored beside them:
+// In the shared database a song keeps EvoLyric's lyrics untouched. EvoChord' additions are stored beside them:
 //   chords: [{l,c,n}]            chords on the lyric lines (l = lyric line index, c = character offset)
-//   rows:   [{at,text,ch:[{c,n}]}] lines EvoChords adds between lyric lines (beat rows, section labels, blank
+//   rows:   [{at,text,ch:[{c,n}]}] lines EvoChord adds between lyric lines (beat rows, section labels, blank
 //                                lines); `at` = index of the lyric line they come before (lyrics length = at the end)
-// On the device EvoChords works on one merged sheet: the lyric lines with the rows put in, and every chord on its
+// On the device EvoChord works on one merged sheet: the lyric lines with the rows put in, and every chord on its
 // merged line. `lyr` keeps the lyrics as they came, so the sheet can be split again without changing a letter.
 
 const norm = (s) => String(s ?? '').replace(/\s+$/, '');
@@ -75,7 +75,7 @@ export function splitLayer(sheet, chords, lyr) {
   return { lyrics: lyr, chords: out, rows };
 }
 
-/** True for sheet lines that are lyrics (locked in EvoChords), false for lines of the layer. */
+/** True for sheet lines that are lyrics (locked in EvoChord), false for lines of the layer. */
 export function lyricMask(sheet, lyr) {
   return sheetMap(sheet, lyr).map((i) => i >= 0);
 }
@@ -91,7 +91,7 @@ const isBeat = (s) => /^\s*\|[•·\s|]*\|\s*$/.test(String(s ?? '')) && /•/.t
 const isSec = (s) => /^\s*\[[^\]]+\]\s*$/.test(String(s ?? ''));
 
 /**
- * @param {string} sheet the song as shown in EvoChords (lyric lines + any layer lines)
+ * @param {string} sheet the song as shown in EvoChord (lyric lines + any layer lines)
  * @param {{l,c,n}[]} chords its chords now (lines that get chords from Chordtela lose their old ones)
  * @param {string} src the Chordtela sheet (lyrics with its beat rows)
  * @param {{l,c,n}[]} srcChords chords of the Chordtela sheet

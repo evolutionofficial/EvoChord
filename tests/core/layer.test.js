@@ -27,7 +27,7 @@ describe('chord layer', () => {
     const s = splitLayer('satu      \ndua', [{ l: 0, c: 8, n: 'E' }], m.lyr);
     expect(s).toEqual({ lyrics: 'satu\ndua', chords: [{ l: 0, c: 8, n: 'E' }], rows: [] });
   });
-  it('a row added in EvoChords (beat row, section label) never changes the lyrics', () => {
+  it('a row added in EvoChord (beat row, section label) never changes the lyrics', () => {
     const sheet = '[Intro]\n' + BEAT + '\n[Verse]\npagi datang perlahan\nsampai pagi tiba\n\n[Chorus]\nkita bernyanyi\n\n[Outro]\n' + BEAT;
     const s = splitLayer(sheet, [{ l: 1, c: 0, n: 'C' }, { l: 10, c: 0, n: 'F' }], LYR);
     expect(s.lyrics).toBe(LYR);

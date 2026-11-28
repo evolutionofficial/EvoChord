@@ -1,20 +1,20 @@
 # Ketentuan Penggunaan
 
-**EvoChords** · Dikelola oleh Evolution Digital Studio
+**EvoChord** · Dikelola oleh Evolution Digital Studio
 Tanggal berlaku: 12 November 2026 · Versi 1.0
 Website: https://evochord.evolution-official-id.workers.dev · Email: evolution.studio.id@gmail.com
 
 ## 1. Pendahuluan
 
-Selamat datang di EvoChords.
+Selamat datang di EvoChord.
 
-EvoChords merupakan aplikasi pencatatan digital (digital notepad) yang dikembangkan oleh Evolution Digital Studio. Aplikasi ini menyediakan fasilitas untuk membuat, menyimpan, mengatur, menampilkan, dan berbagi catatan, termasuk lirik lagu, melalui berbagai perangkat.
+EvoChord merupakan aplikasi pencatatan digital (digital notepad) yang dikembangkan oleh Evolution Digital Studio. Aplikasi ini menyediakan fasilitas untuk membuat, menyimpan, mengatur, menampilkan, dan berbagi catatan, termasuk lirik lagu, melalui berbagai perangkat.
 
-Dengan mengakses atau menggunakan EvoChords, pengguna dianggap telah membaca dan memahami Ketentuan Penggunaan ini serta Kebijakan Privasi EvoChords. Jika pengguna tidak menyetujuinya, pengguna dapat berhenti menggunakan layanan.
+Dengan mengakses atau menggunakan EvoChord, pengguna dianggap telah membaca dan memahami Ketentuan Penggunaan ini serta Kebijakan Privasi EvoChord. Jika pengguna tidak menyetujuinya, pengguna dapat berhenti menggunakan layanan.
 
-## 2. Layanan EvoChords
+## 2. Layanan EvoChord
 
-EvoChords menyediakan fungsi utama berikut:
+EvoChord menyediakan fungsi utama berikut:
 
 - Membuat dan mengedit catatan, termasuk label section yang dapat diberikan otomatis (Auto Section).
 - Menyimpan catatan ke Library dan mengelompokkannya dalam kategori.
@@ -30,27 +30,27 @@ Fitur dapat berubah, ditingkatkan, ditambahkan, atau dihentikan sesuai perkemban
 
 ## 3. Penggunaan sebagai Tamu, Akun, dan Autentikasi
 
-EvoChords dapat digunakan tanpa login sebagai tamu. Data tamu hanya tersimpan di perangkat yang digunakan dan tidak tersinkron ke cloud.
+EvoChord dapat digunakan tanpa login sebagai tamu. Data tamu hanya tersimpan di perangkat yang digunakan dan tidak tersinkron ke cloud.
 
 Untuk menggunakan sinkronisasi cloud, mengakses Library dari perangkat lain, dan fitur Friends, pengguna harus login menggunakan akun Google.
 
-Pengguna bertanggung jawab atas keamanan akun Google dan perangkat yang digunakan untuk mengakses EvoChords, serta atas aktivitas yang dilakukan melalui akunnya.
+Pengguna bertanggung jawab atas keamanan akun Google dan perangkat yang digunakan untuk mengakses EvoChord, serta atas aktivitas yang dilakukan melalui akunnya.
 
-Login dengan Google mengikuti ketentuan usia minimum akun Google di negara pengguna. Anak di bawah usia tersebut sebaiknya menggunakan EvoChords dengan persetujuan dan pengawasan orang tua atau wali.
+Login dengan Google mengikuti ketentuan usia minimum akun Google di negara pengguna. Anak di bawah usia tersebut sebaiknya menggunakan EvoChord dengan persetujuan dan pengawasan orang tua atau wali.
 
 ## 4. Kepemilikan Konten Pengguna
 
 Seluruh catatan dan konten yang dibuat atau dimasukkan pengguna tetap menjadi milik pengguna atau pemegang hak yang sah. Evolution Digital Studio tidak mengklaim kepemilikan atas catatan maupun konten pengguna.
 
-Dengan menggunakan layanan, pengguna memberikan izin terbatas kepada Evolution Digital Studio dan infrastruktur layanan yang digunakan untuk menyimpan, memproses, menyinkronkan, menampilkan, dan mengirim salinan konten sejauh diperlukan untuk menjalankan fitur EvoChords sesuai instruksi pengguna, serta untuk meninjau konten yang dilaporkan. Izin tersebut tidak memindahkan kepemilikan konten kepada Evolution Digital Studio.
+Dengan menggunakan layanan, pengguna memberikan izin terbatas kepada Evolution Digital Studio dan infrastruktur layanan yang digunakan untuk menyimpan, memproses, menyinkronkan, menampilkan, dan mengirim salinan konten sejauh diperlukan untuk menjalankan fitur EvoChord sesuai instruksi pengguna, serta untuk meninjau konten yang dilaporkan. Izin tersebut tidak memindahkan kepemilikan konten kepada Evolution Digital Studio.
 
 ## 5. Tanggung Jawab Pengguna atas Konten
 
-Pengguna bertanggung jawab atas konten yang dibuat, dimasukkan, disimpan, maupun dibagikan melalui EvoChords, termasuk lirik yang diambil dari layanan pencarian.
+Pengguna bertanggung jawab atas konten yang dibuat, dimasukkan, disimpan, maupun dibagikan melalui EvoChord, termasuk lirik yang diambil dari layanan pencarian.
 
-Pengguna wajib memastikan bahwa mereka memiliki hak, izin, atau dasar hukum yang diperlukan untuk menggunakan dan membagikan konten tersebut. Lirik lagu umumnya dilindungi hak cipta; EvoChords ditujukan untuk penggunaan pribadi atau kelompok, bukan untuk menyebarkan lirik secara publik.
+Pengguna wajib memastikan bahwa mereka memiliki hak, izin, atau dasar hukum yang diperlukan untuk menggunakan dan membagikan konten tersebut. Lirik lagu umumnya dilindungi hak cipta; EvoChord ditujukan untuk penggunaan pribadi atau kelompok, bukan untuk menyebarkan lirik secara publik.
 
-Pengguna tidak diperbolehkan menggunakan EvoChords untuk menyimpan atau menyebarkan konten yang melanggar hukum, hak pihak lain, atau ketentuan yang berlaku.
+Pengguna tidak diperbolehkan menggunakan EvoChord untuk menyimpan atau menyebarkan konten yang melanggar hukum, hak pihak lain, atau ketentuan yang berlaku.
 
 ## 6. Fitur Friends dan Berbagi Catatan
 
@@ -75,7 +75,7 @@ Pengguna bertanggung jawab atas informasi dalam username dan bio, dan dilarang m
 
 ## 8. Penggunaan yang Dilarang
 
-Pengguna dilarang menggunakan EvoChords untuk:
+Pengguna dilarang menggunakan EvoChord untuk:
 
 - Melakukan tindakan yang melanggar hukum.
 - Mengakses akun atau data pengguna lain tanpa izin.
@@ -87,7 +87,7 @@ Pengguna dilarang menggunakan EvoChords untuk:
 
 ## 9. Moderasi dan Penegakan
 
-Untuk menjaga layanan tetap aman, EvoChords menerapkan:
+Untuk menjaga layanan tetap aman, EvoChord menerapkan:
 
 - **Batas harian** per akun: 20 permintaan pertemanan, 30 pengiriman, dan 10 laporan dalam 24 jam.
 - **Blokir**: pengguna dapat memblokir pengguna lain. Pertemanan berakhir, kiriman yang menunggu di kedua arah dihapus, dan pihak yang diblokir tidak dapat lagi menemukan, mengirim permintaan, atau mengirim catatan.
@@ -112,7 +112,7 @@ Evolution Digital Studio tidak menjamin sinkronisasi selalu berlangsung tanpa ga
 
 ## 11. Backup, Restore, dan Ekspor
 
-EvoChords menyediakan backup dan restore melalui file .evolyric, serta ekspor seluruh catatan ke file .txt.
+EvoChord menyediakan backup dan restore melalui file .evolyric, serta ekspor seluruh catatan ke file .txt.
 
 Pengguna bertanggung jawab menjaga file yang telah diekspor, termasuk keamanan dan lokasi penyimpanannya. Pemulihan data bergantung pada ketersediaan file backup yang valid.
 
@@ -126,25 +126,25 @@ Penghapusan akun berlaku seketika dan permanen, menghapus akun beserta data clou
 
 ## 13. Layanan Pihak Ketiga
 
-EvoChords menggunakan layanan eksternal, antara lain Google (autentikasi, font, dan Google Search), Supabase (database dan sinkronisasi cloud), Cloudflare (infrastruktur web), dan LRCLIB (pencarian lirik).
+EvoChord menggunakan layanan eksternal, antara lain Google (autentikasi, font, dan Google Search), Supabase (database dan sinkronisasi cloud), Cloudflare (infrastruktur web), dan LRCLIB (pencarian lirik).
 
 Penggunaan layanan tersebut tunduk pada ketentuan dan kebijakan masing-masing penyedia. Evolution Digital Studio tidak memiliki kendali penuh atas ketersediaan maupun perubahan kebijakan layanan pihak ketiga, termasuk kelengkapan dan ketepatan lirik dari layanan pencarian.
 
 ## 14. Biaya dan Monetisasi
 
-Pada peluncuran versi 1.0, EvoChords disediakan secara gratis, tanpa biaya berlangganan dan tanpa iklan.
+Pada peluncuran versi 1.0, EvoChord disediakan secara gratis, tanpa biaya berlangganan dan tanpa iklan.
 
 Evolution Digital Studio dapat mengembangkan model layanan atau monetisasi pada masa mendatang. Apabila terdapat perubahan yang memengaruhi biaya atau ketentuan penggunaan, pengguna akan diberi tahu sebelum perubahan tersebut berlaku.
 
 ## 15. Ketersediaan dan Perubahan Layanan
 
-Evolution Digital Studio berupaya menjaga agar EvoChords dapat digunakan dengan baik. Namun, layanan dapat mengalami gangguan akibat pemeliharaan, pembaruan, masalah jaringan, kegagalan perangkat, atau gangguan penyedia layanan pihak ketiga.
+Evolution Digital Studio berupaya menjaga agar EvoChord dapat digunakan dengan baik. Namun, layanan dapat mengalami gangguan akibat pemeliharaan, pembaruan, masalah jaringan, kegagalan perangkat, atau gangguan penyedia layanan pihak ketiga.
 
 Evolution Digital Studio berhak memperbarui, mengubah, atau menghentikan sebagian fitur sesuai kebutuhan pengembangan dan operasional.
 
 ## 16. Batas Tanggung Jawab
 
-EvoChords disediakan sebagaimana tersedia (as is) dan sesuai kemampuan layanan. Evolution Digital Studio tidak menjamin bahwa layanan akan selalu tersedia tanpa gangguan atau sepenuhnya bebas dari kesalahan.
+EvoChord disediakan sebagaimana tersedia (as is) dan sesuai kemampuan layanan. Evolution Digital Studio tidak menjamin bahwa layanan akan selalu tersedia tanpa gangguan atau sepenuhnya bebas dari kesalahan.
 
 Sejauh diizinkan oleh hukum yang berlaku, Evolution Digital Studio tidak bertanggung jawab atas kehilangan data akibat kerusakan perangkat, penghapusan data lokal, kegagalan sinkronisasi, kehilangan file backup, penghapusan catatan atau akun oleh pengguna, atau gangguan layanan pihak ketiga yang berada di luar kendali wajar kami.
 
@@ -152,7 +152,7 @@ Ketentuan ini tidak mengurangi hak pengguna yang tidak dapat dikesampingkan berd
 
 ## 17. Penghentian Penggunaan
 
-Pengguna dapat berhenti menggunakan EvoChords kapan saja, dan dapat menghapus akunnya sendiri.
+Pengguna dapat berhenti menggunakan EvoChord kapan saja, dan dapat menghapus akunnya sendiri.
 
 Evolution Digital Studio dapat membatasi, membekukan, atau menghentikan akses apabila ditemukan penyalahgunaan layanan atau pelanggaran terhadap ketentuan ini, sebagaimana dijelaskan pada bagian 9, sepanjang sesuai dengan hukum yang berlaku.
 
@@ -166,7 +166,7 @@ Ketentuan Penggunaan ini tunduk pada hukum Republik Indonesia, dengan tetap memp
 
 ## 20. Kontak
 
-Untuk pertanyaan, bantuan, atau informasi terkait penggunaan EvoChords:
+Untuk pertanyaan, bantuan, atau informasi terkait penggunaan EvoChord:
 
 Evolution Digital Studio
 Website: https://evochord.evolution-official-id.workers.dev

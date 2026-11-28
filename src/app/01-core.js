@@ -6,7 +6,7 @@ const E=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=nul
 /* v162: user content (titles, artists, lyrics, section and category names, notes, people) is never translated: UE marks it data-nt; fb is the interface fallback, which is translated */
 const UE=(t,c,v,fb)=>{const e=E(t,c,v||fb||'');if(v)e.setAttribute('data-nt','');return e};
 /* v157: the old demo song – no longer added to new libraries; kept only to recognise (and never upload) an untouched copy on older devices */
-const SAMPLE={id:'s1',title:'Contoh Lagu',artist:'EvoChords',speed:5,font:32,lyrics:
+const SAMPLE={id:'s1',title:'Contoh Lagu',artist:'EvoChord',speed:5,font:32,lyrics:
 '[Intro]\n(petik pelan)\n\n[Verse 1]\nLampu panggung mulai menyala\nSuara kita mengisi ruang\nSatu per satu baris mengalir\nTanpa kertas yang berserakan\n\n[Chorus]\nGulir saja, biar lirik berjalan\nKita bernyanyi sampai selesai\n\n[Male 1]\nBagian ini milik dia\n\n[Female 1]\nBagian ini milik aku\n\n[All]\nSatu suara, satu panggung\n\n[Interlude]\n(solo gitar)\n\n[Verse 2]\nSetelah lagu ini usai\nTepuk tangan jadi penutup\n\n[Rit]\nPelan… dan selesai'};
 let songs=[],cur=null,ed=null,playing=false,boostSp=0,bst=0,frac=0,last=0,fs=false,wl=null,skip=new Set(),g=null,delArm=0,t0,waiting=false,lastT=0,startEl=null,lastA=null,cats=[];
 const SAMPLE_J=JSON.stringify(SAMPLE);let LK=K,LKC='evolyric-cats-v1'; /* active storage keys: guest = K/KC, signed-in = per-account cache (see cloud.js) */

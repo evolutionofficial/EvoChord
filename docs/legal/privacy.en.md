@@ -1,16 +1,16 @@
 # Privacy Policy
 
-**EvoChords** · Operated by Evolution Digital Studio
+**EvoChord** · Operated by Evolution Digital Studio
 Effective date: 12 November 2026 · Version 1.0
 Website: https://evochord.evolution-official-id.workers.dev · Email: evolution.studio.id@gmail.com
 
 ## 1. Introduction
 
-Welcome to EvoChords.
+Welcome to EvoChord.
 
-EvoChords is a digital notepad app that lets users create, save, organise, display and share notes, including song lyrics, across devices.
+EvoChord is a digital notepad app that lets users create, save, organise, display and share notes, including song lyrics, across devices.
 
-EvoChords is developed and operated by Evolution Digital Studio, based in Indonesia.
+EvoChord is developed and operated by Evolution Digital Studio, based in Indonesia.
 
 We respect your privacy and are committed to protecting your personal information and the content you store in the app. This policy explains what we process, why, where it is stored, and what rights you have over your data.
 
@@ -25,7 +25,7 @@ If you sign in with Google, we receive from Google's sign-in service:
 - Your profile photo.
 - The account identifier needed for sign-in.
 
-EvoChords never receives or stores your Google password.
+EvoChord never receives or stores your Google password.
 
 ### B. Profile information
 
@@ -74,7 +74,7 @@ If you contact us with the Contact support button, the email automatically inclu
 
 ## 3. Guest Use and Google Sign-In
 
-You can use EvoChords **without signing in**, as a guest. As a guest you can create, save, organise and display notes, search lyrics through LRCLIB and make backups. All guest data is stored **only on that device**.
+You can use EvoChord **without signing in**, as a guest. As a guest you can create, save, organise and display notes, search lyrics through LRCLIB and make backups. All guest data is stored **only on that device**.
 
 Google sign-in is required to:
 
@@ -92,13 +92,13 @@ The following is stored on your device so the app works offline: your Library, c
 
 ### B. In the cloud
 
-For signed-in users, the Library, profile and required data are stored and synced through Supabase. The EvoChords Supabase project is located in **Tokyo, Japan**. At database level, each account can only access its own data.
+For signed-in users, the Library, profile and required data are stored and synced through Supabase. The EvoChord Supabase project is located in **Tokyo, Japan**. At database level, each account can only access its own data.
 
 Syncing requires an internet connection. Local data that has not synced yet can be lost if browser or app data is cleared, the device is damaged, or local storage is wiped. Guest data is never synced.
 
 ## 5. Backup, Restore and Export
 
-EvoChords provides:
+EvoChord provides:
 
 - **Backup**: one **.evolyric** file with all your notes and categories.
 - **Restore**: brings back a .evolyric file without overwriting notes you already have.
@@ -108,7 +108,7 @@ Exported files are entirely under your control. You are responsible for keeping 
 
 ## 6. Note Privacy and Friends
 
-Your notes are private. Other users cannot see them unless you send them. EvoChords has no public space or public feed.
+Your notes are private. Other users cannot see them unless you send them. EvoChord has no public space or public feed.
 
 As the service operator, Evolution Digital Studio technically has access to the database. We do not open user content except when needed for support you asked for, service security, or to follow up a report of abuse.
 
@@ -126,7 +126,7 @@ You can **block** other users. A blocked person can no longer find you, send you
 
 We use the information to:
 
-- Provide and operate EvoChords.
+- Provide and operate EvoChord.
 - Manage sign-in and user accounts.
 - Store and sync your Library.
 - Provide Friends and note sharing.
@@ -138,26 +138,26 @@ We use the information to:
 
 ## 8. Third-Party Services
 
-EvoChords uses these external services:
+EvoChord uses these external services:
 
 - **Google**: account sign-in (Google Sign-In), fonts (Google Fonts), and Google Search pages opened when lyrics are not found on LRCLIB or when you choose it.
 - **Supabase**: database, sign-in, profiles, Library, Friends, safety features and cloud sync.
-- **Cloudflare**: hosting and web infrastructure for EvoChords.
+- **Cloudflare**: hosting and web infrastructure for EvoChord.
 - **LRCLIB**: lyrics search. Your search text is sent directly from your device to LRCLIB.
 
 Each provider has its own privacy policy and terms, and may log technical information such as IP address and access time under its own policy.
 
 ## 9. Ads and Monetisation
 
-At the launch of version 1.0, EvoChords is free and shows no ads.
+At the launch of version 1.0, EvoChord is free and shows no ads.
 
 Evolution Digital Studio does not sell users' personal data to anyone.
 
-If EvoChords later adds ads, analytics or a business model that affects how data is processed, this policy will be updated and users will be notified.
+If EvoChord later adds ads, analytics or a business model that affects how data is processed, this policy will be updated and users will be notified.
 
 ## 10. Analytics and Technical Information
 
-EvoChords does not use third-party analytics, ad trackers or error-reporting services.
+EvoChord does not use third-party analytics, ad trackers or error-reporting services.
 
 Infrastructure providers (Cloudflare and Supabase) may log technical information such as IP address, access time and request type for operations and security, under their own policies.
 
@@ -193,7 +193,7 @@ Guest data exists only on the device and can be removed by clearing the app's or
 
 We apply security measures appropriate to the service and its infrastructure, including:
 
-- Sign-in through Google; EvoChords stores no passwords.
+- Sign-in through Google; EvoChord stores no passwords.
 - Encrypted connections (HTTPS).
 - Database-level access rules so each account can only access its own data.
 - Email addresses are never shown to other users.
@@ -203,7 +203,7 @@ Still, no storage or transmission over the internet can be guaranteed to be comp
 
 ## 13. Children's Privacy
 
-EvoChords can be used by people of different ages. Signing in with Google follows the minimum age for Google accounts in your country. Children below that age should use EvoChords with the consent and supervision of a parent or guardian, in line with applicable child data protection rules.
+EvoChord can be used by people of different ages. Signing in with Google follows the minimum age for Google accounts in your country. Children below that age should use EvoChord with the consent and supervision of a parent or guardian, in line with applicable child data protection rules.
 
 ## 14. Your Rights
 

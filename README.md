@@ -1,6 +1,6 @@
-# EvoChords
+# EvoChord
 
-Chord dan lirik untuk pemain musik, dari Evolution. Satu keluarga dengan [EvoLyric](https://evolyric.com): tampilan dan cara pakainya sama, EvoChords menambah chord.
+Chord dan lirik untuk pemain musik, dari Evolution. Satu keluarga dengan [EvoLyric](https://evolyric.com): tampilan dan cara pakainya sama, EvoChord menambah chord.
 
 - Semua yang ada di EvoLyric: library & kategori, setlist & antrian, auto-scroll (tap, geser untuk kecepatan, tahan untuk ngebut, cubit untuk ukuran huruf), editor, highlight & catatan, teman, akun & sync cloud, backup, bahasa Indonesia/English
 - Chord di atas lirik yang tidak saling tumpuk, transpose sementara atau disimpan

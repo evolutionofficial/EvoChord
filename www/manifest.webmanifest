@@ -1,6 +1,6 @@
 {
-  "name": "EvoChords",
-  "short_name": "EvoChords",
+  "name": "EvoChord",
+  "short_name": "EvoChord",
   "description": "Chords and lyrics for musicians, with auto-scroll",
   "id": "./",
   "start_url": "./",

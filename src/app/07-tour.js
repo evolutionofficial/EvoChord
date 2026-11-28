@@ -8,9 +8,9 @@ I18N_KEEP.add(TOUR_T);I18N_KEEP.add(TOUR_A); /* the demo song's title and artist
 const tourOn=()=>!!tour;
 const tHome=()=>{fabOpen(false);if(!$('#list').classList.contains('on')){refresh();show('list')}};
 const TOUR=[
- {h:['Welcome to EvoChords','Selamat datang di EvoChords'],d:['A one-minute tour: make a song, tidy it up, then sing it.','Tur satu menit: membuat lagu, merapikannya, lalu menyanyikannya.'],go:tHome},
+ {h:['Welcome to EvoChord','Selamat datang di EvoChord'],d:['A one-minute tour: make a song, tidy it up, then sing it.','Tur satu menit: membuat lagu, merapikannya, lalu menyanyikannya.'],go:tHome},
  {t:'#fab',g:'tap',h:['Add a song','Tambah lagu'],d:['Tap + for New song, Create setlist, Import from file or Paste as new song.','Ketuk + untuk Lagu baru, Buat setlist, Impor dari file, atau Tempel sebagai lagu baru.'],go:tHome},
- {t:'#q',g:'tap',h:['Lyrics from the internet','Lirik dari internet'],d:['Type a title in the search box. Not in your Library? Tap Search the internet: EvoChords looks on LRCLIB, then Google. Hold a song for Search online to find other versions.','Ketik judul di kolom cari. Tidak ada di Library? Ketuk Cari di internet: EvoChords mencari di LRCLIB, lalu Google. Tahan sebuah lagu untuk Cari di internet versi lain.'],go:tHome},
+ {t:'#q',g:'tap',h:['Lyrics from the internet','Lirik dari internet'],d:['Type a title in the search box. Not in your Library? Tap Search the internet: EvoChord looks on LRCLIB, then Google. Hold a song for Search online to find other versions.','Ketik judul di kolom cari. Tidak ada di Library? Ketuk Cari di internet: EvoChord mencari di LRCLIB, lalu Google. Tahan sebuah lagu untuk Cari di internet versi lain.'],go:tHome},
  {t:'#ta',g:'tap',p:r=>[r.left+r.width*.45,r.top+Math.min(r.height*.3,120)],h:['The editor','Editor'],d:['Type or paste lyrics here. We use a demo song; it is not saved.','Ketik atau tempel lirik di sini. Kita pakai lagu contoh; lagu ini tidak disimpan.'],
   go:()=>{if(!$('#edit').classList.contains('on')||!tour.ed){openEdit(null,TOUR_LY,TOUR_T);$('#ea').value=TOUR_A;tour.ed=1;if(tour.i>=5)edAuto()}}},
  {t:'#eA',g:'tap',h:['Auto Section','Auto Section'],d:['One tap labels Verse, Chorus and Bridge for you.','Satu ketukan: Verse, Chorus, dan Bridge diberi label otomatis.']},

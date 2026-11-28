@@ -1,20 +1,20 @@
 # Terms of Service
 
-**EvoChords** · Operated by Evolution Digital Studio
+**EvoChord** · Operated by Evolution Digital Studio
 Effective date: 12 November 2026 · Version 1.0
 Website: https://evochord.evolution-official-id.workers.dev · Email: evolution.studio.id@gmail.com
 
 ## 1. Introduction
 
-Welcome to EvoChords.
+Welcome to EvoChord.
 
-EvoChords is a digital notepad app developed by Evolution Digital Studio. It lets you create, save, organise, display and share notes, including song lyrics, across devices.
+EvoChord is a digital notepad app developed by Evolution Digital Studio. It lets you create, save, organise, display and share notes, including song lyrics, across devices.
 
-By accessing or using EvoChords you confirm that you have read and understood these Terms of Service and the EvoChords Privacy Policy. If you do not agree, you can stop using the service.
+By accessing or using EvoChord you confirm that you have read and understood these Terms of Service and the EvoChord Privacy Policy. If you do not agree, you can stop using the service.
 
-## 2. The EvoChords Service
+## 2. The EvoChord Service
 
-EvoChords's main functions include:
+EvoChord's main functions include:
 
 - Creating and editing notes, including section labels that can be added automatically (Auto Section).
 - Saving notes to a Library and grouping them in categories.
@@ -30,27 +30,27 @@ Features may change, improve, be added or be discontinued as the app develops.
 
 ## 3. Guest Use, Accounts and Sign-In
 
-You can use EvoChords without signing in, as a guest. Guest data is stored only on the device you use and is not synced to the cloud.
+You can use EvoChord without signing in, as a guest. Guest data is stored only on the device you use and is not synced to the cloud.
 
 To use cloud sync, access your Library from other devices, and use Friends, you must sign in with a Google account.
 
-You are responsible for the security of your Google account and the devices you use to access EvoChords, and for activity carried out through your account.
+You are responsible for the security of your Google account and the devices you use to access EvoChord, and for activity carried out through your account.
 
-Signing in with Google follows the minimum age for Google accounts in your country. Children below that age should use EvoChords with the consent and supervision of a parent or guardian.
+Signing in with Google follows the minimum age for Google accounts in your country. Children below that age should use EvoChord with the consent and supervision of a parent or guardian.
 
 ## 4. Ownership of User Content
 
 All notes and content you create or enter remain yours or belong to their rightful owner. Evolution Digital Studio claims no ownership of your notes or content.
 
-By using the service you give Evolution Digital Studio and the infrastructure it uses a limited permission to store, process, sync, display and send copies of your content as far as needed to run EvoChords's features on your instructions, and to review content that has been reported. This permission does not transfer ownership of your content to Evolution Digital Studio.
+By using the service you give Evolution Digital Studio and the infrastructure it uses a limited permission to store, process, sync, display and send copies of your content as far as needed to run EvoChord's features on your instructions, and to review content that has been reported. This permission does not transfer ownership of your content to Evolution Digital Studio.
 
 ## 5. Your Responsibility for Content
 
-You are responsible for the content you create, enter, store or share through EvoChords, including lyrics obtained from search services.
+You are responsible for the content you create, enter, store or share through EvoChord, including lyrics obtained from search services.
 
-You must make sure you have the rights, permission or legal basis to use and share that content. Song lyrics are usually protected by copyright; EvoChords is meant for personal or group use, not for distributing lyrics publicly.
+You must make sure you have the rights, permission or legal basis to use and share that content. Song lyrics are usually protected by copyright; EvoChord is meant for personal or group use, not for distributing lyrics publicly.
 
-You may not use EvoChords to store or spread content that breaks the law, infringes the rights of others, or violates applicable rules.
+You may not use EvoChord to store or spread content that breaks the law, infringes the rights of others, or violates applicable rules.
 
 ## 6. Friends and Sharing Notes
 
@@ -75,7 +75,7 @@ You are responsible for your username and bio, and may not use them to share oth
 
 ## 8. Prohibited Use
 
-You may not use EvoChords to:
+You may not use EvoChord to:
 
 - Do anything unlawful.
 - Access other users' accounts or data without permission.
@@ -87,7 +87,7 @@ You may not use EvoChords to:
 
 ## 9. Moderation and Enforcement
 
-To keep the service safe, EvoChords applies:
+To keep the service safe, EvoChord applies:
 
 - **Daily limits** per account: 20 friend requests, 30 deliveries and 10 reports in 24 hours.
 - **Blocking**: you can block other users. The friendship ends, deliveries waiting in both directions are deleted, and the blocked person can no longer find you, send you requests or send you notes.
@@ -112,7 +112,7 @@ Evolution Digital Studio does not guarantee that syncing will always work withou
 
 ## 11. Backup, Restore and Export
 
-EvoChords provides backup and restore with .evolyric files, and export of all notes to a .txt file.
+EvoChord provides backup and restore with .evolyric files, and export of all notes to a .txt file.
 
 You are responsible for the files you export, including where and how securely you keep them. Restoring depends on having a valid backup file.
 
@@ -126,25 +126,25 @@ Account deletion takes effect immediately and permanently, removes the account a
 
 ## 13. Third-Party Services
 
-EvoChords uses external services including Google (sign-in, fonts and Google Search), Supabase (database and cloud sync), Cloudflare (web infrastructure) and LRCLIB (lyrics search).
+EvoChord uses external services including Google (sign-in, fonts and Google Search), Supabase (database and cloud sync), Cloudflare (web infrastructure) and LRCLIB (lyrics search).
 
 Their use is subject to each provider's terms and policies. Evolution Digital Studio has no full control over the availability or policy changes of third-party services, including the completeness and accuracy of lyrics from search services.
 
 ## 14. Fees and Monetisation
 
-At the launch of version 1.0, EvoChords is free, with no subscription fee and no ads.
+At the launch of version 1.0, EvoChord is free, with no subscription fee and no ads.
 
 Evolution Digital Studio may develop paid services or other business models in the future. If a change affects fees or these terms, users will be notified before it takes effect.
 
 ## 15. Availability and Changes
 
-Evolution Digital Studio works to keep EvoChords running well. The service may still be interrupted by maintenance, updates, network problems, device failures or third-party outages.
+Evolution Digital Studio works to keep EvoChord running well. The service may still be interrupted by maintenance, updates, network problems, device failures or third-party outages.
 
 Evolution Digital Studio may update, change or discontinue parts of the service as development and operations require.
 
 ## 16. Limitation of Liability
 
-EvoChords is provided as is and as available. Evolution Digital Studio does not guarantee that the service will always be available without interruption or completely free of errors.
+EvoChord is provided as is and as available. Evolution Digital Studio does not guarantee that the service will always be available without interruption or completely free of errors.
 
 To the extent permitted by applicable law, Evolution Digital Studio is not liable for data loss caused by device damage, clearing local data, sync failures, lost backup files, notes or accounts deleted by the user, or third-party outages beyond our reasonable control.
 
@@ -152,7 +152,7 @@ These terms do not limit any rights you have that cannot be waived under applica
 
 ## 17. Ending Use
 
-You can stop using EvoChords at any time and delete your account yourself.
+You can stop using EvoChord at any time and delete your account yourself.
 
 Evolution Digital Studio may limit, suspend or end access if it finds abuse of the service or a breach of these terms, as described in section 9, in line with applicable law.
 
@@ -166,7 +166,7 @@ These Terms of Service are governed by the laws of the Republic of Indonesia, wi
 
 ## 20. Contact
 
-For questions, help or information about using EvoChords:
+For questions, help or information about using EvoChord:
 
 Evolution Digital Studio
 Website: https://evochord.evolution-official-id.workers.dev

@@ -1,4 +1,4 @@
-/* ===== EvoChords: Nashville numbers (file 61) =====
+/* ===== EvoChord: Nashville numbers (file 61) =====
    A switch in the Key panel (song screen) shows every chord as its number in the song key: 1, 2m, 3m, 4, 5, 6m, 5/7, b7 …
    (EvoCore.chord.toNashville). Display only, like the transpose: the saved chords stay letters, and the numbers do not
    change when the song is transposed. Remembered on this device ('evo.nashville'). Needs a key (the song's key, else its
