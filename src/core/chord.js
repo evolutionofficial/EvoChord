@@ -134,3 +134,18 @@ export function normKey(key) {
   const pick = { 'C#': 'Db', 'D#': 'Eb', 'F#': 'F#', 'G#': 'Ab', 'A#': 'Bb' }[m[1]] || m[1];
   return pick + (m[3] || '');
 }
+
+// ---------------------------------------------------------------------------
+// Nashville Number System: a chord as its scale degree in the song key (C in C = 1, Dm = 2m, G/B = 5/7, Bb = b7).
+// Degrees count from the key's tonic with major-scale steps, so a minor key reads 1m, b3, 4m, 5, b6, b7. The quality
+// stays as written (7, maj7, sus4, m7b5 …). Numbers do not change when the song is transposed.
+const DEGREE = ['1', 'b2', '2', 'b3', '3', '4', '#4', '5', 'b6', '6', 'b7', '7'];
+
+/** @returns {string} the chord as a number, or the name unchanged when the key or the chord cannot be read */
+export function toNashville(name, key) {
+  const p = parseChord(name), k = parseChord(normKey(key));
+  if (!p || !k) return name;
+  const tonic = pitchClass(k.root + k.acc);
+  const deg = (note) => DEGREE[((pitchClass(note) - tonic) % 12 + 12) % 12];
+  return deg(p.root + p.acc) + p.quality + (p.bass ? '/' + deg(p.bass) : '');
+}

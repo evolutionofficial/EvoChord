@@ -24,4 +24,18 @@ test('Key: a minor key lists minor keys',async()=>{
   eq(o.every(s=>s.endsWith('m')),true,'every option is minor');
   eq(o.includes('Am'),true,'Am is listed');
   eq(t.errors,[],'no page errors');await t.close()});
+test('Key: Nashville numbers – 1 2 3 shows chords as numbers in the song key; they stay when transposed; letters are saved',async()=>{
+  const t=await open(),p=t.page;
+  await p.evaluate(()=>{localStorage.removeItem('evo.nashville');songs[0].lyrics='[Verse]\npagi datang perlahan\nsampai pagi tiba';songs[0].key='C';songs[0].chords=[{l:1,c:0,n:'C'},{l:1,c:6,n:'G/B'},{l:2,c:0,n:'Am'},{l:2,c:6,n:'Bb'}];save();openSong(songs[0])});
+  await p.waitForTimeout(400);
+  const shown=()=>p.evaluate(()=>[...document.querySelectorAll('#txt .chd')].map(e=>e.dataset.c).join(' '));
+  eq(await shown(),'C G/B Am Bb','letters by default');
+  await p.click('#tpb');await p.waitForTimeout(250);await p.click('#tpn');await p.waitForTimeout(250);
+  eq(await shown(),'1 5/7 6m b7','numbers');
+  await p.evaluate(()=>tpSet(2));await p.waitForTimeout(250);
+  eq(await shown(),'1 5/7 6m b7','numbers do not change with transpose');
+  eq(await p.evaluate(()=>[songs[0].chords.map(x=>x.n).join(' '),localStorage.getItem('evo.nashville')]),['C G/B Am Bb','1'],'saved chords are letters; the choice is remembered');
+  await p.click('#tpn');await p.waitForTimeout(250);
+  eq(await shown(),'D A/C# Bm C','letters again, transposed');
+  eq(t.errors,[],'no page errors');await t.close()});
 };

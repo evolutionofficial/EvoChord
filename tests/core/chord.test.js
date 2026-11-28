@@ -92,3 +92,19 @@ describe('extensions and altered chords', () => {
   });
   it('still not a chord', () => { for (const x of ['Cx', 'H7', 'C/9', 'Calt7b']) expect(pc(x), x).toBeNull(); });
 });
+
+import { toNashville } from '../../src/core/chord.js';
+describe('Nashville numbers', () => {
+  it('major key', () => {
+    expect(['C', 'Dm', 'Em', 'F', 'G', 'Am', 'Bdim', 'G/B', 'Bb', 'G7', 'Fmaj7', 'Dsus4', 'E7', 'Ab'].map((c) => toNashville(c, 'C')))
+      .toEqual(['1', '2m', '3m', '4', '5', '6m', '7dim', '5/7', 'b7', '57', '4maj7', '2sus4', '37', 'b6']);
+  });
+  it('other keys and spellings', () => {
+    expect(['D', 'F#m', 'D/F#', 'A7', 'C#m7b5'].map((c) => toNashville(c, 'D'))).toEqual(['1', '3m', '1/3', '57', '7m7b5']);
+    expect(['Bb', 'Eb', 'F/A', 'Gm'].map((c) => toNashville(c, 'A#/Bb'))).toEqual(['1', '4', '5/7', '6m']);
+  });
+  it('minor key counts from its tonic', () => {
+    expect(['Am', 'C', 'Dm', 'E', 'F', 'G'].map((c) => toNashville(c, 'Am'))).toEqual(['1m', 'b3', '4m', '5', 'b6', 'b7']);
+  });
+  it('no key: unchanged', () => expect(toNashville('G', '')).toBe('G'));
+});
