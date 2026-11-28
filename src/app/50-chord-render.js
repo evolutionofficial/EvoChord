@@ -44,12 +44,20 @@ const chordMeasure=document.createElement('canvas').getContext('2d');
 function chordLabelWidth(a){const cs=getComputedStyle(a,'::before');
   chordMeasure.font=(cs.fontStyle||'normal')+' '+(cs.fontWeight||'800')+' '+(cs.fontSize||'16px')+' '+(cs.fontFamily||'sans-serif');
   return chordMeasure.measureText(a.dataset.c||'').width}
-function chordSpace(t){if(!t)return;
-  t.querySelectorAll('.ln.hasch').forEach(line=>{const as=[...line.querySelectorAll('.chd')];as.forEach(a=>{a.style.marginLeft=''});
-    let right=-1e9,top=null;
-    for(const a of as){let r=a.getBoundingClientRect();
-      if(top!==null&&Math.abs(r.top-top)<2&&r.left<right){a.style.marginLeft=(right-r.left).toFixed(1)+'px';r=a.getBoundingClientRect()}
-      const gap=parseFloat(getComputedStyle(a,'::before').fontSize||'12')*.45;
-      right=r.left+chordLabelWidth(a)+gap;top=r.top}})}
+/* Keep chord names apart without breaking words. Per visual row: each name starts at its letter, then a name that
+   would overlap the one before it moves right; if that pushes names past the right edge, they move back left
+   (names may then sit a little before their letter). The label moves (--dx), the text stays: "beri" stays "beri"
+   under "D#m G#m". Only a row with more names than fit above it gets space pushed into the text, as before. */
+function chordSpace(t){if(!t)return;const tr=t.getBoundingClientRect();
+  t.querySelectorAll('.ln.hasch').forEach(line=>{const as=[...line.querySelectorAll('.chd')];as.forEach(a=>{a.style.marginLeft='';a.style.removeProperty('--dx')});
+    if(!as.length)return;const fs=parseFloat(getComputedStyle(as[0],'::before').fontSize||'12'),gap=fs*.45,minL=tr.left+fs*.2,maxR=tr.right-fs*.2;
+    const rows=[];as.forEach(a=>{const r=a.getBoundingClientRect(),row=rows[rows.length-1];
+      const it={a,x:r.left,w:chordLabelWidth(a)};if(row&&Math.abs(row.top-r.top)<2)row.items.push(it);else rows.push({top:r.top,items:[it]})});
+    rows.forEach(({items})=>{const pos=items.map(it=>it.x);
+      for(let k=1;k<items.length;k++)pos[k]=Math.max(pos[k],pos[k-1]+items[k-1].w+gap);
+      const n=items.length-1;if(pos[n]+items[n].w>maxR){pos[n]=maxR-items[n].w;for(let k=n-1;k>=0;k--)pos[k]=Math.min(pos[k],pos[k+1]-gap-items[k].w)}
+      if(pos[0]<minL){ // too many names for the space above this row: push the text apart instead
+        let right=-1e9;items.forEach(it=>{let x=it.a.getBoundingClientRect().left;if(x<right){it.a.style.marginLeft=(right-x).toFixed(1)+'px';x=it.a.getBoundingClientRect().left}right=x+it.w+gap});return}
+      items.forEach((it,k)=>{const dx=pos[k]-it.x;if(Math.abs(dx)>0.5)it.a.style.setProperty('--dx',dx.toFixed(1)+'px')})})})}
 if(window.ResizeObserver){let rw=0,rh=0;new ResizeObserver(es=>{const r=es[0].contentRect;if(Math.abs(r.width-rw)>1||Math.abs(r.height-rh)>1){rw=r.width;rh=r.height;chordSpaceSoon()}}).observe($('#txt'))}
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(chordSpaceSoon);
