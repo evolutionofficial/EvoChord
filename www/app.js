@@ -3231,7 +3231,8 @@ function chMoveUI(){const k=$('#chkb');if(!k||!chs)return;
 
 // Toolbar switch "Per section" (#eLk), after #eCt (or #eN).
 (function(){const after=$('#eCt')||$('#eN');if(!after||$('#eLk'))return;
-  const b=E('button','',L('Per section','Per bagian'));b.id='eLk';b.type='button';
+  const b=E('button','');b.id='eLk';b.type='button';b.setAttribute('aria-label',L('Per section','Per bagian'));b.title=L('Per section: an edit goes to every section of the same kind','Per bagian: edit berlaku ke semua bagian sejenis');
+  b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>';
   const paint=()=>{const on=oeLinked();b.classList.toggle('on',on);b.setAttribute('aria-pressed',on?'true':'false')};
   b.onclick=()=>{try{localStorage.setItem('evo.linkSections',oeLinked()?'0':'1')}catch(e){}paint()};
   paint();after.after(b)})();
@@ -3239,8 +3240,9 @@ function chMoveUI(){const k=$('#chkb');if(!k||!chs)return;
 $('#chtx').addEventListener('pointerdown',chDragDown);
 $('#chkb').addEventListener('pointerdown',chMvPress);
 
-/* The key is part of the undo history (the editor's transpose changes it): a key picked by hand is its own step. */
-$('#ek').addEventListener('change',()=>{if(typeof oe==='object'&&oe&&chs)oeSnap()});
+/* The key is part of the undo history (the editor's transpose changes it): a key picked by hand is its own step,
+   together with the chords it moved (oeKeyChanged, 60). */
+$('#ek').addEventListener('change',()=>{if(typeof oe==='object'&&oe&&chs){oeKeyChanged();oeSnap()}});
 /* ===== src/app/60-smart-tools.js ===== */
 /* ===== EvoChords: smart tools (file 60) =====
    Long press on a chord button (family row, recent chords, a root letter) opens its variants; the toolbar has
@@ -3376,9 +3378,10 @@ function smTranspose(){
 
 // ---- toolbar: Pattern and ♯♭ after "Per section" ----
 (function(){const after=$('#eLk');if(!after||$('#ePt'))return;
-  const pt=E('button','',L('Pattern','Pola'));pt.id='ePt';pt.type='button';
+  const pt=E('button','');pt.id='ePt';pt.type='button';pt.setAttribute('aria-label',L('Pattern','Pola'));pt.title=L('Fill a chord progression','Isi progresi chord');
+  pt.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m17 2 4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>';
   pt.onclick=()=>{if(!chs||chs.sel<0){note(L('Pick a box in the section first','Pilih kotak di bagian itu dulu'),true);return}smPattern()};
-  const tp=E('button','','♯♭');tp.id='eTp';tp.type='button';tp.setAttribute('aria-label',L('Transpose','Transpose'));
+  const tp=E('button','','♯♭');tp.id='eTp';tp.type='button';tp.setAttribute('aria-label',L('Transpose','Transpose'));tp.title=L('Transpose the chords','Transpose chord');
   tp.onclick=()=>{if(chs)smTranspose()};
   after.after(pt);pt.after(tp);smPatBtn()})();
 
@@ -3397,3 +3400,21 @@ chDragMove=(function(orig){return function(e){const d=chDrag;
   return orig.apply(this,arguments)}})(chDragMove);
 
 oeStart=(function(orig){return function(){smRp=null;smRpHide();smLpClose();orig.apply(this,arguments);if(oe)oe.tpBase=null}})(oeStart);
+
+/* The key as anchor: once a song has its key, picking another key in the editor moves every chord with it
+   (C → D: C becomes D, Am becomes Bm). Setting the first key, or switching between a key and its relative
+   (C ↔ Am), only names the key. Same transpose as the ♯♭ sheet and the song screen; back to the old key gives the
+   exact old names. Called by the #ek change listener (59) before it takes the undo step, so key + chords are one step. */
+function oeKeyChanged(){if(!chs||!oe)return;
+  let prev='';try{prev=JSON.parse(oe.undo[oe.ui]).key||''}catch(e){}
+  const C=EvoCore.chord,a=C.normKey(prev),b=C.normKey($('#ek').value),pa=C.parseChord(a),pb=C.parseChord(b);
+  if(!pa||!pb||!chNow().length)return;
+  const minor=p=>/^m(?!aj)/.test(p.quality);if(minor(pa)!==minor(pb))return;
+  let s=((C.pitchClass(pb.root+pb.acc)-C.pitchClass(pa.root+pa.acc))%12+12)%12;if(s>6)s-=12;if(!s)return;
+  const cj=JSON.stringify(chNow()),kb=oe.keyBase;let chords;
+  if(kb&&kb.last===cj){kb.total+=s;chords=kb.total%12?kb.chords.map(x=>({...x,n:C.transposeTo(x.n,kb.total,b)})):kb.chords.map(x=>({...x}))}
+  else{const base=JSON.parse(cj);oe.keyBase={chords:base,total:s};chords=base.map(x=>({...x,n:C.transposeTo(x.n,s,b)}))}
+  oe.busy=1;try{oeApply(chords)}finally{oe.busy=0}
+  oe.keyBase.last=JSON.stringify(chNow());oe.tpBase=null;
+  note(L(`Chords moved to ${b}.`,`Chord dipindah ke ${b}.`))}
+oeStart=(function(orig){return function(){orig.apply(this,arguments);if(oe)oe.keyBase=null}})(oeStart);
