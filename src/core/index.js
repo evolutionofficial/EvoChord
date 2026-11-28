@@ -4,3 +4,4 @@ export * as song from './song.js';
 export * as beats from './beats.js';
 export * as sheet from './chordsheet.js';
 export * as remap from './remap.js';
+export * as lineedit from './lineedit.js';

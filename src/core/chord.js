@@ -6,8 +6,10 @@ const FLAT = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 const PC = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 
 // Root, accidental, quality/extensions, optional slash bass.
-// Accepts the spellings found on Indonesian chord sites: Am7, C#m, Bbmaj7, Dsus4, Cadd9, G/B, F#m7b5, Cdim, Caug, C+, Em(add9) is NOT accepted.
-const CHORD_RE = /^([A-G])([#b]?)((?:maj|min|m|M|dim|aug|sus|add|\+|°|ø)?\d*(?:(?:sus|add|maj|b|#|\+|-)?\d+)*)(?:\/([A-G])([#b]?))?$/;
+// Accepts the spellings found on Indonesian chord sites: Am7, C#m, Bbmaj7, Dsus4, Cadd9, G/B, F#m7b5, Cdim, Caug, C+,
+// extensions and alterations (C9, C11, C13, C7b9, C7#11, C7#5, Cmaj7#11, C7alt, C6/9) and a part in brackets (C7(b9), Em(add9)).
+const QUALITY = String.raw`(?:maj|min|m|M|dim|aug|sus|add|\+|°|ø)?(?:\d+|alt|sus\d*|add\d+|maj\d+|[b#+-]\d+|(?<=6)\/9|\((?:add|sus|maj|[b#+-])?\d+(?:,\s?(?:[b#+-])?\d+)*\))*`;
+const CHORD_RE = new RegExp(String.raw`^([A-G])([#b]?)(${QUALITY})(?:\/([A-G])([#b]?))?$`);
 
 /** @returns {{root:string, acc:string, quality:string, bass:string|null}|null} */
 export function parseChord(name) {

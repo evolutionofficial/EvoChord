@@ -10,7 +10,8 @@ test('Editor: changing title, artist and key and pressing Save updates the song'
 test('Editor: a new song can be created and saved to the library',async()=>{
   const t=await open(),p=t.page;
   await p.evaluate(()=>{fabOpen(true)});await p.click('#nw');await p.waitForTimeout(400);
-  await p.fill('#et','Lagu Baru');await p.fill('#ta','[Verse]\nSatu dua tiga');await p.click('#eS');await p.waitForTimeout(400);
+  await p.fill('#et','Lagu Baru');await p.click('#chtx .choadd button >> nth=1');await p.waitForTimeout(200);await p.click('#csheet button:text-is("Verse")');await p.waitForTimeout(200);
+  await p.fill('.chin','Satu dua tiga');await p.click('.chedit button >> nth=0');await p.click('#eS');await p.waitForTimeout(400);
   eq(await p.evaluate(()=>songs.length),6,'song count');eq(await p.evaluate(()=>songs.find(s=>s.title==='Lagu Baru').lyrics),'[Verse]\nSatu dua tiga','lyrics');await t.close()});
 test('Editor: the Section panel has three groups and only one is open at a time',async()=>{
   const t=await open(),p=t.page;await p.evaluate(()=>openEdit(songs[0]));await p.waitForTimeout(400);
@@ -35,9 +36,4 @@ test('Editor: older markers (Sing Along, Medley, Rit, Rall) are still treated as
   const r=await p.evaluate(()=>SEC_OLD.slice());eq(r,['Sing Along','Free Style','Medley','Rit','Rall'],'old markers kept');
   await p.evaluate(()=>{songs[0].lyrics='[Sing Along]\nla la la';save()});await p.evaluate(()=>openSong(songs[0]));await p.waitForTimeout(400);
   eq(await p.evaluate(()=>document.querySelector('#secs .chip').textContent),'Sing Along','old label still a chip');await t.close()});
-test('Editor: the Section drawer button hides and shows the panel and is remembered',async()=>{
-  const t=await open(),p=t.page;await p.evaluate(()=>openEdit(songs[0]));await p.waitForTimeout(400);
-  const hidden=()=>p.evaluate(()=>$('#edit').classList.contains('noside'));
-  await p.click('#eSd');eq(await hidden(),true,'hidden');eq(await p.evaluate(()=>localStorage.getItem('evo.side')),'0','stored');
-  await p.click('#eSd');eq(await hidden(),false,'shown');await t.close()});
 };

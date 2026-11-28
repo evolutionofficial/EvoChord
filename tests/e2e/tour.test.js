@@ -21,7 +21,7 @@ test('Tour: starts by itself once for a new user (empty library) and walks Home 
   await p.evaluate(()=>show('list'));await p.waitForTimeout(1500);
   eq(await p.$('#tour'),null,'shown once');
   eq(t.errors,[],'no page errors');await t.close()});
-test('Tour: Auto Section labels the demo song in the editor, and the lyrics screen shows those sections',async()=>{
+test('Tour: the demo song in the editor has section labels, and the lyrics screen shows those sections',async()=>{
   const t=await open({tour:true}),p=t.page;await p.evaluate(()=>tourStart());
   for(let k=0;k<6;k++){await p.waitForTimeout(450);await p.click('#tour .tnx')}
   await p.waitForTimeout(500);
