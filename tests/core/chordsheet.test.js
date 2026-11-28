@@ -177,3 +177,30 @@ describe('page furniture', () => {
     expect(r.lyrics).toBe('lirik terakhir');
   });
 });
+
+describe('Chordtela: "[[VERSI ORIGINAL]]" divider and author notes (Mahen – Pura Pura Lupa)', () => {
+  const a = (c) => `<a class="tbi-tooltip">${c}</a>`;
+  const page = '<pre>Chord naik 1 fret\n\nIntro : ' + a('C') + ' ' + a('G') + '\n\n' +
+    a('C') + '      ' + a('G') + '\npernah aku jatuh hati\n\n' +
+    'Catatan :\nChord sudah disederhanakan.\n\n[[VERSI ORIGINAL]]\n\nIntro : ' + a('D') + ' ' + a('A/C#') + '\n\n' +
+    a('B') + '      ' + a('F#/Bb') + '\npernah aku jatuh hati</pre>';
+  it('opens the original version and drops the notes', () => {
+    const r = parseChordtelaHtml(page);
+    expect(r.versions.map((v) => v.name)).toEqual(['Chord dasar', 'Versi original']);
+    expect(r.main).toBe(1);
+    expect(r.chords.map((c) => c.n)).toEqual(['D', 'A/C#', 'B', 'F#/Bb']);
+    for (const v of r.versions) {
+      expect(v.lyrics).not.toMatch(/VERSI ORIGINAL|Catatan|disederhanakan|naik 1 fret/i);
+    }
+  });
+  it('other divider spellings', () => {
+    for (const d of ['[Versi Asli]', '**ORIGINAL VERSION**', 'Versi Original', 'VERSI ORIGINAL :']) {
+      const r = parseChordtelaHtml('<pre>' + a('C') + '\nsatu\n\n' + d + '\n\n' + a('D') + '\nsatu</pre>');
+      expect([d, r.main, r.chords[0].n]).toEqual([d, 1, 'D']);
+    }
+  });
+  it('a section label is not a divider', () => {
+    const r = parseChordtelaHtml('<pre>[Chorus]\n' + a('C') + '\nsatu\n[Verse]\n' + a('D') + '\ndua</pre>');
+    expect(r.versions).toHaveLength(1);
+  });
+});

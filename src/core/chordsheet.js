@@ -83,6 +83,8 @@ const CAPO_RE = /\bcapo\b[^\d\n]{0,14}?(\d{1,2})\b/i;
 const BACK_RE = /^\s*\*?\s*(?:back\s+to|kembali\s+ke|balik\s+ke|repeat|ulang(?:i)?|ke)\s+(reff?|chorus|refrain|verse|bait|intro|bridge|pre[- ]?chorus)\b/i;
 // Page furniture after the song (share buttons, related songs, footer): everything from here on is dropped.
 const STOP_RE = /^\s*(?:share\b|bagikan\b|chord\s+kunci\s+gitar\s+terkait|lagu\s+terkait|about\s+us\b|copyright\b)/i;
+// Notes from the page's author, not part of the song: "Catatan : …", "Chord sudah disederhanakan.", "Chord naik 1 fret".
+const NOTE_RE = /^\s*(?:catatan|note|keterangan|ket)\s*:|^\s*(?:semua\s+)?chord\s+(?:sudah\s+)?(?:di)?(?:sederhana(?:kan)?|naik(?:kan)?|turun(?:kan)?|ubah)\b|^\s*(?:chord\s+)?(?:naik|turun)\s+\d+(?:[.,]5)?\s*(?:fret|nada|semitone|step|kunci)\b/i;
 const SKIP_RE = /^\s*(?:\*+|chord\s+by|kunci\s+gitar|add\s+to\s+playlist|tuning|original\s+key|capo|strum|genre\s*:|lirik\s*(?:oleh|by|:)|lyrics?\s+by|\(?\s*\d+\s*x\s*\)?$)/i;
 
 // ---------------------------------------------------------------------------
@@ -168,7 +170,7 @@ export function parseChordSheet(text, opts = {}) {
       if (sec) copySection(sec);
       continue;
     }
-    if (SKIP_RE.test(tr)) continue;
+    if (SKIP_RE.test(tr) || (tr.length < 80 && NOTE_RE.test(tr))) continue;
 
     // Section label at the start (blanked out so chord columns stay aligned).
     const lab = readLabel(line, isChordsOrEmpty);
@@ -361,6 +363,10 @@ function pageTitle(html) {
 // Chordtela pages often hold an easy "chord dasar" version first and the original version after a divider.
 // "===ORIGINAL VERSION===", "===ORIGINAL CHORD===", "== VERSI ASLI =="
 const VERSION_SPLIT = /^\s*(?:-{3,}\s*)?={2,}\s*([^=\n]*?(?:version|versi|chord|original|asli)[^=\n]*?)\s*={2,}\s*$/im;
+// Other ways pages write the divider: "[[VERSI ORIGINAL]]", "[Versi Asli]", "**ORIGINAL VERSION**", or the words alone on a line.
+// They are rewritten to the "===…===" form before splitting.
+const VERSION_ALT = /^[ \t]*(?:\[{1,2}[ \t]*([^\[\]\n]*?(?:versi|version)[^\[\]\n]*?)[ \t]*\]{1,2}|\*{2,}[ \t]*([^*\n]*?(?:versi|version|original|asli)[^*\n]*?)[ \t]*\*{2,}|((?:versi|version)[ \t]+(?:original|asli)|original[ \t]+(?:version|chord)))[ \t]*:?[ \t]*$/gim;
+const normalizeDividers = (text) => text.replace(VERSION_ALT, (m, a, b, c) => '===' + (a || b || c).trim() + '===');
 const VERSION_NOISE = /^\s*(?:-{3,}|lihat\s+pula\b.*|.*\bversi\s+chord\b.*)\s*$/gim;
 
 /**
@@ -379,7 +385,7 @@ export function parseChordtelaHtml(html, url = '') {
 
 function parseVersions(text, html, url) {
   const head = pageTitle(html);
-  const parts = text.split(VERSION_SPLIT); // [first, label, second, ...]
+  const parts = normalizeDividers(text).split(VERSION_SPLIT); // [first, label, second, ...]
   const versions = [];
   for (let k = 0; k < parts.length; k += 2) {
     const chunk = parts[k].replace(VERSION_NOISE, '');
