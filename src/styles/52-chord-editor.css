@@ -26,3 +26,5 @@
 #chkb .chfam button{flex:1 0 auto;min-width:38px;padding:8px 5px;border-radius:12px;border:1px solid rgba(240,160,75,.45);background:rgba(240,160,75,.12);color:var(--acct);font:800 14px/1 'Bricolage Grotesque',system-ui,sans-serif}
 #chkb .chfam button.on{background:var(--acc);color:#15110e}
 #chkb .chfam[hidden]{display:none}
+/* 56: the fourth key row has four wider keys */
+#chkb .kr:has(> [data-k="alt"]) button{flex:1}

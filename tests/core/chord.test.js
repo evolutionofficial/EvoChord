@@ -79,3 +79,16 @@ describe('normKey', () => {
   });
   it('family of an editor pair', () => { expect(chordFamily('A#/Bb')[0]).toBe('Bb'); });
 });
+
+import { parseChord as pc, transposeChord as tc } from '../../src/core/chord.js';
+describe('extensions and altered chords', () => {
+  it('parse and transpose', () => {
+    for (const [a, b] of [['C9', 'D9'], ['C11', 'D11'], ['C13', 'D13'], ['C7b9', 'D7b9'], ['C7#9', 'D7#9'], ['C7#11', 'D7#11'], ['C7b13', 'D7b13'],
+      ['C7#5', 'D7#5'], ['Cm7b5', 'Dm7b5'], ['Cmaj7#11', 'Dmaj7#11'], ['C7alt', 'D7alt'], ['C6/9', 'D6/9'], ['C7(b9)', 'D7(b9)'], ['Em(add9)', 'F#m(add9)'],
+      ['C13/E', 'D13/F#'], ['C9sus4', 'D9sus4'], ['C5', 'D5']]) {
+      expect(pc(a), a).not.toBeNull();
+      expect(tc(a, 2)).toBe(b);
+    }
+  });
+  it('still not a chord', () => { for (const x of ['Cx', 'H7', 'C/9', 'Calt7b']) expect(pc(x), x).toBeNull(); });
+});

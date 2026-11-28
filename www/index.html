@@ -841,6 +841,32 @@ select#tpk{flex:1;min-width:64px;text-align:center;font:800 24px/1 'Bricolage Gr
 #chkb .chfam button{flex:1 0 auto;min-width:38px;padding:8px 5px;border-radius:12px;border:1px solid rgba(240,160,75,.45);background:rgba(240,160,75,.12);color:var(--acct);font:800 14px/1 'Bricolage Grotesque',system-ui,sans-serif}
 #chkb .chfam button.on{background:var(--acc);color:#15110e}
 #chkb .chfam[hidden]{display:none}
+/* 56: the fourth key row has four wider keys */
+#chkb .kr:has(> [data-k="alt"]) button{flex:1}
+/* ===== src/styles/55-one-editor.css ===== */
+/* ===== EvoChords: one editor (file 55): the chord grid is the body of the song editor ===== */
+/* the text box, the lyrics toolbar buttons that only the text box needs, and the bars for it are not shown */
+#edit.one .ed,#edit.one #hlbar,#edit.one #notebar,#edit.one #secbar{display:none!important}
+#edit.one #eP,#edit.one #eK,#edit.one #eH,#edit.one #eCho{display:none}
+/* the grid fills the page; the chord keyboard docks at the bottom (it is the last child of #edit) */
+#edit.one #chl{flex:1;min-height:0}
+/* a lyric row with no letters yet is still a row to type in */
+.chrow.chempty{min-height:28px}
+/* the letters part of a box is tappable: it opens the text field */
+.chc .cht{cursor:text}
+/* the row being typed in */
+.chedit{display:flex;gap:6px;align-items:center;margin:6px 0}
+.chin{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px;border-radius:10px;border:1px solid var(--acc);background:var(--card);color:var(--fg);-webkit-user-select:text;user-select:text}
+.chedit .chbtn,.chdel{flex:none;width:36px;height:36px;padding:0;border-radius:50%;border:1px solid var(--ln);background:var(--bg);color:var(--fg);font:700 16px/1 'Atkinson Hyperlegible',sans-serif;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.chedit .chbtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* delete a section label line */
+.chsec .chdel{width:26px;height:26px;margin-left:8px;font-size:15px}
+/* the bottom bar under the rows: + lyric line, + section, + beats */
+.choadd{display:flex;gap:8px;flex-wrap:wrap;padding:12px 0 24px}
+
+#edit.one #eSd,#edit.one #side{display:none!important}
+/* blank lines: no boxes to see, but tapping the row still lets you type into it */
+#chtx .chrow.chempty .chc{opacity:0}
 </style>
 </head>
 <body>
